@@ -78,17 +78,17 @@ class CheckDetailView extends Component {
         )
     }
 
-    renderSubmittedByView(data) {
+    renderSubmittedByView(lineNo, shiftNo, fullName, dateTime) {
         return (
             <View style={[styles.round_white_bg_container, { marginTop: 5 }]}>
                 <Text style={{
                     fontSize: 16, fontWeight: "bold",
                     color: appPinkColor, marginBottom: 5
                 }}>Submitted By</Text>
-                {this.renderTVRow("Name", "Jahnzaib Ramzan")}
-                {this.renderTVRow("Working Line(s)", "1")}
-                {this.renderTVRow("Working Shift", "Morning")}
-                {this.renderTVRow("Date & Time", "4 Jan 2019 12:00:00")}
+                {fullName != undefined && this.renderTVRow("Name", fullName)}
+                {lineNo != undefined && this.renderTVRow("Working Line(s)", lineNo)}
+                {shiftNo != undefined && this.renderTVRow("Working Shift", shiftNo)}
+                {dateTime != undefined && this.renderTVRow("Date & Time", dateTime)}
             </View>
         )
     }
@@ -157,7 +157,7 @@ class CheckDetailView extends Component {
                         })
                     }
                 </View>
-                
+
             </View>
         )
     }
@@ -186,8 +186,13 @@ class CheckDetailView extends Component {
                     <View style={{ flex: 1 }}>
 
                         <ScrollView style={{ flex: 1 }}>
-                            {this.renderSubmittedByView("dfsd")}
                             {this.renderCheckView(this.state.checkDetail[0], 0)}
+                            {this.renderSubmittedByView(
+                                this.state.checkDetail[0].line_no,
+                                this.state.checkDetail[0].shift_no,
+                                this.state.checkDetail[0].full_name,
+                                this.state.checkDetail[0].complete_datetime
+                            )}
                         </ScrollView>
 
                         <View style={{ flexDirection: "row", padding: 10 }}>

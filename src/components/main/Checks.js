@@ -13,7 +13,6 @@ import Modal from "react-native-modal";
 import WebHandler from "../../data/remote/WebHandler"
 import LocalDBManager from "../../data/local/LocalDBManager"
 import firebase from 'react-native-firebase';
-import type { RemoteMessage } from 'react-native-firebase';
 
 const localDB = new LocalDBManager()
 const webHandler = new WebHandler()
@@ -55,7 +54,7 @@ class Checks extends Component {
     async setUpForMessaging() {
         const enabled = await firebase.messaging().hasPermission();
         if (enabled) {
-            this.messageListener = firebase.messaging().onMessage((message: RemoteMessage) => {
+            this.messageListener = firebase.messaging().onMessage((message) => {
                 // Process your message when app is visible to user
                 var data = JSON.parse(message.data.data);
                 this.showMessage(data.title, data.message)
@@ -135,12 +134,12 @@ class Checks extends Component {
         return (
             <View style={{ flexDirection: "row", backgroundColor: appPinkColor, padding: 10 }}>
                 <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>2</Text>
+                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
                     <Text style={{ color: "#fff", fontSize: 14 }}>PENDING</Text>
                 </View>
                 <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>0</Text>
-                    <Text style={{ color: "#fff", fontSize: 14 }}>ACCEPTED</Text>
+                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
+                    <Text style={{ color: "#fff", fontSize: 14 }}>REVIEWED</Text>
                 </View>
             </View>
         )

@@ -3,9 +3,6 @@ import Urls from "./Urls"
 import LocalDBManager from "../local/LocalDBManager"
 
 import CryptoJS from "crypto-js"
-import sha256 from 'crypto-js/sha256';
-import hmacSHA512 from 'crypto-js/hmac-sha512';
-import Base64 from 'crypto-js/enc-base64';
 
 const API_KEY = "3ec00dddc00e1dec3115457b0e317c9fb1c34db2";
 const prefManager = new PrefManager();
