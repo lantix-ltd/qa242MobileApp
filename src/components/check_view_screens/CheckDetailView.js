@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {
-    View, Text, Image, StyleSheet, FlatList, ScrollView,
+    View, Text, Image, StyleSheet, TextInput, ScrollView,
     TouchableHighlight, TouchableOpacity, ActivityIndicator
 } from "react-native";
 import { RadioButton } from "react-native-paper"
@@ -35,7 +35,8 @@ class CheckDetailView extends Component {
             checkDetail: [],
             isError: false, errorMsg: "",
             checkQuesRefs: [],
-            isFormSubmitting: false
+            isFormSubmitting: false,
+            reviewerComment: ""
         }
     }
 
@@ -84,11 +85,33 @@ class CheckDetailView extends Component {
                 <Text style={{
                     fontSize: 16, fontWeight: "bold",
                     color: appPinkColor, marginBottom: 5
-                }}>Submitted By</Text>
+                }}>Submitted By:</Text>
                 {fullName != undefined && this.renderTVRow("Name", fullName)}
                 {lineNo != undefined && this.renderTVRow("Working Line(s)", lineNo)}
                 {shiftNo != undefined && this.renderTVRow("Working Shift", shiftNo)}
                 {dateTime != undefined && this.renderTVRow("Date & Time", dateTime)}
+            </View>
+        )
+    }
+
+    renderCommentView() {
+        return (
+            <View style={[styles.round_white_bg_container, { marginTop: 5 }]}>
+                <Text style={{
+                    fontSize: 16, fontWeight: "bold",
+                    color: appPinkColor, marginBottom: 5
+                }}>Your Comment (If Any) :</Text>
+                <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    keyboardType='number-pad'
+                    returnKeyType="done"
+                    value={this.state.reviewerComment}
+                    numberOfLines={1}
+                    multiline={false}
+                    placeholder='Type here'
+                    onChangeText={(text) => this.setState({ reviewerComment: text })}
+                    placeholderTextColor='#797979' />
             </View>
         )
     }
@@ -103,7 +126,7 @@ class CheckDetailView extends Component {
                 {item.questions.map((quest, q_index) => {
                     return (
                         <View key={q_index}>
-                            {quest.question_type === "Choice" &&
+                            {(quest.question_type === "Dropdown" || quest.question_type === "Fixed") &&
                                 <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
                                     <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
                                         {(q_index + 1) + ". "}
@@ -193,6 +216,7 @@ class CheckDetailView extends Component {
                                 this.state.checkDetail[0].full_name,
                                 this.state.checkDetail[0].complete_datetime
                             )}
+                            {this.renderCommentView()}
                         </ScrollView>
 
                         <View style={{ flexDirection: "row", padding: 10 }}>
@@ -225,8 +249,17 @@ class CheckDetailView extends Component {
     }
 
     acceptData() {
-        MyUtils.showSnackbar("Added to reviewed successfully", "")
-        this.props.navigation.goBack()
+        this.setState({ isFormSubmitting: true })
+        webHandler.submitAsReviewd(this.state.checkId, this.state.reviewerComment,
+            (responseJson) => {
+                MyUtils.showSnackbar("Added to reviewed successfully", "")
+                this.setState({ isFormSubmitting: false })
+                this.props.navigation.state.params.onReload()
+                this.props.navigation.goBack();
+            }, (error) => {
+                alert(error)
+                this.setState({ isFormSubmitting: false })
+            })
     }
 
     renderImageFileView(item, index) {

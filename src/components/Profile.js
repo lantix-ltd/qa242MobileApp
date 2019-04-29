@@ -5,7 +5,9 @@ import { defTextInputStyle, defButtonContainer, defButtonText, appGreyColor } fr
 import Icon from 'react-native-vector-icons/Feather';
 import MyUtils from "../utils/MyUtils"
 import PrefManager from "../data/local/PrefManager"
+import WebHandler from "../data/remote/WebHandler"
 
+const webHandler = new WebHandler()
 const prefManager = new PrefManager()
 class Profile extends Component {
 
@@ -26,6 +28,7 @@ class Profile extends Component {
                 this.setState({
                     first_name: result.fname,
                     last_name: result.lname,
+                    email: result.email,
                     contact_no: result.mobileNo
                 })
             }
@@ -107,9 +110,18 @@ class Profile extends Component {
     updateInfo() {
         var fname = this.state.first_name.toString()
         var lname = this.state.last_name.toString()
-        var mobNo = this.state.first_name.toString()
+        var mobNo = this.state.contact_no.toString()
         if (fname.trim() != "" && lname.trim() != "" && mobNo.trim() != "") {
-
+            this.setState({ isLoading: true })
+            webHandler.updateUserInfo(fname, lname, mobNo,
+                (responseJson) => {
+                    prefManager.updateUserProfileInfo(fname, lname, mobNo)
+                    this.setState({ isLoading: false })
+                    MyUtils.showSnackbar("Profile updated successfully!", "")
+                }, error => {
+                    this.setState({ isLoading: false })
+                    MyUtils.showSnackbar(error, "")
+                })
         } else {
             MyUtils.showSnackbar("Please fill all required (*) fields", "")
         }

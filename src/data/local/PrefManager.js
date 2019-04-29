@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 const USER_ID_KEY = "@Session:UserId"
 const USER_NAME_KEY = "@Session:UserName"
+const USER_EMAIL_KEY = "@Session:UserEmail"
 const USER_FNAME_KEY = "@Session:UserFName"
 const USER_LNAME_KEY = "@Session:UserLName"
 const USER_MOBNO_KEY = "@Session:UserMobNo"
@@ -34,6 +35,7 @@ export default class PrefManager {
         try {
             await AsyncStorage.setItem(USER_ID_KEY, userData.userId.toString());
             await AsyncStorage.setItem(USER_NAME_KEY, userData.userName.toString());
+            await AsyncStorage.setItem(USER_EMAIL_KEY, userData.email.toString());
             await AsyncStorage.setItem(USER_PIC_KEY, userData.picPath.toString());
 
             await AsyncStorage.setItem(USER_FNAME_KEY, userData.userFName.toString());
@@ -58,6 +60,7 @@ export default class PrefManager {
         try {
             const id = await AsyncStorage.getItem(USER_ID_KEY);
             const un = await AsyncStorage.getItem(USER_NAME_KEY);
+            const em = await AsyncStorage.getItem(USER_EMAIL_KEY);
 
             const p_gid = await AsyncStorage.getItem(USER_PRIMARY_GID_KEY);
             const p_type = await AsyncStorage.getItem(USER_PRIMARY_TYPE_KEY);
@@ -70,6 +73,7 @@ export default class PrefManager {
             let data = {
                 id: id,
                 username: un,
+                email: em,
                 userPrimaryGId: p_gid,
                 userPrimaryType: p_type,
                 userSecondaryGId: s_gid,
@@ -88,6 +92,7 @@ export default class PrefManager {
         try {
             const id = await AsyncStorage.getItem(USER_ID_KEY);
             const un = await AsyncStorage.getItem(USER_NAME_KEY);
+            const em = await AsyncStorage.getItem(USER_EMAIL_KEY);
             const pic = await AsyncStorage.getItem(USER_PIC_KEY);
             const fn = await AsyncStorage.getItem(USER_FNAME_KEY);
             const ln = await AsyncStorage.getItem(USER_LNAME_KEY);
@@ -95,6 +100,7 @@ export default class PrefManager {
             let data = {
                 id: id,
                 username: un,
+                email: em,
                 userpic: pic,
                 fname: fn,
                 lname: ln,
@@ -103,6 +109,24 @@ export default class PrefManager {
             onResult(data)
         } catch (ex) {
             onResult(null)
+            console.warn(ex.message)
+        }
+    }
+
+    async updateUserProfileInfo(fName, lName, mobileNo) {
+        try {
+            await AsyncStorage.setItem(USER_FNAME_KEY, fName.toString());
+            await AsyncStorage.setItem(USER_LNAME_KEY, lName.toString());
+            await AsyncStorage.setItem(USER_MOBNO_KEY, mobileNo.toString());
+        } catch (ex) {
+            console.warn(ex.message)
+        }
+    }
+
+    async updateUserProfilePic(profilePicUrl) {
+        try {
+            await AsyncStorage.setItem(USER_PIC_KEY, profilePicUrl.toString());
+        } catch (ex) {
             console.warn(ex.message)
         }
     }

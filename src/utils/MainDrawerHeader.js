@@ -9,14 +9,13 @@ import {
 import { NavigationActions, StackActions } from 'react-navigation';
 import ImagePicker from 'react-native-image-crop-picker';
 
-// import WebHandler from '../Data/Remote/WebHandler';
-// import Urls from '../Data/Remote/Routs';
+import WebHandler from '../data/remote/WebHandler';
 import PrefManager from "../data/local/PrefManager"
 import MyUtils from '../utils/MyUtils'
-import { appGreyColor } from './AppStyles';
+import { appGreyColor, appPinkColor } from './AppStyles';
+import Modal from "react-native-modal";
 
-// const webHandler = new WebHandler()
-
+const webHandler = new WebHandler()
 const prefManager = new PrefManager()
 const win = Dimensions.get('window');
 const width = win.width * 70 / 100
@@ -26,7 +25,7 @@ export default class MainDrawerHeader extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            isLoading: true,
+            isLoading: false,
             isImageUploading: false,
             isLoggedIn: true,
             userId: "",
@@ -113,9 +112,25 @@ export default class MainDrawerHeader extends React.Component {
                             }
                         }}
                     />
+                    {this.renderLoadingDialog()}
                 </ScrollView>
             </SafeAreaView>
         );
+    }
+
+    renderLoadingDialog() {
+        return (
+            <Modal
+                isVisible={this.state.isLoading}
+                // onBackdropPress={() => this.setState({ modalVisible: false })}
+                onBackButtonPress={() => this.setState({ isFormSubmitting: false })}
+            >
+                <View style={{ backgroundColor: "#fff", height: 100, justifyContent: "center", alignItems: "center" }}>
+                    <ActivityIndicator size="large" color={appPinkColor} />
+                    <Text>Logging Out...</Text>
+                </View>
+            </Modal>
+        )
     }
 
     async destroyUserSession() {
@@ -133,7 +148,18 @@ export default class MainDrawerHeader extends React.Component {
             "Log Out", "Are you sure to log out?",
             [
                 {
-                    text: 'Yes', onPress: () => { this.destroyUserSession() }
+                    text: 'Yes', onPress: () => {
+                        this.setState({ isLoading: true })
+                        webHandler.logOutUser(
+                            (responseJson) => {
+                                this.setState({ isLoading: false })
+                                this.destroyUserSession()
+                            },
+                            (error) => {
+                                this.setState({ isLoading: false })
+                                MyUtils.showSnackbar("Unable to logout", "")
+                            })
+                    }
                 },
                 {
                     text: 'No', onPress: () => { }
@@ -206,42 +232,17 @@ export default class MainDrawerHeader extends React.Component {
         )
     }
 
-    async updateProfilePic(image) {
-
-        this.setState({ userProfilePic: image.uri, });
-
-        // this.setState({ isImageUploading: true })
-        // let userId = this.state.session.Userid;
-        // var formData = new FormData();
-        // formData.append("user_id", userId)
-        // formData.append("image", { uri: image.uri, name: 'ProfilePic.jpg', type: 'multipart/form-data' })
-
-        // webHandler.Fetchrequests(Urls.ProfilePicUpdate, formData, async (responseJson) => {
-        //     myUtils.showSnackbar("Profile picture updated", "green")
-        //     this.setState({ isImageUploading: false, userProfilePic: responseJson.Image, urlcheck: 'live' });
-        //     try {
-        //         const getsession = await AsyncStorage.getItem('@Session:key');
-        //         let Session = JSON.parse(getsession);
-        //         if (Session != null && Session.Status && Session.Status == 'true') {
-        //             Session.Userimage = responseJson.Image;
-        //             try {
-        //                 await AsyncStorage.setItem('@Session:key', JSON.stringify(Session));
-        //             } catch (error) {
-        //                 console.log(error.message);
-        //             }
-        //         }
-        //     } catch (error) {
-        //         console.log(error.message);
-        //     }
-        // }, (error) => {
-        //     //error snackbar showing in the Webhandler class
-        //     if (error == "Catcherror") {
-
-        //     } else {
-
-        //     }
-        //     this.setState({ isImageUploading: false })
-        // }, false, false)
+    updateProfilePic(image) {
+        // this.setState({ userProfilePic: image.uri, });
+        this.setState({ isImageUploading: true })
+        webHandler.updateUserProfilePic(image.uri, (responseJson) => {
+            MyUtils.showSnackbar("Profile picture updated", "")
+            prefManager.updateUserProfilePic(responseJson.user_image)
+            this.setState({ isImageUploading: false, userProfilePic: responseJson.user_image });
+        }, error => {
+            this.setState({ isImageUploading: false })
+            MyUtils.showSnackbar(error, "")
+        })
     }
 }
 

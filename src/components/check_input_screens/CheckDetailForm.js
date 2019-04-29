@@ -21,10 +21,19 @@ import FullImageView from "../../utils/FullImageView"
 
 const webHandler = new WebHandler()
 var count = 0
+
+const attributes = [
+    "Shape",
+    "Unit Weight",
+    "Dough Thickness",
+    "Filling Percentage"
+]
+
 class CheckDetailForm extends Component {
 
     constructor(props) {
         super(props)
+
         this.state = {
             isLoading: false,
             refreshing: false,
@@ -73,21 +82,28 @@ class CheckDetailForm extends Component {
                     fontSize: 16, textAlign: "center",
                     fontWeight: "bold", marginVertical: 10
                 }}>{item.productname}</Text>
+
+                <Text style={{
+                    fontSize: 15, color: appPinkColor, marginVertical: 5
+                }}>{"* Please provide the following input:"}
+                </Text>
+
                 {item.questions.map((quest, q_index) => {
                     return (
                         <View key={q_index}>
-                            {quest.question_type === "Choice" &&
+                            {(quest.question_type === "Dropdown" || quest.question_type === "Fixed") &&
                                 <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
                                     <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
                                         {(q_index + 1) + ". "}
                                     </Text>
-                                    <View style={{ flex: 1 }}>
+                                    <View style={{ flex: 1, flexDirection: "row" }}>
                                         <Text style={{ fontSize: 16, color: appPinkColor }}>
                                             {quest.question_title}
                                         </Text>
                                     </View>
                                 </View>
                             }
+
                             {quest.question_type === "Range" &&
                                 <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
                                     <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
@@ -106,8 +122,13 @@ class CheckDetailForm extends Component {
                                     </View>
                                 </View>
                             }
+
                             <View style={{ width: "100%" }}>
-                                <QuesDetailForm _quesData={quest} onResponse={(resp) => this.updateCheckResp(item.productid, resp)} />
+                                <QuesDetailForm _quesData={quest}
+                                    onResponse={(resp) => {
+                                        this.updateCheckResp(item.productid, resp)
+                                    }}
+                                />
                             </View>
                             <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
                         </View>

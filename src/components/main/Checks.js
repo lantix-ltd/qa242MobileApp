@@ -13,6 +13,7 @@ import Modal from "react-native-modal";
 import WebHandler from "../../data/remote/WebHandler"
 import LocalDBManager from "../../data/local/LocalDBManager"
 import firebase from 'react-native-firebase';
+import { connect } from "react-redux"
 
 const localDB = new LocalDBManager()
 const webHandler = new WebHandler()
@@ -59,6 +60,7 @@ class Checks extends Component {
                 var data = JSON.parse(message.data.data);
                 this.showMessage(data.title, data.message)
                 //alert(message.data.data)
+                this.props.updateCounter(1)
             });
         } else {
             try {
@@ -83,15 +85,17 @@ class Checks extends Component {
     }
 
     loadDataFromServer() {
-        webHandler.getUserChecks((responseJson) => {
+        webHandler.getUserChecks(1, (responseJson) => {
             this.setState({
                 checksData: responseJson.data,
                 totalPages: responseJson.total_pages,
                 newChecks: responseJson.open,
                 overDueChecks: responseJson.overdue,
                 submittedChecks: responseJson.complete,
+                currentPage: 1,
                 isLoading: false, refreshing: false
             })
+            this.props.updateCounter(responseJson.total_notification)
             // prefManager.getLastOpenedForm(result => {
             //     if (result != null) {
             //         this.handleOnItemClick(result)
@@ -217,7 +221,7 @@ class Checks extends Component {
                             onRefresh={() => this.handleRefresh()}
                             refreshing={this.state.refreshing}
                             onEndReached={() => this.handleLoadMore()}
-                            onEndReachedThreshold={0.5}
+                            onEndReachedThreshold={0.2}
                         />
                     </View>
                 }
@@ -252,7 +256,23 @@ class Checks extends Component {
     }
 
     handleLoadMore() {
-
+        var page = this.state.currentPage
+        page++;
+        if (page <= this.state.totalPages) {
+            this.setState({ refreshing: true })
+            webHandler.getUserChecks(page, (responseJson) => {
+                this.setState({
+                    checksData: [...this.state.checksData, ...responseJson.data],
+                    currentPage: page,
+                    refreshing: false
+                })
+            }, (errorMsg) => {
+                this.setState({ refreshing: false })
+                MyUtils.showSnackbar(errorMsg, "")
+            }, (checksData) => {
+                this.setState({ refreshing: false })
+            })
+        }
     }
 }
 
@@ -263,4 +283,10 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Checks;
+const mapDispatchToProps = (dispatch) => {
+    return {
+        updateCounter: (counts) => dispatch({ type: 'UPDATE_NOTIFICATIONS_COUNTER', counts: counts }),
+        resetCounter: () => dispatch({ type: 'RESET_NOTIFICATIONS_COUNTER' })
+    }
+}
+export default connect(null, mapDispatchToProps)(Checks)

@@ -4,7 +4,9 @@ import Icon from 'react-native-vector-icons/Feather';
 import MyUtils from "../../utils/MyUtils";
 import { primaryColor } from "../../utils/AppStyles";
 import { DrawerActions } from 'react-navigation';
+import WebHandler from "../../data/remote/WebHandler"
 
+const webHandler = new WebHandler()
 const chatsData = [
     {
         id: "1", username: "Person1",
@@ -33,12 +35,15 @@ class Contact extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            refreshing: false
+            usersData: [],
+            isLoading: false, refreshing: false, isError: false, errorMsg: "",
+            currentPage: 1, totalPages: 1
         }
     }
 
     componentDidMount() {
-
+        this.setState({ isLoading: true })
+        this.loadData()
     }
 
     handleToggle() {
@@ -46,7 +51,17 @@ class Contact extends Component {
     }
 
     loadData() {
-
+        webHandler.getAllUsersContacts(1, (responseJson) => {
+            this.setState({
+                usersData: responseJson.user_list,
+                totalPages: responseJson.total_pages,
+                currentPage: 1,
+                refreshing: false, isLoading: false
+            })
+        }, (error) => {
+            this.setState({ refreshing: false, isLoading: false, isError: true, errorMsg: error })
+            MyUtils.showSnackbar(error, "")
+        })
     }
 
     renderItem(item, index) {
@@ -54,9 +69,9 @@ class Contact extends Component {
             <TouchableOpacity onPress={() => this.handleOnItemClick(item)}>
                 <View>
                     <View style={{ flex: 1, padding: 10, flexDirection: "row" }}>
-                        {this.circledImage({ uri: item.user_pic })}
+                        {this.circledImage({ uri: item.user_image })}
                         <View style={{ flex: 1, marginStart: 10, paddingHorizontal: 10, justifyContent: "center" }}>
-                            <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item.username}</Text>
+                            <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item.first_name + " " + item.last_name}</Text>
                         </View>
                     </View>
                     <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
@@ -101,33 +116,59 @@ class Contact extends Component {
                     </Text>
                     <View style={{ flex: 1 }} />
                 </View>
-                <FlatList
-                    style={{ flex: 1 }}
-                    data={chatsData}
-                    renderItem={({ item, index }) => this.renderItem(item, index)}
-                    keyExtractor={(item, index) => index.toString()}
-                    onRefresh={() => this.handleRefresh()}
-                    refreshing={this.state.refreshing}
-                    onEndReached={() => this.handleLoadMore()}
-                    onEndReachedThreshold={0.5}
-                />
+
+                {this.state.isLoading && MyUtils.renderLoadingView()}
+
+                {(!this.state.isLoading && !this.state.isError) &&
+                    <FlatList
+                        style={{ flex: 1 }}
+                        data={this.state.usersData}
+                        renderItem={({ item, index }) => this.renderItem(item, index)}
+                        keyExtractor={(item, index) => index.toString()}
+                        onRefresh={() => this.handleRefresh()}
+                        refreshing={this.state.refreshing}
+                        onEndReached={() => this.handleLoadMore()}
+                        onEndReachedThreshold={0.5}
+                    />
+                }
+
+                {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
+                    this.setState({ isLoading: true, isError: false })
+                    this.loadData()
+                })}
+
             </View>
         );
     }
 
     handleOnItemClick(item) {
         this.props.navigation.navigate("Conversation", {
-            _userName: item.username,
+            _userName: item.first_name + " " + item.last_name,
             _userId: item.id
         })
     }
 
     handleRefresh() {
-
+        this.setState({ refreshing: true, })
+        this.loadData()
     }
 
     handleLoadMore() {
-
+        var page = this.state.currentPage
+        page++;
+        if (page <= this.state.totalPages) {
+            this.setState({ refreshing: true })
+            webHandler.getAllUsersContacts(page, (responseJson) => {
+                this.setState({
+                    notificationsData: [...this.state.usersData, ...responseJson.user_list],
+                    currentPage: page,
+                    refreshing: false
+                })
+            }, (errorMsg) => {
+                this.setState({ refreshing: false })
+                MyUtils.showSnackbar(errorMsg, "")
+            })
+        }
     }
 
 }

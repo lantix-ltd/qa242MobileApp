@@ -4,7 +4,9 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator 
 import { defTextInputStyle, defButtonContainer, defButtonText, appGreyColor } from '../utils/AppStyles'
 import Icon from 'react-native-vector-icons/Feather';
 import MyUtils from "../utils/MyUtils"
+import WebHandler from "../data/remote/WebHandler"
 
+const webHandler = new WebHandler()
 class UpdatePassword extends Component {
 
     constructor(props) {
@@ -88,7 +90,15 @@ class UpdatePassword extends Component {
         } else if (newPass != confirmPass) {
             MyUtils.showSnackbar("Password fields doesn't matched", "")
         } else {
-
+            this.setState({ isLoading: true })
+            webHandler.updatePassword(oldPass, newPass,
+                (responseJson) => {
+                    this.setState({ isLoading: false, old_password: "", new_password: "", confirm_password: "" })
+                    MyUtils.showSnackbar("Password updated successfully", "")
+                }, (error) => {
+                    this.setState({ isLoading: false })
+                    MyUtils.showSnackbar(error, "")
+                })
         }
     }
 }

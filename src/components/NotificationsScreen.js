@@ -1,41 +1,18 @@
 import React, { Component } from "react";
-import { View, Text, Image, StyleSheet, FlatList, TouchableHighlight, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Alert } from "react-native";
 import Icon from 'react-native-vector-icons/Feather';
+import WebHandler from "../data/remote/WebHandler"
+import MyUtils from "../utils/MyUtils";
 
-const chatsData = [
-    {
-        id: "1", title: "Person1",
-        user_pic: "https://centrik.in/wp-content/uploads/2017/02/user-image-.png",
-        notification_msg: "Hello, This is a test notification message."
-    },
-    {
-        id: "2", title: "Person2",
-        user_pic: "https://centrik.in/wp-content/uploads/2017/02/user-image-.png",
-        notification_msg: "Hello, This is a test notification message. Hello, This is a test notification message. Hello, This is a test notification message. Hello, This is a test notification message. Hello, This is a test notification message. Hello, This is a test notification message."
-    },
-    {
-        id: "3", title: "Person3",
-        user_pic: "https://centrik.in/wp-content/uploads/2017/02/user-image-.png",
-        notification_msg: "Hello, This is a test notification message."
-    },
-    {
-        id: "4", title: "Person4",
-        user_pic: "https://centrik.in/wp-content/uploads/2017/02/user-image-.png",
-        notification_msg: "Hello, This is a test notification message."
-    },
-    {
-        id: "5", title: "Person5",
-        user_pic: "https://centrik.in/wp-content/uploads/2017/02/user-image-.png",
-        notification_msg: "Hello, This is a test notification message."
-    },
-]
-
+const webHandler = new WebHandler()
 class NotificationsScreen extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            refreshing: false
+            notificationsData: [],
+            isLoading: false, refreshing: false, isError: false, errorMsg: "",
+            currentPage: 1, totalPages: 1
         }
     }
 
@@ -46,11 +23,22 @@ class NotificationsScreen extends Component {
     };
 
     componentDidMount() {
-
+        this.setState({ isLoading: true })
+        this.loadData()
     }
 
     loadData() {
-
+        webHandler.getUserNotifications(1, (responseJson) => {
+            this.setState({
+                notificationsData: responseJson.notifications,
+                totalPages: responseJson.total_pages,
+                currentPage: 1,
+                refreshing: false, isLoading: false
+            })
+        }, (error) => {
+            this.setState({ refreshing: false, isLoading: false, isError: true, errorMsg: error })
+            MyUtils.showSnackbar(error, "")
+        })
     }
 
     renderItem(item, index) {
@@ -58,61 +46,51 @@ class NotificationsScreen extends Component {
             <TouchableOpacity onPress={() => this.handleOnItemClick(item)}>
                 <View>
                     <View style={{ flex: 1, padding: 10, flexDirection: "row" }}>
-                        {this.circledImage({ uri: item.user_pic })}
+                        <Icon style={{ alignSelf: "center", justifyContent: "center" }} name="bell" size={40} color="#ccc" />
                         <View style={{ flex: 1, marginStart: 10, paddingHorizontal: 10, justifyContent: "center" }}>
                             <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item.title}</Text>
                             <Text style={{ fontSize: 13 }} ellipsizeMode="tail" numberOfLines={2}>
-                                {item.notification_msg}
+                                {item.message}
                             </Text>
                         </View>
                     </View>
+                    <Text style={{ alignSelf: "flex-end", paddingHorizontal: 5 }}>{item.datetime}</Text>
                     <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
                 </View>
             </TouchableOpacity>
         )
     }
 
-    circledImage(imgPath) {
-        return <TouchableHighlight
-            style={{
-                overflow: 'hidden',
-                height: 50,
-                width: 50,
-                borderRadius: 100 / 2,
-                elevation: 2
-            }}>
-            <Image
-                style={{
-                    height: 50,
-                    width: 50,
-                    borderRadius: 50,
-                    backgroundColor: '#FFFFFF'
-                }}
-                source={imgPath}
-            />
-        </TouchableHighlight>
-    }
-
     render() {
         return (
             <View style={styles.container}>
-                <FlatList
-                    style={{ flex: 1 }}
-                    data={chatsData}
-                    renderItem={({ item, index }) => this.renderItem(item, index)}
-                    keyExtractor={(item, index) => index.toString()}
-                    onRefresh={() => this.handleRefresh()}
-                    refreshing={this.state.refreshing}
-                    onEndReached={() => this.handleLoadMore()}
-                    onEndReachedThreshold={0.5}
-                />
+                {this.state.isLoading && MyUtils.renderLoadingView()}
+
+                {(!this.state.isLoading && !this.state.isError) &&
+                    <FlatList
+                        style={{ flex: 1 }}
+                        data={this.state.notificationsData}
+                        renderItem={({ item, index }) => this.renderItem(item, index)}
+                        keyExtractor={(item, index) => index.toString()}
+                        onRefresh={() => this.handleRefresh()}
+                        refreshing={this.state.refreshing}
+                        onEndReached={() => this.handleLoadMore()}
+                        onEndReachedThreshold={0.5}
+                    />
+                }
+
+                {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
+                    this.setState({ isLoading: true, isError: false })
+                    this.loadData()
+                })}
+
             </View>
         );
     }
 
     handleOnItemClick(item) {
         Alert.alert(
-            item.title, item.notification_msg,
+            item.title, item.message,
             [
                 {
                     text: 'OK', onPress: () => { }
@@ -122,11 +100,26 @@ class NotificationsScreen extends Component {
     }
 
     handleRefresh() {
-
+        this.setState({ refreshing: true, })
+        this.loadData()
     }
 
     handleLoadMore() {
-
+        var page = this.state.currentPage
+        page++;
+        if (page <= this.state.totalPages) {
+            this.setState({ refreshing: true })
+            webHandler.getUserNotifications(page, (responseJson) => {
+                this.setState({
+                    notificationsData: [...this.state.notificationsData, ...responseJson.notifications],
+                    currentPage: page,
+                    refreshing: false
+                })
+            }, (errorMsg) => {
+                this.setState({ refreshing: false })
+                MyUtils.showSnackbar(errorMsg, "")
+            })
+        }
     }
 
 }

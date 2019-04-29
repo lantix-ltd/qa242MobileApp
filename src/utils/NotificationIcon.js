@@ -21,7 +21,7 @@ const NotificationIcon = (props) => {
                     <Icon name="bell" size={20} color={"#fff"} />
                 </Text>
                 {props.counter > 0 &&
-                    <Text style={{ backgroundColor: primaryColor, position: "absolute", right: 0, top: 5, borderRadius: 150 / 2, height: 10, width: 10 }} />
+                    <Text style={{ backgroundColor: "red", position: "absolute", right: 0, top: 5, borderRadius: 150 / 2, height: 10, width: 10 }} />
                 }
             </TouchableOpacity>
         </View>
