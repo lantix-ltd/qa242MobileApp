@@ -19,7 +19,6 @@ const localDB = new LocalDBManager()
 const webHandler = new WebHandler()
 const prefManager = new PrefManager()
 
-//Change test for Android
 class Checks extends Component {
 
     constructor(props) {
