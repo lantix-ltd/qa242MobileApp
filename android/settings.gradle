@@ -1,4 +1,6 @@
 rootProject.name = 'QAProject'
+include ':react-native-snackbar'
+project(':react-native-snackbar').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-snackbar/android')
 include ':react-native-video'
 project(':react-native-video').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-video/android-exoplayer')
 include ':react-native-linear-gradient'

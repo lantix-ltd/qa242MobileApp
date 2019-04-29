@@ -3,6 +3,7 @@ package com.qaproject;
 import android.support.multidex.MultiDexApplication;
 
 import com.facebook.react.ReactApplication;
+import com.azendoo.reactnativesnackbar.SnackbarPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.github.yamill.orientation.OrientationPackage;
@@ -39,6 +40,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
             new MainReactPackage(),
+            new SnackbarPackage(),
             new ReactVideoPackage(),
             new LinearGradientPackage(),
             new OrientationPackage(),

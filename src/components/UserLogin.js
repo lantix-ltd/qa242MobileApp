@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, 
+    ActivityIndicator, SafeAreaView, KeyboardAvoidingView } from "react-native";
 import Icon from 'react-native-vector-icons/Feather';
 import { defTextInputStyle, defButtonContainer, defButtonText } from '../utils/AppStyles'
 import MyUtils from "../utils/MyUtils";
@@ -24,63 +25,66 @@ class UserLogin extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
+            <KeyboardAvoidingView style={{ flex: 1 }}>
 
-                <Image style={{ width: 200, height: 200 }} source={require("../assets/images/qa242_logo.png")} />
+                <View style={styles.container}>
 
-                <Text style={{ fontSize: 25, fontWeight: "bold", marginBottom: 20 }}>Account Login</Text>
+                    <Image style={{ width: 200, height: 200 }} source={require("../assets/images/qa242_logo.png")} />
 
-                <View style={defTextInputStyle.inputsection}>
-                    <Icon name="user" style={defTextInputStyle.icon} size={15} color="#797979" />
-                    <TextInput style={[defTextInputStyle.input]}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='email-address'
-                        returnKeyType="next"
-                        value={this.state.username}
-                        placeholder='* Username / Email'
-                        onChangeText={(text) => this.setState({ email: text })}
-                        placeholderTextColor='#797979' />
-                </View>
-                <View style={defTextInputStyle.inputsection}>
-                    <Icon name="lock" style={defTextInputStyle.icon} size={15} color="#797979" />
-                    <View
-                        style={[defTextInputStyle.input, { flexDirection: "row", padding: 0 }]}>
-                        <TextInput style={{ flex: 1, height: 40, padding: 10 }}
-                            returnKeyType="go"
-                            placeholder='* Password'
-                            value={this.state.password}
-                            onChangeText={(text) => this.setState({ password: text })}
-                            placeholderTextColor='#797979'
-                            secureTextEntry={this.state.hidePassword} />
-                        <TouchableOpacity
-                            onPress={() => this.togglePwdVisibility()}>
-                            <Icon name={this.state.hidePassword ? "eye-off" : "eye"} style={[styles.icon, { borderBottomWidth: 0, top: 1, padding: 10, left: 5 }]} size={16} color="#797979" />
+                    <Text style={{ fontSize: 25, fontWeight: "bold", marginBottom: 20 }}>Account Login</Text>
+
+                    <View style={defTextInputStyle.inputsection}>
+                        <Icon name="user" style={defTextInputStyle.icon} size={15} color="#797979" />
+                        <TextInput style={[defTextInputStyle.input]}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='email-address'
+                            returnKeyType="next"
+                            value={this.state.username}
+                            placeholder='* Username / Email'
+                            onChangeText={(text) => this.setState({ email: text })}
+                            placeholderTextColor='#797979' />
+                    </View>
+                    <View style={defTextInputStyle.inputsection}>
+                        <Icon name="lock" style={defTextInputStyle.icon} size={15} color="#797979" />
+                        <View
+                            style={[defTextInputStyle.input, { flexDirection: "row", padding: 0 }]}>
+                            <TextInput style={{ flex: 1, height: 40, padding: 10 }}
+                                returnKeyType="go"
+                                placeholder='* Password'
+                                value={this.state.password}
+                                onChangeText={(text) => this.setState({ password: text })}
+                                placeholderTextColor='#797979'
+                                secureTextEntry={this.state.hidePassword} />
+                            <TouchableOpacity
+                                onPress={() => this.togglePwdVisibility()}>
+                                <Icon name={this.state.hidePassword ? "eye-off" : "eye"} style={[styles.icon, { borderBottomWidth: 0, top: 1, padding: 10, left: 5 }]} size={16} color="#797979" />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                    <View style={{ marginTop: 20 }}>
+                        <TouchableOpacity activeOpacity={0.9} style={{}}
+                            onPress={() => { this.handleForgotPwd() }}>
+                            <Text style={{ fontSize: 14, color: "blue" }}>Forgot Password?</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
 
-                <View style={{ marginTop: 20 }}>
-                    <TouchableOpacity activeOpacity={0.9} style={{}}
-                        onPress={() => { this.handleForgotPwd() }}>
-                        <Text style={{ fontSize: 14, color: "blue" }}>Forgot Password?</Text>
-                    </TouchableOpacity>
-                </View>
+                    <View style={{ marginTop: 20 }}>
+                        {!this.state.isLoading &&
+                            <TouchableOpacity activeOpacity={0.9} style={[{ width: 200 }, defButtonContainer]}
+                                onPress={() => this.loginUser(this.state.email, this.state.password)}>
+                                <Text style={defButtonText}>LOGIN</Text>
+                            </TouchableOpacity>
+                        }
+                        {this.state.isLoading &&
+                            <ActivityIndicator size="large" />
+                        }
 
-                <View style={{ marginTop: 20 }}>
-                    {!this.state.isLoading &&
-                        <TouchableOpacity activeOpacity={0.9} style={[{ width: 200 }, defButtonContainer]}
-                            onPress={() => this.loginUser(this.state.email, this.state.password)}>
-                            <Text style={defButtonText}>LOGIN</Text>
-                        </TouchableOpacity>
-                    }
-                    {this.state.isLoading &&
-                        <ActivityIndicator size="large" />
-                    }
+                    </View>
 
                 </View>
-
-            </View>
+            </KeyboardAvoidingView>
         );
     }
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { ToastAndroid, ActivityIndicator, Text, View, TouchableOpacity } from "react-native"
+import { ToastAndroid, ActivityIndicator, Text, View, TouchableOpacity, Platform } from "react-native"
 import { appPinkColor, defButtonContainer, defButtonText } from "./AppStyles";
 import { Button } from "react-native-elements"
 
@@ -16,16 +16,22 @@ export default {
     },
 
     showSnackbar(message, color) {
-        // Snackbarr.show({
+        // Snackbar.show({
         //     title: message,
-        //     duration: Snackbarr.LENGTH_LONG,
-        //     backgroundColor: color,
+        //     duration: Snackbar.LENGTH_LONG,
+        //     backgroundColor: "#000",
         //     action: {
         //         title: 'Ok',
         //         color: 'white',
         //     },
         // });
-        ToastAndroid.show(message, ToastAndroid.SHORT)
+
+        if (Platform.OS == "android") {
+            ToastAndroid.show(message, ToastAndroid.SHORT)
+        } else {
+            alert(message)
+        }
+
     },
 
     renderLoadingView() {

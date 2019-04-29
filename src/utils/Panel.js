@@ -1,5 +1,5 @@
 import React from 'react';
-import { Component, StyleSheet, Text, View, TouchableHighlight, Animated } from 'react-native';
+import { Component, StyleSheet, Text, View, TouchableHighlight, Animated, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 class Panel extends React.Component {
     constructor(props) {
@@ -71,30 +71,32 @@ class Panel extends React.Component {
         }
 
         return (
-            <Animated.View
-                style={[styles.container, { height: this.state.animation }]}>
-                <View style={styles.titleContainer} onLayout={this._setMinHeight.bind(this)}>
-                    <TouchableHighlight
-                        style={{ flex: 1 }}
-                        underlayColor="#f1f1f1"
-                        onPress={() => { this.handleItemClick() }}
-                    >
-                        <Text style={[styles.title, { color: this.state.titleColor }]}>{this.state.title}</Text>
-                    </TouchableHighlight>
+            <SafeAreaView style={{ flex: 1 }}>
+                <Animated.View
+                    style={[styles.container, { height: this.state.animation }]}>
+                    <View style={styles.titleContainer} onLayout={this._setMinHeight.bind(this)}>
+                        <TouchableHighlight
+                            style={{ flex: 1 }}
+                            underlayColor="#f1f1f1"
+                            onPress={() => { this.handleItemClick() }}
+                        >
+                            <Text style={[styles.title, { color: this.state.titleColor }]}>{this.state.title}</Text>
+                        </TouchableHighlight>
 
-                    <TouchableHighlight
-                        style={{ marginRight: 10, borderRadius: 150 / 2, padding: 10 }}
-                        onPress={this.toggle.bind(this)}
-                        underlayColor="#f1f1f1">
-                        <Icon name={icon} style={styles.icon} size={20} color="#4D5761" />
-                    </TouchableHighlight>
-                </View>
+                        <TouchableHighlight
+                            style={{ marginRight: 10, borderRadius: 150 / 2, padding: 10 }}
+                            onPress={this.toggle.bind(this)}
+                            underlayColor="#f1f1f1">
+                            <Icon name={icon} style={styles.icon} size={20} color="#4D5761" />
+                        </TouchableHighlight>
+                    </View>
 
-                <View style={styles.body} onLayout={this._setMaxHeight.bind(this)}>
-                    {this.props.children}
-                </View>
+                    <View style={styles.body} onLayout={this._setMaxHeight.bind(this)}>
+                        {this.props.children}
+                    </View>
 
-            </Animated.View>
+                </Animated.View>
+            </SafeAreaView>
         );
     }
 
