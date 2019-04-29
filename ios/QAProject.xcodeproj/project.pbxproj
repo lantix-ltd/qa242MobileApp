@@ -15,6 +15,10 @@
 		00E356F31AD99517003FC87E /* QAProjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* QAProjectTests.m */; };
 		02FCD315100B464398EB6208 /* libRNFirebase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 389486302006441BBB506A3C /* libRNFirebase.a */; };
 		0472673222706BD2000EA770 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 047266FC22706BD2000EA770 /* GoogleService-Info.plist */; };
+		0488633B227345E600E09469 /* RSKImageCropper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0488633A227345E600E09469 /* RSKImageCropper.framework */; };
+		0488633C227345E600E09469 /* RSKImageCropper.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0488633A227345E600E09469 /* RSKImageCropper.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0488633F227345EC00E09469 /* QBImagePicker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0488633E227345EC00E09469 /* QBImagePicker.framework */; };
+		04886340227345EC00E09469 /* QBImagePicker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0488633E227345EC00E09469 /* QBImagePicker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		04C8651425414A2EB53E533C /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 45671DC31FDF4ABE8C163462 /* MaterialIcons.ttf */; };
 		0E5099915D1045089B1B2BC0 /* libReactNativePermissions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E46D23A198B4AC686B115D2 /* libReactNativePermissions.a */; };
 		11D1A2F320CAFA9E000508D9 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
@@ -120,6 +124,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = QAProject;
+		};
+		04886306227345D200E09469 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 048862FF227345D100E09469 /* imageCropPicker.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3400A8081CEB54A6008A0BC7;
+			remoteInfo = imageCropPicker;
 		};
 		04A22A6022705FD900586EF4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -466,6 +477,21 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		0488633D227345E700E09469 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0488633C227345E600E09469 /* RSKImageCropper.framework in Embed Frameworks */,
+				04886340227345EC00E09469 /* QBImagePicker.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTActionSheet.xcodeproj; path = "../node_modules/react-native/Libraries/ActionSheetIOS/RCTActionSheet.xcodeproj"; sourceTree = "<group>"; };
@@ -477,6 +503,9 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* QAProjectTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QAProjectTests.m; sourceTree = "<group>"; };
 		047266FC22706BD2000EA770 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		048862FF227345D100E09469 /* imageCropPicker.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = imageCropPicker.xcodeproj; path = "../node_modules/react-native-image-crop-picker/ios/imageCropPicker.xcodeproj"; sourceTree = "<group>"; };
+		0488633A227345E600E09469 /* RSKImageCropper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RSKImageCropper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0488633E227345EC00E09469 /* QBImagePicker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = QBImagePicker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B5A9E8E21454AFA8D69C962 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		0D2C8ABA09954587BA41945F /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
@@ -568,7 +597,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0488633F227345EC00E09469 /* QBImagePicker.framework in Frameworks */,
 				ED297163215061F000B7C4FE /* JavaScriptCore.framework in Frameworks */,
+				0488633B227345E600E09469 /* RSKImageCropper.framework in Frameworks */,
 				ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */,
 				11D1A2F320CAFA9E000508D9 /* libRCTAnimation.a in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
@@ -709,6 +740,14 @@
 				4529886AFEBC46BDAEC003CC /* Zocial.ttf */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		04886300227345D100E09469 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				04886307227345D200E09469 /* libimageCropPicker.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		04A22A3722705FD400586EF4 /* Recovered References */ = {
@@ -933,8 +972,9 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
+				048862FF227345D100E09469 /* imageCropPicker.xcodeproj */,
+				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
 				ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */,
 				00C302B51ABCB90400DB3ED1 /* RCTGeolocation.xcodeproj */,
@@ -974,6 +1014,8 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				0488633E227345EC00E09469 /* QBImagePicker.framework */,
+				0488633A227345E600E09469 /* RSKImageCropper.framework */,
 				047266FC22706BD2000EA770 /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* QAProject */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -1055,7 +1097,8 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				604BB09912C2EA5FE426C75D /* [CP] Copy Pods Resources */,
+				5B36FBEA71D0491D6D47F26B /* [CP] Copy Pods Resources */,
+				0488633D227345E700E09469 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1115,7 +1158,11 @@
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = UGCJ73B96F;
 						TestTargetID = 13B07F861A680F5B00A75B9A;
+					};
+					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = UGCJ73B96F;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -1147,6 +1194,10 @@
 				{
 					ProductGroup = 04A22A7022705FD900586EF4 /* Products */;
 					ProjectRef = 9355936497CB49959CD1FEFE /* imageCropPicker.xcodeproj */;
+				},
+				{
+					ProductGroup = 04886300227345D100E09469 /* Products */;
+					ProjectRef = 048862FF227345D100E09469 /* imageCropPicker.xcodeproj */;
 				},
 				{
 					ProductGroup = 04A22A7C22705FD900586EF4 /* Products */;
@@ -1285,6 +1336,13 @@
 			fileType = archive.ar;
 			path = libRCTVibration.a;
 			remoteRef = 00C302E31ABCB9EE00DB3ED1 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		04886307227345D200E09469 /* libimageCropPicker.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libimageCropPicker.a;
+			remoteRef = 04886306227345D200E09469 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		04A22A6122705FD900586EF4 /* libjsi.a */ = {
@@ -1688,7 +1746,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1726,7 +1784,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		604BB09912C2EA5FE426C75D /* [CP] Copy Pods Resources */ = {
+		5B36FBEA71D0491D6D47F26B /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1884,6 +1942,7 @@
 			baseConfigurationReference = FCE4B6B3D9C91469C439D853 /* Pods-QAProjectTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = UGCJ73B96F;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1940,6 +1999,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = UGCJ73B96F;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)..\node_modules\neact-native-gesture-handlerios/**",
@@ -1993,21 +2053,48 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = UGCJ73B96F;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)..\node_modules\neact-native-gesture-handlerios/**",
-					"$(SRCROOT)..\node_modules\neact-native-vector-iconsRNVectorIconsManager",
-					"$(SRCROOT)..\node_modules@react-native-community\async-storageios",
-					"$(SRCROOT)..\node_modules\neact-native-firebaseiosRNFirebase/**",
-					"$(SRCROOT)..\node_modules\neact-native-image-crop-pickerios/**",
-					"$(SRCROOT)..\node_modules\neact-native-audioios",
-					"$(SRCROOT)..\node_modules\neact-native-permissionsios/**",
-					"$(SRCROOT)..\node_modules\neact-native-soundRNSound",
-					"$(SRCROOT)..\node_modules\nealmsrc/**",
-					"$(SRCROOT)..\node_modules\neact-native-videoios/**",
-					"$(SRCROOT)..\node_modules\neact-native-keep-awakeios",
-					"$(SRCROOT)..\node_modules\neact-native-orientationiOSRCTOrientation/**",
-					"$(SRCROOT)..\node_modules\neact-native-linear-gradientBVLinearGradient",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-gesture-handlerios/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-vector-iconsRNVectorIconsManager",
+					"$(SRCROOT)..",
+					"ode_modules@react-native-community\async-storageios",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-firebaseiosRNFirebase/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-image-crop-pickerios/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-audioios",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-permissionsios/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-soundRNSound",
+					"$(SRCROOT)..",
+					ode_modules,
+					"ealmsrc/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-videoios/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-keep-awakeios",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-orientationiOSRCTOrientation/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-linear-gradientBVLinearGradient",
+					"$(SRCROOT)/../node_modules/react-native/React/**",
 				);
 				INFOPLIST_FILE = QAProject/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2028,21 +2115,48 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = UGCJ73B96F;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)..\node_modules\neact-native-gesture-handlerios/**",
-					"$(SRCROOT)..\node_modules\neact-native-vector-iconsRNVectorIconsManager",
-					"$(SRCROOT)..\node_modules@react-native-community\async-storageios",
-					"$(SRCROOT)..\node_modules\neact-native-firebaseiosRNFirebase/**",
-					"$(SRCROOT)..\node_modules\neact-native-image-crop-pickerios/**",
-					"$(SRCROOT)..\node_modules\neact-native-audioios",
-					"$(SRCROOT)..\node_modules\neact-native-permissionsios/**",
-					"$(SRCROOT)..\node_modules\neact-native-soundRNSound",
-					"$(SRCROOT)..\node_modules\nealmsrc/**",
-					"$(SRCROOT)..\node_modules\neact-native-videoios/**",
-					"$(SRCROOT)..\node_modules\neact-native-keep-awakeios",
-					"$(SRCROOT)..\node_modules\neact-native-orientationiOSRCTOrientation/**",
-					"$(SRCROOT)..\node_modules\neact-native-linear-gradientBVLinearGradient",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-gesture-handlerios/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-vector-iconsRNVectorIconsManager",
+					"$(SRCROOT)..",
+					"ode_modules@react-native-community\async-storageios",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-firebaseiosRNFirebase/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-image-crop-pickerios/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-audioios",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-permissionsios/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-soundRNSound",
+					"$(SRCROOT)..",
+					ode_modules,
+					"ealmsrc/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-videoios/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-keep-awakeios",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-orientationiOSRCTOrientation/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-linear-gradientBVLinearGradient",
+					"$(SRCROOT)/../node_modules/react-native/React/**",
 				);
 				INFOPLIST_FILE = QAProject/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

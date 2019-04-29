@@ -1,21 +1,17 @@
 import React, { Component } from "react";
 import {
-    View, Text, Image, StyleSheet, FlatList, ScrollView,
-    TouchableHighlight, TouchableOpacity, ActivityIndicator
+    View, Text, Image, StyleSheet, TextInput, ScrollView,
+    SafeAreaView, TouchableOpacity, ActivityIndicator
 } from "react-native";
-import { RadioButton } from "react-native-paper"
 import { Button } from 'react-native-elements'
 import Modal from "react-native-modal";
-import ImagePicker from 'react-native-image-crop-picker';
 import Sound from 'react-native-sound';
 import Icon from 'react-native-vector-icons/Feather';
 
 import { appPinkColor, appYellowColor, appGreyColor } from "../../utils/AppStyles";
-import Panel from "../../utils/Panel"
 import MyUtils from "../../utils/MyUtils";
 import WebHandler from "../../data/remote/WebHandler"
 import QuesDetailView from "./QuesDetailView"
-import MyAudioRecorder from "../../utils/MyAudioRecorder"
 import FullImageView from "../../utils/FullImageView"
 
 const webHandler = new WebHandler()
@@ -35,7 +31,8 @@ class CheckDetailView extends Component {
             checkDetail: [],
             isError: false, errorMsg: "",
             checkQuesRefs: [],
-            isFormSubmitting: false
+            isFormSubmitting: false,
+            reviewerComment: ""
         }
     }
 
@@ -84,11 +81,33 @@ class CheckDetailView extends Component {
                 <Text style={{
                     fontSize: 16, fontWeight: "bold",
                     color: appPinkColor, marginBottom: 5
-                }}>Submitted By</Text>
+                }}>Submitted By:</Text>
                 {fullName != undefined && this.renderTVRow("Name", fullName)}
                 {lineNo != undefined && this.renderTVRow("Working Line(s)", lineNo)}
                 {shiftNo != undefined && this.renderTVRow("Working Shift", shiftNo)}
                 {dateTime != undefined && this.renderTVRow("Date & Time", dateTime)}
+            </View>
+        )
+    }
+
+    renderCommentView() {
+        return (
+            <View style={[styles.round_white_bg_container, { marginTop: 5 }]}>
+                <Text style={{
+                    fontSize: 16, fontWeight: "bold",
+                    color: appPinkColor, marginBottom: 5
+                }}>Your Comment (If Any) :</Text>
+                <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    keyboardType='number-pad'
+                    returnKeyType="done"
+                    value={this.state.reviewerComment}
+                    numberOfLines={1}
+                    multiline={false}
+                    placeholder='Type here'
+                    onChangeText={(text) => this.setState({ reviewerComment: text })}
+                    placeholderTextColor='#797979' />
             </View>
         )
     }
@@ -103,7 +122,7 @@ class CheckDetailView extends Component {
                 {item.questions.map((quest, q_index) => {
                     return (
                         <View key={q_index}>
-                            {quest.question_type === "Choice" &&
+                            {(quest.question_type === "Dropdown" || quest.question_type === "Fixed") &&
                                 <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
                                     <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
                                         {(q_index + 1) + ". "}
@@ -179,54 +198,66 @@ class CheckDetailView extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
-                {this.renderLoadingDialog()}
-                {this.state.isLoading && MyUtils.renderLoadingView()}
-                {(!this.state.isLoading && !this.state.isError && !MyUtils.isEmptyArray(this.state.checkDetail)) &&
-                    <View style={{ flex: 1 }}>
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={styles.container}>
+                    {this.renderLoadingDialog()}
+                    {this.state.isLoading && MyUtils.renderLoadingView()}
+                    {(!this.state.isLoading && !this.state.isError && !MyUtils.isEmptyArray(this.state.checkDetail)) &&
+                        <View style={{ flex: 1 }}>
 
-                        <ScrollView style={{ flex: 1 }}>
-                            {this.renderCheckView(this.state.checkDetail[0], 0)}
-                            {this.renderSubmittedByView(
-                                this.state.checkDetail[0].line_no,
-                                this.state.checkDetail[0].shift_no,
-                                this.state.checkDetail[0].full_name,
-                                this.state.checkDetail[0].complete_datetime
-                            )}
-                        </ScrollView>
+                            <ScrollView style={{ flex: 1 }}>
+                                {this.renderCheckView(this.state.checkDetail[0], 0)}
+                                {this.renderSubmittedByView(
+                                    this.state.checkDetail[0].line_no,
+                                    this.state.checkDetail[0].shift_no,
+                                    this.state.checkDetail[0].full_name,
+                                    this.state.checkDetail[0].complete_datetime
+                                )}
+                                {this.renderCommentView()}
+                            </ScrollView>
 
-                        <View style={{ flexDirection: "row", padding: 10 }}>
-                            <Button
-                                title="REVIEWED"
-                                containerStyle={{ flex: 1 }}
-                                buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
-                                onPress={() => { this.acceptData() }}
-                            />
-                            <Button
-                                title="CANCEL"
-                                style={{ width: "50%" }}
-                                containerStyle={{ flex: 1 }}
-                                buttonStyle={{ backgroundColor: "red", marginStart: 5 }}
-                                onPress={() => { this.props.navigation.goBack() }}
+                            <View style={{ flexDirection: "row", padding: 10 }}>
+                                <Button
+                                    title="REVIEWED"
+                                    containerStyle={{ flex: 1 }}
+                                    buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                                    onPress={() => { this.acceptData() }}
+                                />
+                                <Button
+                                    title="CANCEL"
+                                    style={{ width: "50%" }}
+                                    containerStyle={{ flex: 1 }}
+                                    buttonStyle={{ backgroundColor: "red", marginStart: 5 }}
+                                    onPress={() => { this.props.navigation.goBack() }}
+                                />
+                            </View>
+
+                            <FullImageView
+                                ref="_fullImageViewModal"
                             />
                         </View>
-
-                        <FullImageView
-                            ref="_fullImageViewModal"
-                        />
-                    </View>
-                }
-                {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
-                    this.setState({ isLoading: true, isError: false })
-                    this.loadData()
-                })}
-            </View>
+                    }
+                    {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
+                        this.setState({ isLoading: true, isError: false })
+                        this.loadData()
+                    })}
+                </View>
+            </SafeAreaView>
         );
     }
 
     acceptData() {
-        MyUtils.showSnackbar("Added to reviewed successfully", "")
-        this.props.navigation.goBack()
+        this.setState({ isFormSubmitting: true })
+        webHandler.submitAsReviewd(this.state.checkId, this.state.reviewerComment,
+            (responseJson) => {
+                MyUtils.showSnackbar("Added to reviewed successfully", "")
+                this.setState({ isFormSubmitting: false })
+                this.props.navigation.state.params.onReload()
+                this.props.navigation.goBack();
+            }, (error) => {
+                alert(error)
+                this.setState({ isFormSubmitting: false })
+            })
     }
 
     renderImageFileView(item, index) {

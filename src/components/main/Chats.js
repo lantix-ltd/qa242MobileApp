@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, Image, StyleSheet, FlatList, TouchableHighlight, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, FlatList, TouchableHighlight, TouchableOpacity, SafeAreaView } from "react-native";
 import Icon from 'react-native-vector-icons/Feather';
 import MyUtils from "../../utils/MyUtils";
 import { primaryColor } from "../../utils/AppStyles";
@@ -105,30 +105,32 @@ class Chats extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
-                <View style={{ padding: 5, height: 60, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: primaryColor }}>
-                    <TouchableOpacity
-                        style={{ padding: 10, }}
-                        onPress={() => this.handleToggle()}>
-                        <Icon name="menu" size={20} color={"#fff"} />
-                    </TouchableOpacity>
-                    <Text
-                        style={{ color: "#fff", fontSize: 16, marginLeft: 10, }}>
-                        {MyUtils.APP_NAME}
-                    </Text>
-                    <View style={{ flex: 1 }} />
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={styles.container}>
+                    <View style={{ padding: 5, height: 60, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: primaryColor }}>
+                        <TouchableOpacity
+                            style={{ padding: 10, }}
+                            onPress={() => this.handleToggle()}>
+                            <Icon name="menu" size={20} color={"#fff"} />
+                        </TouchableOpacity>
+                        <Text
+                            style={{ color: "#fff", fontSize: 16, marginLeft: 10, }}>
+                            {MyUtils.APP_NAME}
+                        </Text>
+                        <View style={{ flex: 1 }} />
+                    </View>
+                    <FlatList
+                        style={{ flex: 1 }}
+                        data={chatsData}
+                        renderItem={({ item, index }) => this.renderItem(item, index)}
+                        keyExtractor={(item, index) => index.toString()}
+                        onRefresh={() => this.handleRefresh()}
+                        refreshing={this.state.refreshing}
+                        onEndReached={() => this.handleLoadMore()}
+                        onEndReachedThreshold={0.5}
+                    />
                 </View>
-                <FlatList
-                    style={{ flex: 1 }}
-                    data={chatsData}
-                    renderItem={({ item, index }) => this.renderItem(item, index)}
-                    keyExtractor={(item, index) => index.toString()}
-                    onRefresh={() => this.handleRefresh()}
-                    refreshing={this.state.refreshing}
-                    onEndReached={() => this.handleLoadMore()}
-                    onEndReachedThreshold={0.5}
-                />
-            </View>
+            </SafeAreaView>
         );
     }
 

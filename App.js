@@ -23,7 +23,7 @@ import LinesAndShiftScreen from "./src/components/LinesAndShiftScreen"
 import MyVideoPlayer from "./src/utils/MyVideoPlayer"
 
 import { primaryColor, appGreyColor, appPinkColor } from './src/utils/AppStyles';
-import { Dimensions, ToastAndroid } from "react-native"
+import { Dimensions, SafeAreaView, View } from "react-native"
 
 import PrefManager from "./src/data/local/PrefManager"
 
@@ -104,7 +104,7 @@ const DrawerNavigator = createDrawerNavigator({
         screen: AboutUs,
         navigationOptions: {
             drawerLabel: 'Quit',
-            drawerIcon: ({ tintColor }) => (<Icon name="log-out" size={17} color={tintColor} />),
+            drawerIcon: ({ tintColor }) => (<Icon style={{ padding: 5 }} name="log-out" size={17} color={tintColor} />),
         }
     }
 }, {
@@ -114,7 +114,7 @@ const DrawerNavigator = createDrawerNavigator({
         contentOptions: {
             activeBackgroundColor: "rgba(255,107,129,0.2)",
             activeTintColor: appPinkColor,
-            inactiveTintColor: appGreyColor
+            inactiveTintColor: appGreyColor,
         }
     }
 );

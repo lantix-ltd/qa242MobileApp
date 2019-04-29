@@ -37,6 +37,7 @@ export default class WebHandler {
                     var userData = {
                         userId: data.user_id,
                         userName: data.name,
+                        email: data.email,
                         picPath: data.user_image,
                         userFName: data.first_name,
                         userLName: data.last_name,
@@ -57,7 +58,7 @@ export default class WebHandler {
             });
     }
 
-    getUserChecks(onSuccess, onFailure, onOffLineData) {
+    getUserChecks(pageNo, onSuccess, onFailure, onOffLineData) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
                 var body =
@@ -65,7 +66,8 @@ export default class WebHandler {
                     "&outlet_id=" + userData.businessId +
                     "&role=" + userData.userPrimaryType +
                     "&group_id=" + userData.userPrimaryGId +
-                    "&session_token=" + userData.sessionToken
+                    "&session_token=" + userData.sessionToken +
+                    "&page_number=" + pageNo
                 this.sendSimplePostFormRequest(Urls.CHECKS_LIST_URL, body, (responseJson) => {
                     if (responseJson.status) {
                         localDB.addNewChecks(responseJson.data)
@@ -202,6 +204,171 @@ export default class WebHandler {
                 })
             } else {
                 onFailure("Please define your working lines & shift.")
+            }
+        })
+    }
+
+    getUserNotifications(pageNo, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    "&page_number=" + pageNo
+                this.sendSimplePostFormRequest(Urls.USER_NOTIFICATIONS_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    submitAsReviewd(assignId, comment, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    "&assign_id=" + assignId +
+                    "&review_comments=" + comment
+                this.sendSimplePostFormRequest(Urls.SUBMIT_AS_REVIEWED_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    getAllUsersContacts(pageNo, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    "&page_number=" + pageNo
+                this.sendSimplePostFormRequest(Urls.ALL_USERS_CONTACTS_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    updatePassword(oldPass, newPass, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    "&old_password=" + oldPass +
+                    "&new_password=" + newPass
+                this.sendSimplePostFormRequest(Urls.UPDATE_PASSWORD_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    updateUserInfo(fName, lName, mobileNo, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    "&first_name=" + fName +
+                    "&last_name=" + lName +
+                    "&phone=" + mobileNo
+                this.sendSimplePostFormRequest(Urls.UPDATE_PROFILE_INFO_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    updateUserProfilePic(picPath, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var formData = new FormData()
+                formData.append("user_id", userData.id)
+                formData.append("outlet_id", userData.businessId)
+                formData.append("session_token", userData.sessionToken)
+                formData.append("user_image", { uri: picPath, name: 'ProfilePic.jpg', type: 'multipart/form-data' })
+
+                this.sendMediaPostFormRequest(Urls.UPDATE_PROFILE_PIC_URL, formData, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    logOutUser(onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken
+                this.sendSimplePostFormRequest(Urls.LOGOUT_USER_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
             }
         })
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Google
+ * Copyright 2019 Google
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-/// @file FIRInteropEventNames.h
+/// Handles events and messages from Analytics.
+@protocol FIRAnalyticsInteropListener <NSObject>
 
-#import <Foundation/Foundation.h>
+/// Triggers when an Analytics event happens for the registered origin with
+/// `FIRAnalyticsInterop`s `registerAnalyticsListener:withOrigin:`.
+- (void)messageTriggered:(NSString *)name parameters:(NSDictionary *)parameters;
 
-/// Notification open event name.
-static NSString *const kFIRIEventNotificationOpen = @"_no";
-
-/// Notification foreground event name.
-static NSString *const kFIRIEventNotificationForeground = @"_nf";
-
-/// Campaign event name.
-static NSString *const kFIRIEventFirebaseCampaign = @"_cmp";
+@end

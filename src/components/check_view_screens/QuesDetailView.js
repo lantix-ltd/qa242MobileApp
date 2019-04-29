@@ -1,9 +1,6 @@
 import React, { Component } from "react";
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, Alert } from "react-native";
-import { RadioButton } from "react-native-paper"
 import Icon from 'react-native-vector-icons/Feather'
-
-import { appPinkColor, appYellowColor, appGreyColor } from "../../utils/AppStyles";
 
 class QuesDetailView extends Component {
 
@@ -21,9 +18,9 @@ class QuesDetailView extends Component {
     componentDidMount() {
         const qData = this.state.checkQuesData
         if (qData != undefined && qData != null) {
-            if (qData.question_type === "Choice") {
+            if (qData.question_type === "Dropdown" || qData.question_type === "Fixed") {
                 this.setState({
-                    selectedAnsValue: qData.givenanswers[0].answer_id,
+                    selectedAnsValue: qData.givenanswers[0].given_answer,
                     quesComment: qData.givenanswers[0].comments,
                 })
                 this.handleAnswereChange(qData.givenanswers[0].answer_id)
@@ -40,9 +37,12 @@ class QuesDetailView extends Component {
     handleAnswereChange(selecetdAnsId) {
         var answers = this.state.checkQuesData.answers
         var indx = answers.findIndex(item => item.answer_id == selecetdAnsId)
-        var my_ans = answers[indx]
-        var val = my_ans.is_acceptable == "1"
-        this.setState({ isAcceptableAnswer: val, selectedAnsValue: my_ans.possible_answer })
+        var isAcceptable = false
+        if (indx != undefined && indx > -1) {
+            var my_ans = answers[indx]
+            isAcceptable = my_ans.is_acceptable == "1"
+        }
+        this.setState({ isAcceptableAnswer: isAcceptable })
     }
 
     handleRangeInputChange(txt) {
@@ -57,8 +57,7 @@ class QuesDetailView extends Component {
     render() {
         return (
             <View style={styles.container}>
-                {(this.state.checkQuesData.question_type === "Choice" &&
-                    this.state.isAcceptableAnswer) &&
+                {(this.state.checkQuesData.question_type === "Dropdown" || this.state.checkQuesData.question_type === "Fixed") &&
                     <View style={styles.round_white_bg_container}>
                         <Text style={{ paddingHorizontal: 10, fontSize: 15 }}>
                             {this.state.selectedAnsValue}

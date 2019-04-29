@@ -4,6 +4,7 @@ import Moment from 'moment';
 import PrefManager from "../data/local/PrefManager"
 import firebase from 'react-native-firebase';
 import MyUtils from "../utils/MyUtils";
+import { SafeAreaView } from "react-native"
 
 const prefManager = new PrefManager()
 class ConversationScreen extends Component {
@@ -97,14 +98,16 @@ class ConversationScreen extends Component {
 
     render() {
         return (
-            <GiftedChat
-                messages={this.state.messages}
-                onSend={messages => this.onSend(messages)}
-                user={{ _id: this.state.myUserId, }}
-                loadEarlier={this.state.loadEarlier}
-                onLoadEarlier={() => this.onLoadEarlier()}
-                isLoadingEarlier={this.state.isLoadingEarlier}
-            />
+            <SafeAreaView style={{ flex: 1 }}>
+                <GiftedChat
+                    messages={this.state.messages}
+                    onSend={messages => this.onSend(messages)}
+                    user={{ _id: this.state.myUserId, }}
+                    loadEarlier={this.state.loadEarlier}
+                    onLoadEarlier={() => this.onLoadEarlier()}
+                    isLoadingEarlier={this.state.isLoadingEarlier}
+                />
+            </SafeAreaView>
         );
     }
 

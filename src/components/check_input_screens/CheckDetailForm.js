@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {
-    View, Text, Image, StyleSheet, FlatList, ScrollView,
+    View, Text, Image, StyleSheet, SafeAreaView, ScrollView,
     TouchableHighlight, TouchableOpacity, ActivityIndicator
 } from "react-native";
 import { RadioButton } from "react-native-paper"
@@ -21,10 +21,12 @@ import FullImageView from "../../utils/FullImageView"
 
 const webHandler = new WebHandler()
 var count = 0
+
 class CheckDetailForm extends Component {
 
     constructor(props) {
         super(props)
+
         this.state = {
             isLoading: false,
             refreshing: false,
@@ -73,21 +75,28 @@ class CheckDetailForm extends Component {
                     fontSize: 16, textAlign: "center",
                     fontWeight: "bold", marginVertical: 10
                 }}>{item.productname}</Text>
+
+                <Text style={{
+                    fontSize: 15, color: appPinkColor, marginVertical: 5
+                }}>{"* Please provide the following input:"}
+                </Text>
+
                 {item.questions.map((quest, q_index) => {
                     return (
                         <View key={q_index}>
-                            {quest.question_type === "Choice" &&
+                            {(quest.question_type === "Dropdown" || quest.question_type === "Fixed") &&
                                 <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
                                     <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
                                         {(q_index + 1) + ". "}
                                     </Text>
-                                    <View style={{ flex: 1 }}>
+                                    <View style={{ flex: 1, flexDirection: "row" }}>
                                         <Text style={{ fontSize: 16, color: appPinkColor }}>
                                             {quest.question_title}
                                         </Text>
                                     </View>
                                 </View>
                             }
+
                             {quest.question_type === "Range" &&
                                 <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
                                     <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
@@ -106,8 +115,13 @@ class CheckDetailForm extends Component {
                                     </View>
                                 </View>
                             }
+
                             <View style={{ width: "100%" }}>
-                                <QuesDetailForm _quesData={quest} onResponse={(resp) => this.updateCheckResp(item.productid, resp)} />
+                                <QuesDetailForm _quesData={quest}
+                                    onResponse={(resp) => {
+                                        this.updateCheckResp(item.productid, resp)
+                                    }}
+                                />
                             </View>
                             <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
                         </View>
@@ -156,67 +170,58 @@ class CheckDetailForm extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
-                {this.renderLoadingDialog()}
-                {this.state.isLoading && MyUtils.renderLoadingView()}
-                {(!this.state.isLoading && !this.state.isError && !MyUtils.isEmptyArray(this.state.checkDetail)) &&
-                    <View style={{ flex: 1 }}>
-                        {/* <FlatList
-                            style={{ flex: 1 }}
-                            data={this.state.checkDetail}
-                            renderItem={({ item, index }) => this.renderItem(item, index)}
-                            keyExtractor={(item, index) => index.toString()}
-                            onRefresh={() => this.handleRefresh()}
-                            refreshing={this.state.refreshing}
-                            onEndReached={() => this.handleLoadMore()}
-                            onEndReachedThreshold={0.5}
-                        /> */}
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={styles.container}>
+                    {this.renderLoadingDialog()}
+                    {this.state.isLoading && MyUtils.renderLoadingView()}
+                    {(!this.state.isLoading && !this.state.isError && !MyUtils.isEmptyArray(this.state.checkDetail)) &&
+                        <View style={{ flex: 1 }}>
 
-                        <ScrollView style={{ flex: 1 }}>
-                            {this.renderItem(this.state.checkDetail[0], 0)}
-                        </ScrollView>
+                            <ScrollView style={{ flex: 1 }}>
+                                {this.renderItem(this.state.checkDetail[0], 0)}
+                            </ScrollView>
 
-                        <View style={{ flexDirection: "row", padding: 10 }}>
-                            <Button
-                                title="SUBMIT"
-                                containerStyle={{ flex: 1 }}
-                                buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
-                                onPress={() => {
-                                    this.verifyForSubmit(
-                                        this.state.checkDetail[0].productid,
-                                        this.state.checkDetail[0].questions)
+                            <View style={{ flexDirection: "row", padding: 10 }}>
+                                <Button
+                                    title="SUBMIT"
+                                    containerStyle={{ flex: 1 }}
+                                    buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                                    onPress={() => {
+                                        this.verifyForSubmit(
+                                            this.state.checkDetail[0].productid,
+                                            this.state.checkDetail[0].questions)
+                                    }}
+                                />
+                                <Button
+                                    title="CANCEL"
+                                    containerStyle={{ flex: 1 }}
+                                    buttonStyle={{ backgroundColor: "red", marginStart: 5 }}
+                                    onPress={() => { this.props.navigation.goBack() }}
+                                />
+                            </View>
+
+                            <SelectOptionModal
+                                ref="_selectOptionModal"
+                                onItemPress={(type) => this.handleMediaFileAction(type)}
+                            />
+                            <MyAudioRecorder
+                                ref="_myAudioRecorder"
+                                onDone={(filePath) => {
+                                    count++
+                                    this.addNewMediaFile(count, filePath, "audio")
                                 }}
                             />
-                            <Button
-                                title="CANCEL"
-                                style={{ width: "50%" }}
-                                containerStyle={{ flex: 1 }}
-                                buttonStyle={{ backgroundColor: "red", marginStart: 5 }}
-                                onPress={() => { this.props.navigation.goBack() }}
+                            <FullImageView
+                                ref="_fullImageViewModal"
                             />
                         </View>
-
-                        <SelectOptionModal
-                            ref="_selectOptionModal"
-                            onItemPress={(type) => this.handleMediaFileAction(type)}
-                        />
-                        <MyAudioRecorder
-                            ref="_myAudioRecorder"
-                            onDone={(filePath) => {
-                                count++
-                                this.addNewMediaFile(count, filePath, "audio")
-                            }}
-                        />
-                        <FullImageView
-                            ref="_fullImageViewModal"
-                        />
-                    </View>
-                }
-                {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
-                    this.setState({ isLoading: true, isError: false })
-                    this.loadData()
-                })}
-            </View>
+                    }
+                    {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
+                        this.setState({ isLoading: true, isError: false })
+                        this.loadData()
+                    })}
+                </View>
+            </SafeAreaView>
         );
     }
 

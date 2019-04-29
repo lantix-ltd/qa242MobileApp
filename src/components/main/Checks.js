@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, SafeAreaView } from "react-native";
 import PrefManager from "../../data/local/PrefManager"
 import MyUtils from "../../utils/MyUtils";
 import NotificationIcon from '../../utils/NotificationIcon'
@@ -13,6 +13,7 @@ import Modal from "react-native-modal";
 import WebHandler from "../../data/remote/WebHandler"
 import LocalDBManager from "../../data/local/LocalDBManager"
 import firebase from 'react-native-firebase';
+import { connect } from "react-redux"
 
 const localDB = new LocalDBManager()
 const webHandler = new WebHandler()
@@ -59,6 +60,7 @@ class Checks extends Component {
                 var data = JSON.parse(message.data.data);
                 this.showMessage(data.title, data.message)
                 //alert(message.data.data)
+                this.props.updateCounter(1)
             });
         } else {
             try {
@@ -83,15 +85,17 @@ class Checks extends Component {
     }
 
     loadDataFromServer() {
-        webHandler.getUserChecks((responseJson) => {
+        webHandler.getUserChecks(1, (responseJson) => {
             this.setState({
                 checksData: responseJson.data,
                 totalPages: responseJson.total_pages,
                 newChecks: responseJson.open,
                 overDueChecks: responseJson.overdue,
                 submittedChecks: responseJson.complete,
+                currentPage: 1,
                 isLoading: false, refreshing: false
             })
+            this.props.updateCounter(responseJson.total_notification)
             // prefManager.getLastOpenedForm(result => {
             //     if (result != null) {
             //         this.handleOnItemClick(result)
@@ -180,7 +184,7 @@ class Checks extends Component {
                     <Button
                         title="Start"
                         onPress={() => { this.handleOnItemClick(item) }}
-                        containerStyle={{ width: 100, height: 30, marginTop: 5, alignSelf: "flex-end" }}
+                        containerStyle={{ width: 100, marginTop: 5, alignSelf: "flex-end" }}
                     />
                 </View>
             </Panel >
@@ -189,43 +193,45 @@ class Checks extends Component {
 
     render() {
         return (
-            <View style={{ flex: 1, backgroundColor: '#F8F8F8' }}>
-                {this.state.userRole == prefManager.AGENT && this.renderLineAndShiftModal()}
-                <View style={{ padding: 5, height: 60, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: primaryColor }}>
-                    <TouchableOpacity
-                        style={{ padding: 10, }}
-                        onPress={() => this.handleToggle()}>
-                        <Icon name="menu" size={20} color={"#fff"} />
-                    </TouchableOpacity>
-                    <Text
-                        style={{ color: "#fff", fontSize: 16, marginLeft: 10, }}>
-                        {MyUtils.APP_NAME}
-                    </Text>
-                    <View style={{ flex: 1 }} />
-                    <NotificationIcon navigation={this.props.navigation} />
-                </View>
-                {this.state.isLoading && MyUtils.renderLoadingView()}
-                {(!this.state.isLoading && !this.state.isError) &&
-                    <View style={styles.container}>
-                        {this.state.userRole === prefManager.AGENT && this.renderQATesterHeader()}
-                        {this.state.userRole === prefManager.EDITOR && this.renderQAManagerHeader()}
-                        <FlatList
-                            style={{ flex: 1 }}
-                            data={this.state.checksData}
-                            renderItem={({ item, index }) => this.renderItem(item, index)}
-                            keyExtractor={(item, index) => index.toString()}
-                            onRefresh={() => this.handleRefresh()}
-                            refreshing={this.state.refreshing}
-                            onEndReached={() => this.handleLoadMore()}
-                            onEndReachedThreshold={0.5}
-                        />
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={{ flex: 1, backgroundColor: '#F8F8F8' }}>
+                    {this.state.userRole == prefManager.AGENT && this.renderLineAndShiftModal()}
+                    <View style={{ padding: 5, height: 60, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: primaryColor }}>
+                        <TouchableOpacity
+                            style={{ padding: 10, }}
+                            onPress={() => this.handleToggle()}>
+                            <Icon name="menu" size={20} color={"#fff"} />
+                        </TouchableOpacity>
+                        <Text
+                            style={{ color: "#fff", fontSize: 16, marginLeft: 10, }}>
+                            {MyUtils.APP_NAME}
+                        </Text>
+                        <View style={{ flex: 1 }} />
+                        <NotificationIcon navigation={this.props.navigation} />
                     </View>
-                }
-                {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
-                    this.setState({ isLoading: true, isError: false })
-                    this.loadDataFromServer()
-                })}
-            </View>
+                    {this.state.isLoading && MyUtils.renderLoadingView()}
+                    {(!this.state.isLoading && !this.state.isError) &&
+                        <View style={styles.container}>
+                            {this.state.userRole === prefManager.AGENT && this.renderQATesterHeader()}
+                            {this.state.userRole === prefManager.EDITOR && this.renderQAManagerHeader()}
+                            <FlatList
+                                style={{ flex: 1 }}
+                                data={this.state.checksData}
+                                renderItem={({ item, index }) => this.renderItem(item, index)}
+                                keyExtractor={(item, index) => index.toString()}
+                                onRefresh={() => this.handleRefresh()}
+                                refreshing={this.state.refreshing}
+                                onEndReached={() => this.handleLoadMore()}
+                                onEndReachedThreshold={0.2}
+                            />
+                        </View>
+                    }
+                    {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
+                        this.setState({ isLoading: true, isError: false })
+                        this.loadDataFromServer()
+                    })}
+                </View>
+            </SafeAreaView>
         );
     }
 
@@ -252,7 +258,23 @@ class Checks extends Component {
     }
 
     handleLoadMore() {
-
+        var page = this.state.currentPage
+        page++;
+        if (page <= this.state.totalPages) {
+            this.setState({ refreshing: true })
+            webHandler.getUserChecks(page, (responseJson) => {
+                this.setState({
+                    checksData: [...this.state.checksData, ...responseJson.data],
+                    currentPage: page,
+                    refreshing: false
+                })
+            }, (errorMsg) => {
+                this.setState({ refreshing: false })
+                MyUtils.showSnackbar(errorMsg, "")
+            }, (checksData) => {
+                this.setState({ refreshing: false })
+            })
+        }
     }
 }
 
@@ -263,4 +285,10 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Checks;
+const mapDispatchToProps = (dispatch) => {
+    return {
+        updateCounter: (counts) => dispatch({ type: 'UPDATE_NOTIFICATIONS_COUNTER', counts: counts }),
+        resetCounter: () => dispatch({ type: 'RESET_NOTIFICATIONS_COUNTER' })
+    }
+}
+export default connect(null, mapDispatchToProps)(Checks)
