@@ -23,7 +23,7 @@ import LinesAndShiftScreen from "./src/components/LinesAndShiftScreen"
 import MyVideoPlayer from "./src/utils/MyVideoPlayer"
 
 import { primaryColor, appGreyColor, appPinkColor } from './src/utils/AppStyles';
-import { Dimensions, SafeAreaView, View } from "react-native"
+import { Dimensions, Platform, View } from "react-native"
 
 import PrefManager from "./src/data/local/PrefManager"
 
@@ -54,7 +54,7 @@ const BottomNavigation = createBottomTabNavigator({
     {
         tabBarOptions: {
             showLabel: true, // hide labels
-            labelStyle: { fontSize: 12, fontWeight: "bold", padding: 5 },
+            labelStyle: { fontSize: 12, fontWeight: "bold" },
             activeTintColor: "#fff", // active icon color
             inactiveTintColor: "#858585",  // inactive icon color
             activeBackgroundColor: "#F75473",
