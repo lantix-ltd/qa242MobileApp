@@ -55,11 +55,11 @@ const BottomNavigation = createBottomTabNavigator({
         tabBarOptions: {
             showLabel: true, // hide labels
             labelStyle: { fontSize: 12, fontWeight: "bold" },
-            activeTintColor: appPinkColor, // active icon color
-            inactiveTintColor: appGreyColor,  // inactive icon color
-            activeBackgroundColor: "rgba(255,107,129,0.2)",
+            activeTintColor: "#fff", // active icon color
+            inactiveTintColor: "#858585",  // inactive icon color
+            activeBackgroundColor: "#F75473",
             style: {
-                backgroundColor: "#f8f8f8" // TabBar background
+                backgroundColor: "#F4F4F4" // TabBar background
             }
         }
     })

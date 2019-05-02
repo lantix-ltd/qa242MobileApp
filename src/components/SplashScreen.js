@@ -29,7 +29,7 @@ class SplashScreen extends Component {
                 style={styles.container}
             >
                 <Image
-                    source={require("../assets/images/qa242_logo.png")}
+                    source={require("../assets/images/qa242_new_logo.png")}
                     style={{ width: 250, height: 250 }}
                 />
             </Animatable.View>

@@ -137,12 +137,12 @@ class Checks extends Component {
 
     renderQAManagerHeader() {
         return (
-            <View style={{ flexDirection: "row", backgroundColor: appPinkColor, padding: 10 }}>
-                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <View style={{ flexDirection: "row", padding: 10 }}>
+                <View style={[styles.round_pending_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginEnd: 5 }]}>
                     <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
                     <Text style={{ color: "#fff", fontSize: 14 }}>PENDING</Text>
                 </View>
-                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                <View style={[styles.round_reviewed_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginStart: 5 }]}>
                     <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
                     <Text style={{ color: "#fff", fontSize: 14 }}>REVIEWED</Text>
                 </View>
@@ -152,16 +152,16 @@ class Checks extends Component {
 
     renderQATesterHeader() {
         return (
-            <View style={{ flexDirection: "row", backgroundColor: appPinkColor, padding: 10 }}>
-                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <View style={{ flexDirection: "row", padding: 10 }}>
+                <View style={[styles.round_new_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10 }]}>
                     <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
                     <Text style={{ color: "#fff", fontSize: 14 }}>NEW</Text>
                 </View>
-                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                <View style={[styles.round_overdue_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginHorizontal: 5 }]}>
                     <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.overDueChecks}</Text>
                     <Text style={{ color: "#fff", fontSize: 14 }}>OVER DUE</Text>
                 </View>
-                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                <View style={[styles.round_submitted_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10 }]}>
                     <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
                     <Text style={{ color: "#fff", fontSize: 14 }}>SUBMITTED</Text>
                 </View>
@@ -170,10 +170,10 @@ class Checks extends Component {
     }
 
     renderItem(item, index) {
-        let title_color = "#4D5761"
-        if (item.assign_status == "OverDue") {
-            title_color = "#f1c40f"
-        }
+        let title_color = "#A6A6A6"
+        // if (item.assign_status == "OverDue") {
+        //     title_color = "#EFDAA5"
+        // }
         return (
             <Panel key={index}
                 title={item.checkname} collapse="true"
@@ -283,7 +283,33 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F8F8F8',
-    }
+    },
+    round_new_checks_bg: {
+        backgroundColor: '#EDADC8',
+        overflow: 'hidden',
+        borderRadius: 5
+    },
+    round_overdue_checks_bg: {
+        backgroundColor: '#EFDAA5',
+        overflow: 'hidden',
+        borderRadius: 5
+    },
+    round_submitted_checks_bg: {
+        backgroundColor: '#629AE5',
+        overflow: 'hidden',
+        borderRadius: 5
+    },
+    round_pending_checks_bg: {
+        backgroundColor: '#EFDAA5',
+        overflow: 'hidden',
+        borderRadius: 5
+    },
+    round_reviewed_checks_bg: {
+        backgroundColor: '#EDADC8',
+        overflow: 'hidden',
+        borderRadius: 5
+    },
+
 });
 
 const mapDispatchToProps = (dispatch) => {

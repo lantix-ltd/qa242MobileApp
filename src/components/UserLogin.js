@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, 
-    ActivityIndicator, SafeAreaView, KeyboardAvoidingView } from "react-native";
+import {
+    View, Text, TextInput, Image, StyleSheet, TouchableOpacity,
+    ActivityIndicator, ImageBackground, KeyboardAvoidingView
+} from "react-native";
 import Icon from 'react-native-vector-icons/Feather';
 import { defTextInputStyle, defButtonContainer, defButtonText } from '../utils/AppStyles'
 import MyUtils from "../utils/MyUtils";
@@ -27,63 +29,81 @@ class UserLogin extends Component {
         return (
             <KeyboardAvoidingView style={{ flex: 1 }}>
 
-                <View style={styles.container}>
+                <ImageBackground
+                    source={require("../assets/images/login_bg_pattern.png")}
+                    style={{ width: "100%", height: "100%" }}
+                >
 
-                    <Image style={{ width: 200, height: 200 }} source={require("../assets/images/qa242_logo.png")} />
+                    <View style={styles.container}>
 
-                    <Text style={{ fontSize: 25, fontWeight: "bold", marginBottom: 20 }}>Account Login</Text>
+                        <View style={{ flex: 1 }} />
 
-                    <View style={defTextInputStyle.inputsection}>
-                        <Icon name="user" style={defTextInputStyle.icon} size={15} color="#797979" />
-                        <TextInput style={[defTextInputStyle.input]}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            keyboardType='email-address'
-                            returnKeyType="next"
-                            value={this.state.username}
-                            placeholder='* Username / Email'
-                            onChangeText={(text) => this.setState({ email: text })}
-                            placeholderTextColor='#797979' />
-                    </View>
-                    <View style={defTextInputStyle.inputsection}>
-                        <Icon name="lock" style={defTextInputStyle.icon} size={15} color="#797979" />
+                        <Image style={{ width: 200, height: 200 }} source={require("../assets/images/qa242_new_logo.png")} />
+
                         <View
-                            style={[defTextInputStyle.input, { flexDirection: "row", padding: 0 }]}>
-                            <TextInput style={{ flex: 1, height: 40, padding: 10 }}
+                            style={[styles.round_white_bg, { flexDirection: "row", padding: 0, marginHorizontal: 15, marginBottom: 10 }]}>
+                            {/* <Icon name="user" style={defTextInputStyle.icon} size={15} color="#797979" /> */}
+                            <TextInput style={{ flex: 1, textAlign: "center", height: 40, padding: 10 }}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                keyboardType='email-address'
+                                returnKeyType="next"
+                                value={this.state.username}
+                                placeholder='User Name'
+                                onChangeText={(text) => this.setState({ email: text })}
+                                placeholderTextColor='#AAAAAA' />
+                        </View>
+                        <View
+                            style={[styles.round_white_bg, { flexDirection: "row", padding: 0, marginHorizontal: 15, marginBottom: 10 }]}>
+                            <TextInput style={{ flex: 1, textAlign: "center", height: 40, padding: 10 }}
                                 returnKeyType="go"
-                                placeholder='* Password'
+                                placeholder='        Password'
                                 value={this.state.password}
                                 onChangeText={(text) => this.setState({ password: text })}
-                                placeholderTextColor='#797979'
+                                placeholderTextColor='#AAAAAA' ø
                                 secureTextEntry={this.state.hidePassword} />
                             <TouchableOpacity
                                 onPress={() => this.togglePwdVisibility()}>
                                 <Icon name={this.state.hidePassword ? "eye-off" : "eye"} style={[styles.icon, { borderBottomWidth: 0, top: 1, padding: 10, left: 5 }]} size={16} color="#797979" />
                             </TouchableOpacity>
                         </View>
-                    </View>
 
-                    <View style={{ marginTop: 20 }}>
-                        <TouchableOpacity activeOpacity={0.9} style={{}}
-                            onPress={() => { this.handleForgotPwd() }}>
-                            <Text style={{ fontSize: 14, color: "blue" }}>Forgot Password?</Text>
-                        </TouchableOpacity>
-                    </View>
+                        <View style={{ flexDirection: "row", padding: 0, marginHorizontal: 15, marginBottom: 10, marginTop: 5 }}>
+                            {!this.state.isLoading &&
+                                <TouchableOpacity
+                                    activeOpacity={0.9}
+                                    style={[styles.round_pink_btn_bg, { flex: 1, height: 40, justifyContent: "center" }]}
+                                    onPress={() => this.loginUser(this.state.email, this.state.password)}>
+                                    <Text style={{ textAlign: "center", fontSize: 17, fontWeight: "bold", color: "#fff" }}>Login</Text>
+                                </TouchableOpacity>
+                            }
+                            {this.state.isLoading &&
+                                <ActivityIndicator size="large" />
+                            }
 
-                    <View style={{ marginTop: 20 }}>
-                        {!this.state.isLoading &&
-                            <TouchableOpacity activeOpacity={0.9} style={[{ width: 200 }, defButtonContainer]}
-                                onPress={() => this.loginUser(this.state.email, this.state.password)}>
-                                <Text style={defButtonText}>LOGIN</Text>
+                        </View>
+
+                        <View style={{ flex: 1, flexDirection: "row", marginHorizontal: 15, }}>
+                            <TouchableOpacity activeOpacity={0.9} style={{}}
+                                onPress={() => { this.handleForgotPwd() }}>
+                                <Text style={{ fontSize: 15, color: "#AAAAAA", textDecorationLine: "underline" }} >Lost Password?</Text>
                             </TouchableOpacity>
-                        }
-                        {this.state.isLoading &&
-                            <ActivityIndicator size="large" />
-                        }
+                            <View style={{ flex: 1 }} />
+                            <TouchableOpacity activeOpacity={0.9} style={{}}
+                                onPress={() => { this.handleForgotPwd() }}>
+                                <Text style={{ fontSize: 15, color: "#AAAAAA", textDecorationLine: "underline" }} >New Member</Text>
+                            </TouchableOpacity>
+                        </View>
 
+
+                        <View style={{ flex: 1 }} />
+
+                        <Text style={{ fontSize: 12, color: "#000", marginVertical: 5 }} >Copyright all rights reserved 2019.</Text>
                     </View>
 
-                </View>
+
+                </ImageBackground>
+
             </KeyboardAvoidingView>
         );
     }
@@ -136,9 +156,20 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 10,
-        backgroundColor: 'white',
+        // backgroundColor: '#F4F4F4',
         justifyContent: "center", alignItems: "center"
+    },
+    round_white_bg: {
+        backgroundColor: '#fff',
+        overflow: 'hidden',
+        borderRadius: 5
+    },
+    round_pink_btn_bg: {
+        backgroundColor: '#F75473',
+        overflow: 'hidden',
+        borderRadius: 5
     }
+
 });
 
 export default UserLogin;
