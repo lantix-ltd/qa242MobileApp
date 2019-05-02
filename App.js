@@ -35,32 +35,32 @@ const BottomNavigation = createBottomTabNavigator({
     Checks: {
         screen: Checks, navigationOptions: {
             tabBarLabel: 'Checks',
-            tabBarIcon: ({ tintColor }) => <Icon size={22} style={{ padding: 20 }} name="check-circle" color={tintColor} />
+            tabBarIcon: ({ tintColor }) => <Icon size={22} style={{ marginVertical: 2 }} name="check-circle" color={tintColor} />
         }
     },
     Chats: {
         screen: Chats, navigationOptions: {
             tabBarLabel: 'Chats',
-            tabBarIcon: ({ tintColor }) => <Icon size={22} style={{ padding: 20 }} name="message-circle" color={tintColor} />
+            tabBarIcon: ({ tintColor }) => <Icon size={22} style={{ marginVertical: 2 }} name="message-circle" color={tintColor} />
         }
     },
     Contact: {
         screen: Contact, navigationOptions: {
             tabBarLabel: 'Contact',
-            tabBarIcon: ({ tintColor }) => <Icon size={22} style={{ padding: 20 }} name="users" color={tintColor} />
+            tabBarIcon: ({ tintColor }) => <Icon size={22} style={{ marginVertical: 2 }} name="users" color={tintColor} />
         }
     },
 },
     {
         tabBarOptions: {
             showLabel: true, // hide labels
-            labelStyle: { fontSize: 12, fontWeight: "bold" },
+            labelStyle: { fontSize: 12, fontWeight: "bold", padding: 5 },
             activeTintColor: "#fff", // active icon color
             inactiveTintColor: "#858585",  // inactive icon color
             activeBackgroundColor: "#F75473",
             style: {
                 backgroundColor: "#F4F4F4" // TabBar background
-            }
+            },
         }
     })
 
