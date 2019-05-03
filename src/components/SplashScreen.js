@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Image, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Image, Dimensions, ImageBackground } from "react-native";
 import { StackActions, NavigationActions } from 'react-navigation';
 import PrefManager from "../data/local/PrefManager"
 import * as Animatable from 'react-native-animatable';
@@ -21,18 +21,25 @@ class SplashScreen extends Component {
 
     render() {
         return (
-            <Animatable.View
-                animation="pulse"
-                direction="alternate"
-                easing="ease-out"
-                iterationCount="infinite"
-                style={styles.container}
+            <ImageBackground
+                source={require("../assets/images/splash_bg_pattern.png")}
+                style={{ width: "100%", height: "100%" }}
             >
-                <Image
-                    source={require("../assets/images/qa242_new_logo.png")}
-                    style={{ width: 250, height: 250 }}
-                />
-            </Animatable.View>
+                <View style={{ marginTop: 20, justifyContent: "center", alignItems: "center" }}>
+                    <Animatable.View
+                        animation="pulse"
+                        direction="alternate"
+                        easing="ease-out"
+                        iterationCount="infinite"
+                    >
+                        <Image
+                            source={require("../assets/images/qa242_new_logo.png")}
+                            style={{ width: 250, height: 250 }}
+                        />
+                    </Animatable.View>
+                </View>
+
+            </ImageBackground>
         );
     }
 
@@ -67,8 +74,6 @@ class SplashScreen extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
         justifyContent: "center", alignItems: "center"
     }
 });
