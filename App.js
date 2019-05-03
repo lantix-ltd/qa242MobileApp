@@ -62,7 +62,8 @@ const BottomNavigation = createBottomTabNavigator({
                 backgroundColor: "#F4F4F4" // TabBar background
             },
         }
-    })
+    }
+);
 
 const DrawerNavigator = createDrawerNavigator({
     Home: {
