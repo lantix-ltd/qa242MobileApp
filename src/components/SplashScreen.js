@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Image, Dimensions, ImageBackground } from "react-native";
+import { View, Text, StyleSheet, Image, Dimensions, ImageBackground, SafeAreaView } from "react-native";
 import { StackActions, NavigationActions } from 'react-navigation';
 import PrefManager from "../data/local/PrefManager"
 import * as Animatable from 'react-native-animatable';
@@ -21,25 +21,27 @@ class SplashScreen extends Component {
 
     render() {
         return (
-            <ImageBackground
-                source={require("../assets/images/splash_bg_pattern.png")}
-                style={{ width: "100%", height: "100%" }}
-            >
-                <View style={{ marginTop: 20, justifyContent: "center", alignItems: "center" }}>
-                    <Animatable.View
-                        animation="pulse"
-                        direction="alternate"
-                        easing="ease-out"
-                        iterationCount="infinite"
-                    >
-                        <Image
-                            source={require("../assets/images/qa242_new_logo.png")}
-                            style={{ width: 250, height: 250 }}
-                        />
-                    </Animatable.View>
-                </View>
+            <SafeAreaView style={{ flex: 1 }}>
+                <ImageBackground
+                    source={require("../assets/images/splash_bg_pattern.png")}
+                    style={{ width: "100%", height: "100%" }}
+                >
+                    <View style={{ marginTop: 20, justifyContent: "center", alignItems: "center" }}>
+                        <Animatable.View
+                            animation="pulse"
+                            direction="alternate"
+                            easing="ease-out"
+                            iterationCount="infinite"
+                        >
+                            <Image
+                                source={require("../assets/images/qa242_new_logo.png")}
+                                style={{ width: 250, height: 250 }}
+                            />
+                        </Animatable.View>
+                    </View>
 
-            </ImageBackground>
+                </ImageBackground>
+            </SafeAreaView>
         );
     }
 
