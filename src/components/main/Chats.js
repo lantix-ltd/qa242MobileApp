@@ -4,51 +4,29 @@ import Icon from 'react-native-vector-icons/Feather';
 import MyUtils from "../../utils/MyUtils";
 import { primaryColor } from "../../utils/AppStyles";
 import { DrawerActions } from 'react-navigation';
+import WebHandler from "../../data/remote/WebHandler"
 
-const chatsData = [
-    {
-        id: "1", username: "Person1",
-        user_pic: "https://centrik.in/wp-content/uploads/2017/02/user-image-.png",
-        user_last_msg: "Hello, last message!",
-        online: true, online_time: "10:00 AM"
-    },
-    {
-        id: "2", username: "Person2",
-        user_pic: "https://centrik.in/wp-content/uploads/2017/02/user-image-.png",
-        user_last_msg: "Hello, last message!",
-        online: true, online_time: "10:00 AM"
-    },
-    {
-        id: "3", username: "Person3",
-        user_pic: "https://centrik.in/wp-content/uploads/2017/02/user-image-.png",
-        user_last_msg: "Hello, last message!",
-        online: false, online_time: "10:00 AM"
-    },
-    {
-        id: "4", username: "Person4",
-        user_pic: "https://centrik.in/wp-content/uploads/2017/02/user-image-.png",
-        user_last_msg: "Hello, last message!",
-        online: true, online_time: "10:00 AM"
-    },
-    {
-        id: "5", username: "Person5",
-        user_pic: "https://centrik.in/wp-content/uploads/2017/02/user-image-.png",
-        user_last_msg: "Hello, last message!",
-        online: false, online_time: "10:00 AM"
-    },
-]
-
+const webHandler = new WebHandler()
 class Chats extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            refreshing: false
+            chatHistoryData: [],
+            isLoading: false, refreshing: false, isError: false, errorMsg: "",
+            isFirstLoaded: false
         }
     }
 
     componentDidMount() {
+        this.props.navigation.addListener('willFocus', async (playload) => {
+            if (this.state.isFirstLoaded) {
+                this.loadData()
+            }
+        })
 
+        this.setState({ isLoading: true, isFirstLoaded: true })
+        this.loadData()
     }
 
     handleToggle() {
@@ -56,7 +34,15 @@ class Chats extends Component {
     }
 
     loadData() {
-
+        webHandler.getUserChatHistory((responseJson) => {
+            this.setState({
+                chatHistoryData: responseJson.left_panel,
+                refreshing: false, isLoading: false
+            })
+        }, (error) => {
+            this.setState({ refreshing: false, isLoading: false, isError: true, errorMsg: error })
+            MyUtils.showSnackbar(error, "")
+        })
     }
 
     renderItem(item, index) {
@@ -64,17 +50,17 @@ class Chats extends Component {
             <TouchableOpacity onPress={() => this.handleOnItemClick(item)}>
                 <View>
                     <View style={{ flex: 1, padding: 10, flexDirection: "row" }}>
-                        {this.circledImage({ uri: item.user_pic })}
+                        {this.circledImage({ uri: item.image })}
                         <View style={{ flex: 1, marginStart: 10, paddingHorizontal: 10, justifyContent: "center" }}>
-                            <Text style={{ fontWeight: "bold" }}>{item.username}</Text>
-                            <Text>{item.user_last_msg}</Text>
+                            <Text style={{ fontWeight: "bold" }}>{item.name}</Text>
+                            <Text>{item.last_message}</Text>
                         </View>
-                        <View style={{ alignItems: "center", justifyContent: "center" }}>
+                        {/* <View style={{ alignItems: "center", justifyContent: "center" }}>
                             <Text >{item.online_time}</Text>
                             {item.online &&
                                 <Icon name="circle" style={{ marginTop: 3 }} size={14} color="green" />
                             }
-                        </View>
+                        </View> */}
                     </View>
                     <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
                 </View>
@@ -119,16 +105,37 @@ class Chats extends Component {
                         </Text>
                         <View style={{ flex: 1 }} />
                     </View>
-                    <FlatList
-                        style={{ flex: 1 }}
-                        data={chatsData}
-                        renderItem={({ item, index }) => this.renderItem(item, index)}
-                        keyExtractor={(item, index) => index.toString()}
-                        onRefresh={() => this.handleRefresh()}
-                        refreshing={this.state.refreshing}
-                        onEndReached={() => this.handleLoadMore()}
-                        onEndReachedThreshold={0.5}
-                    />
+                    {this.state.isLoading && MyUtils.renderLoadingView()}
+                    {(!this.state.isLoading && !this.state.isError) &&
+                        <View style={styles.container}>
+                            {!MyUtils.isEmptyArray(this.state.chatHistoryData) &&
+                                <FlatList
+                                    style={{ flex: 1 }}
+                                    data={this.state.chatHistoryData}
+                                    renderItem={({ item, index }) => this.renderItem(item, index)}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    onRefresh={() => this.handleRefresh()}
+                                    refreshing={this.state.refreshing}
+                                    onEndReached={() => this.handleLoadMore()}
+                                    onEndReachedThreshold={0.5}
+                                />
+                            }
+                            {MyUtils.isEmptyArray(this.state.chatHistoryData) &&
+                                <View style={{
+                                    flex: 1,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}>
+                                    <Text style={{ alignSelf: "center", fontSize: 16 }}>No checks found</Text>
+                                </View>
+                            }
+                        </View>
+                    }
+                    {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
+                        this.setState({ isLoading: true, isError: false })
+                        this.loadData()
+                    })}
+
                 </View>
             </SafeAreaView>
         );
@@ -136,13 +143,16 @@ class Chats extends Component {
 
     handleOnItemClick(item) {
         this.props.navigation.navigate("Conversation", {
-            _userName: item.username,
-            _userId: item.id
+            _userName: item.name,
+            _userId: item.id,
+            _chatId: item.trackig_id,
+            _chatType: item.type,
         })
     }
 
     handleRefresh() {
-
+        this.setState({ refreshing: true, })
+        this.loadData()
     }
 
     handleLoadMore() {

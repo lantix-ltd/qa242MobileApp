@@ -12,4 +12,6 @@ export default {
     UPDATE_PROFILE_INFO_URL: SERVER + "user-profile-update",
     UPDATE_PROFILE_PIC_URL: SERVER + "user-picture-update",
     LOGOUT_USER_URL: SERVER + "mobile-user-logout",
+    CHAT_HISTORY_URL: SERVER + "user-chat-list",
+    SEND_MESSAGE_URL: SERVER + "send-user-message",
 }

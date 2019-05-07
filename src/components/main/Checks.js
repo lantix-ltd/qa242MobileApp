@@ -215,16 +215,28 @@ class Checks extends Component {
                         <View style={styles.container}>
                             {this.state.userRole === prefManager.AGENT && this.renderQATesterHeader()}
                             {this.state.userRole === prefManager.EDITOR && this.renderQAManagerHeader()}
-                            <FlatList
-                                style={{ flex: 1 }}
-                                data={this.state.checksData}
-                                renderItem={({ item, index }) => this.renderItem(item, index)}
-                                keyExtractor={(item, index) => index.toString()}
-                                onRefresh={() => this.handleRefresh()}
-                                refreshing={this.state.refreshing}
-                                onEndReached={() => this.handleLoadMore()}
-                                onEndReachedThreshold={0.2}
-                            />
+                            {!MyUtils.isEmptyArray(this.state.checksData) &&
+                                <FlatList
+                                    style={{ flex: 1 }}
+                                    data={this.state.checksData}
+                                    renderItem={({ item, index }) => this.renderItem(item, index)}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    onRefresh={() => this.handleRefresh()}
+                                    refreshing={this.state.refreshing}
+                                    onEndReached={() => this.handleLoadMore()}
+                                    onEndReachedThreshold={0.2}
+                                />
+                            }
+                            {MyUtils.isEmptyArray(this.state.checksData) &&
+                                <View style={{
+                                    flex: 1,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}>
+                                    <Text style={{ alignSelf: "center", fontSize: 16 }}>No checks found</Text>
+                                </View>
+                            }
+
                         </View>
                     }
                     {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {

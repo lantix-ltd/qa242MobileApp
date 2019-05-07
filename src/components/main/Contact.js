@@ -13,6 +13,7 @@ class Contact extends Component {
         super(props)
         this.state = {
             usersData: [],
+            groupsData: [],
             isLoading: false, refreshing: false, isError: false, errorMsg: "",
             currentPage: 1, totalPages: 1
         }
@@ -31,8 +32,7 @@ class Contact extends Component {
         webHandler.getAllUsersContacts(1, (responseJson) => {
             this.setState({
                 usersData: responseJson.user_list,
-                totalPages: responseJson.total_pages,
-                currentPage: 1,
+                groupsData: responseJson.group_list,
                 refreshing: false, isLoading: false
             })
         }, (error) => {
@@ -46,9 +46,9 @@ class Contact extends Component {
             <TouchableOpacity onPress={() => this.handleOnItemClick(item)}>
                 <View>
                     <View style={{ flex: 1, padding: 10, flexDirection: "row" }}>
-                        {this.circledImage({ uri: item.user_image })}
+                        {this.circledImage({ uri: item.image })}
                         <View style={{ flex: 1, marginStart: 10, paddingHorizontal: 10, justifyContent: "center" }}>
-                            <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item.first_name + " " + item.last_name}</Text>
+                            <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item.name}</Text>
                         </View>
                     </View>
                     <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
@@ -98,16 +98,28 @@ class Contact extends Component {
                     {this.state.isLoading && MyUtils.renderLoadingView()}
 
                     {(!this.state.isLoading && !this.state.isError) &&
-                        <FlatList
-                            style={{ flex: 1 }}
-                            data={this.state.usersData}
-                            renderItem={({ item, index }) => this.renderItem(item, index)}
-                            keyExtractor={(item, index) => index.toString()}
-                            onRefresh={() => this.handleRefresh()}
-                            refreshing={this.state.refreshing}
-                            onEndReached={() => this.handleLoadMore()}
-                            onEndReachedThreshold={0.5}
-                        />
+                        <View style={{ flex: 1 }}>
+
+                            <View style={{ padding: 5 }}>
+                                <Text style={{ marginBottom: 5, fontWeight: "bold" }}>Groups:</Text>
+                                <FlatList
+                                    data={this.state.groupsData}
+                                    renderItem={({ item, index }) => this.renderItem(item, index)}
+                                    keyExtractor={(item, index) => index.toString()}
+                                />
+                            </View>
+
+                            <View style={{ flex: 1, padding: 5 }}>
+                                <Text style={{ marginBottom: 5, fontWeight: "bold" }}>Members:</Text>
+                                <FlatList
+                                    style={{ flex: 1 }}
+                                    data={this.state.usersData}
+                                    renderItem={({ item, index }) => this.renderItem(item, index)}
+                                    keyExtractor={(item, index) => index.toString()}
+                                />
+                            </View>
+
+                        </View>
                     }
 
                     {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
@@ -122,8 +134,9 @@ class Contact extends Component {
 
     handleOnItemClick(item) {
         this.props.navigation.navigate("Conversation", {
-            _userName: item.first_name + " " + item.last_name,
-            _userId: item.id
+            _userName: item.name,
+            _userId: item.id,
+            _chatId: item.trackig_id
         })
     }
 

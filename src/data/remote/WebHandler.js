@@ -373,6 +373,53 @@ export default class WebHandler {
         })
     }
 
+    getUserChatHistory(onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken
+                this.sendSimplePostFormRequest(Urls.CHAT_HISTORY_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    sendMessageToServer(chatType, message, toUserId, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&chattype=" + chatType +
+                    "&message=" + message +
+                    "&to=" + toUserId +
+                    "&session_token=" + userData.sessionToken
+                this.sendSimplePostFormRequest(Urls.SEND_MESSAGE_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
     sendSimplePostFormRequest(url, _body, onResponse, onError) {
         var dt = Date.now().toString()
         var data = dt + url

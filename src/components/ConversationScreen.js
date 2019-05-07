@@ -5,7 +5,9 @@ import PrefManager from "../data/local/PrefManager"
 import firebase from 'react-native-firebase';
 import MyUtils from "../utils/MyUtils";
 import { SafeAreaView } from "react-native"
+import WebHandler from "../data/remote/WebHandler"
 
+const webHandler = new WebHandler()
 const prefManager = new PrefManager()
 class ConversationScreen extends Component {
 
@@ -16,6 +18,8 @@ class ConversationScreen extends Component {
         this.state = {
             myUserId: "",
             userId: props.navigation.getParam("_userId", ""),
+            chatId: props.navigation.getParam("_chatId", ""),
+            chatType: props.navigation.getParam("_chatType", ""),
             messages: [],
             loadEarlier: false,
             isLoadingEarlier: false,
@@ -44,7 +48,7 @@ class ConversationScreen extends Component {
     }
 
     loadData(myUserId) {
-        this.unsubscribe = this.ref.collection("jahanzaib_ramzan")
+        this.unsubscribe = this.ref.collection(this.state.chatId)
             .orderBy("createdAt", "desc")
             .limit(10)
             .onSnapshot((querySnapshot) => {
@@ -81,18 +85,24 @@ class ConversationScreen extends Component {
     }
 
     sendMessageToServer(msg) {
-        var msg_data = {
-            text: msg.text,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            user_id: this.state.myUserId,
-            user_name: "Jahanzaib Ramzan",
-            user_pic: "https://placeimg.com/140/140/any"
-        }
-        this.ref.collection("jahanzaib_ramzan").add(msg_data)
-            .then((response) => {
-                MyUtils.showSnackbar("sent", "")
-            }).catch(error => {
-                MyUtils.showSnackbar(JSON.stringify(error), "")
+        webHandler.sendMessageToServer(this.state.chatType, msg.text, this.state.userId,
+            (responseJson) => {
+                var msg_data = {
+                    text: msg.text,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    user_id: this.state.myUserId,
+                    user_name: responseJson.user_name,
+                    user_pic: responseJson.user_image,
+                    chat_id: responseJson.chat_id
+                }
+                this.ref.collection(this.state.chatId).add(msg_data)
+                    .then((response) => {
+                        MyUtils.showSnackbar("sent", "")
+                    }).catch(error => {
+                        MyUtils.showSnackbar(JSON.stringify(error), "")
+                    })
+            }, (error) => {
+                MyUtils.showSnackbar(error, "")
             })
     }
 
@@ -114,7 +124,7 @@ class ConversationScreen extends Component {
     onLoadEarlier() {
         this.setState({ isLoadingEarlier: true });
         setTimeout(() => {
-            this.ref.collection("jahanzaib_ramzan")
+            this.ref.collection(this.state.chatId)
                 .orderBy("createdAt", "desc")
                 .startAfter(this.state.lastLoadedDoc)
                 .limit(10)
