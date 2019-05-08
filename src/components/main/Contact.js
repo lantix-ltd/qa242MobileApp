@@ -43,17 +43,22 @@ class Contact extends Component {
 
     renderItem(item, index) {
         return (
-            <TouchableOpacity onPress={() => this.handleOnItemClick(item)}>
-                <View>
-                    <View style={{ flex: 1, padding: 10, flexDirection: "row" }}>
-                        {this.circledImage({ uri: item.image })}
-                        <View style={{ flex: 1, marginStart: 10, paddingHorizontal: 10, justifyContent: "center" }}>
-                            <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item.name}</Text>
+            <View style={[styles.round_white_bg, { marginHorizontal: 10, marginBottom: 10 }]}>
+                <TouchableOpacity onPress={() => this.handleOnItemClick(item)}>
+                    <View>
+                        <View style={{ flex: 1, padding: 10, flexDirection: "row" }}>
+                            <Text style={{ alignSelf: "center", fontSize: 15, marginEnd: 10 }}>
+                                {("0" + (index + 1)).slice(-2)}.
+                            </Text>
+                            {this.circledImage({ uri: item.image })}
+                            <View style={{ flex: 1, marginStart: 10, paddingHorizontal: 10, justifyContent: "center" }}>
+                                <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item.name}</Text>
+                            </View>
                         </View>
+                        {/* <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} /> */}
                     </View>
-                    <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
-                </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+            </View>
         )
     }
 
@@ -71,7 +76,7 @@ class Contact extends Component {
                     height: 50,
                     width: 50,
                     borderRadius: 50,
-                    backgroundColor: '#FFFFFF'
+                    backgroundColor: '#CCCCCC'
                 }}
                 source={imgPath}
             />
@@ -136,7 +141,8 @@ class Contact extends Component {
         this.props.navigation.navigate("Conversation", {
             _userName: item.name,
             _userId: item.id,
-            _chatId: item.trackig_id
+            _chatId: item.trackig_id,
+            _chatType: item.type,
         })
     }
 
@@ -168,8 +174,13 @@ class Contact extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
-    }
+        backgroundColor: '#F8F8F8',
+    },
+    round_white_bg: {
+        backgroundColor: '#ffffff',
+        overflow: 'hidden',
+        borderRadius: 10
+    },
 });
 
 export default Contact;

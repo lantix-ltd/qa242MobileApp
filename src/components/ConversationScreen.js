@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { GiftedChat } from 'react-native-gifted-chat'
+import { GiftedChat, Bubble, MessageText, Time } from 'react-native-gifted-chat'
 import Moment from 'moment';
 import PrefManager from "../data/local/PrefManager"
 import firebase from 'react-native-firebase';
@@ -116,6 +116,47 @@ class ConversationScreen extends Component {
                     loadEarlier={this.state.loadEarlier}
                     onLoadEarlier={() => this.onLoadEarlier()}
                     isLoadingEarlier={this.state.isLoadingEarlier}
+                    listViewProps={{
+                        style: {
+                            backgroundColor: "#F8F8F8"
+                        }
+                    }}
+                    renderBubble={(props) => {
+                        return (
+                            <Bubble {...props}
+                                wrapperStyle={{
+                                    left: {
+                                        backgroundColor: 'white',
+                                    },
+                                    right: {
+                                        backgroundColor: '#FCEBBF',
+                                    }
+                                }}
+                            />
+                        )
+                    }}
+                    renderMessageText={(props) => {
+                        return (
+                            <MessageText {...props}
+                                textStyle={{
+                                    right: {
+                                        color: "#000",
+                                    }
+                                }}
+                            />
+                        )
+                    }}
+                    renderTime={(props) => {
+                        return (
+                            <Time {...props}
+                                textStyle={{
+                                    right: {
+                                        color: "#AAA"
+                                    }
+                                }}
+                            />
+                        )
+                    }}
                 />
             </SafeAreaView>
         );

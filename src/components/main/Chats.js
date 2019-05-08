@@ -47,24 +47,25 @@ class Chats extends Component {
 
     renderItem(item, index) {
         return (
-            <TouchableOpacity onPress={() => this.handleOnItemClick(item)}>
-                <View>
-                    <View style={{ flex: 1, padding: 10, flexDirection: "row" }}>
-                        {this.circledImage({ uri: item.image })}
-                        <View style={{ flex: 1, marginStart: 10, paddingHorizontal: 10, justifyContent: "center" }}>
-                            <Text style={{ fontWeight: "bold" }}>{item.name}</Text>
-                            <Text>{item.last_message}</Text>
-                        </View>
-                        {/* <View style={{ alignItems: "center", justifyContent: "center" }}>
+            <View style={[styles.round_white_bg, { marginHorizontal: 10, marginBottom: 10 }]}>
+                <TouchableOpacity onPress={() => this.handleOnItemClick(item)}>
+                    <View>
+                        <View style={{ flex: 1, padding: 10, flexDirection: "row" }}>
+                            {this.circledImage({ uri: item.image })}
+                            <View style={{ flex: 1, marginStart: 10, paddingHorizontal: 10, justifyContent: "center" }}>
+                                <Text style={{ fontWeight: "bold" }}>{item.name}</Text>
+                                <Text>{item.last_message}</Text>
+                            </View>
+                            {/* <View style={{ alignItems: "center", justifyContent: "center" }}>
                             <Text >{item.online_time}</Text>
                             {item.online &&
                                 <Icon name="circle" style={{ marginTop: 3 }} size={14} color="green" />
                             }
                         </View> */}
+                        </View>
                     </View>
-                    <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
-                </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+            </View>
         )
     }
 
@@ -82,7 +83,7 @@ class Chats extends Component {
                     height: 50,
                     width: 50,
                     borderRadius: 50,
-                    backgroundColor: '#FFFFFF'
+                    backgroundColor: '#CCCCCC'
                 }}
                 source={imgPath}
             />
@@ -163,8 +164,13 @@ class Chats extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
-    }
+        backgroundColor: '#F8F8F8',
+    },
+    round_white_bg: {
+        backgroundColor: '#ffffff',
+        overflow: 'hidden',
+        borderRadius: 10
+    },
 });
 
 export default Chats;
