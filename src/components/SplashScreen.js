@@ -40,6 +40,14 @@ class SplashScreen extends Component {
                         </Animatable.View>
                     </View>
 
+                    <View style={{ flex: 1 }} />
+                    <View style={{ flexDirection: "row" }}>
+                        <View style={{ flex: 1 }} />
+                        <Text style={{ padding: 5, fontSize: 12, color: "#000", backgroundColor: "#FFF", marginVertical: 5 }} >
+                            Copyright all rights reserved 2019. </Text>
+                        <View style={{ flex: 1 }} />
+                    </View>
+
                 </ImageBackground>
             </SafeAreaView>
         );
