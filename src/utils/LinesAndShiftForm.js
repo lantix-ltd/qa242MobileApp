@@ -44,7 +44,7 @@ class LinesAndShift extends Component {
     }
 
     render() {
-        const shifts = ['Morning', 'Evening']
+        const shifts = ['One', 'Two', 'Three']
         return (
             <View style={styles.container}>
                 <View style={{ alignItems: "flex-start", marginTop: 5 }}>

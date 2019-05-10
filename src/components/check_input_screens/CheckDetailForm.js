@@ -130,7 +130,7 @@ class CheckDetailForm extends Component {
 
                 <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
                     <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                        <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Media Files</Text>
+                        <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Media Files:</Text>
                         <TouchableOpacity
                             onPress={() => { this.refs._selectOptionModal.setModalVisible(true) }}
                         >
@@ -296,7 +296,7 @@ class CheckDetailForm extends Component {
                 this.props.navigation.state.params.onReload()
                 this.props.navigation.goBack();
             }, error => {
-                alert(error)
+                MyUtils.showCustomAlert("Check Submit Failed", error)
                 this.setState({ isFormSubmitting: false })
             })
 

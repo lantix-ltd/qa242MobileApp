@@ -14,4 +14,5 @@ export default {
     LOGOUT_USER_URL: SERVER + "mobile-user-logout",
     CHAT_HISTORY_URL: SERVER + "user-chat-list",
     SEND_MESSAGE_URL: SERVER + "send-user-message",
+    SUBMIT_AS_ACCEPTED_URL: SERVER + "change-status-for-approve",
 }

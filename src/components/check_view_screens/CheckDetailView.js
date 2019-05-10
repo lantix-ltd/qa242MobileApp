@@ -13,7 +13,9 @@ import MyUtils from "../../utils/MyUtils";
 import WebHandler from "../../data/remote/WebHandler"
 import QuesDetailView from "./QuesDetailView"
 import FullImageView from "../../utils/FullImageView"
+import PrefManager from "../../data/local/PrefManager"
 
+const prefManager = new PrefManager()
 const webHandler = new WebHandler()
 var count = 0
 class CheckDetailView extends Component {
@@ -28,6 +30,7 @@ class CheckDetailView extends Component {
 
             checkId: props.navigation.getParam("_id", ""),
             checkTitle: props.navigation.getParam("_title", ""),
+            userRole: props.navigation.getParam("_user_type", ""),
             checkDetail: [],
             isError: false, errorMsg: "",
             checkQuesRefs: [],
@@ -162,7 +165,7 @@ class CheckDetailView extends Component {
 
                 <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
                     <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                        <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Media Files</Text>
+                        <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Media Files:</Text>
                     </View>
                     {
                         this.state.mediaFiles.map((item, index) => {
@@ -172,7 +175,7 @@ class CheckDetailView extends Component {
                                 return this.renderAudioFileView(item, index)
                             } else if (item.type == "video") {
                                 return this.renderVideoFileView(item, index)
-                            }
+                            } 
                         })
                     }
                 </View>
@@ -217,12 +220,22 @@ class CheckDetailView extends Component {
                             </ScrollView>
 
                             <View style={{ flexDirection: "row", padding: 10 }}>
-                                <Button
-                                    title="REVIEWED"
-                                    containerStyle={{ flex: 1 }}
-                                    buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
-                                    onPress={() => { this.acceptData() }}
-                                />
+                                {this.state.userRole == prefManager.EDITOR &&
+                                    <Button
+                                        title="REVIEWED"
+                                        containerStyle={{ flex: 1 }}
+                                        buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                                        onPress={() => { this.acceptDataForReview() }}
+                                    />
+                                }
+                                {this.state.userRole == prefManager.ADMIN &&
+                                    <Button
+                                        title="APPROVED"
+                                        containerStyle={{ flex: 1 }}
+                                        buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                                        onPress={() => { this.acceptDataForApproval() }}
+                                    />
+                                }
                                 <Button
                                     title="CANCEL"
                                     style={{ width: "50%" }}
@@ -246,7 +259,7 @@ class CheckDetailView extends Component {
         );
     }
 
-    acceptData() {
+    acceptDataForReview() {
         this.setState({ isFormSubmitting: true })
         webHandler.submitAsReviewd(this.state.checkId, this.state.reviewerComment,
             (responseJson) => {
@@ -255,7 +268,21 @@ class CheckDetailView extends Component {
                 this.props.navigation.state.params.onReload()
                 this.props.navigation.goBack();
             }, (error) => {
-                alert(error)
+                MyUtils.showCustomAlert("Check Review Failed", error)
+                this.setState({ isFormSubmitting: false })
+            })
+    }
+
+    acceptDataForApproval() {
+        this.setState({ isFormSubmitting: true })
+        webHandler.submitAsApproved(this.state.checkId, this.state.reviewerComment,
+            (responseJson) => {
+                MyUtils.showSnackbar("Added to approved successfully", "")
+                this.setState({ isFormSubmitting: false })
+                this.props.navigation.state.params.onReload()
+                this.props.navigation.goBack();
+            }, (error) => {
+                MyUtils.showCustomAlert("Check Approve Failed", error)
                 this.setState({ isFormSubmitting: false })
             })
     }

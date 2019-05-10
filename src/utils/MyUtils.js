@@ -1,5 +1,5 @@
 import React from "react";
-import { ToastAndroid, ActivityIndicator, Text, View, TouchableOpacity, Platform } from "react-native"
+import { ToastAndroid, ActivityIndicator, Text, View, TouchableOpacity, Platform, Alert } from "react-native"
 import { appPinkColor, defButtonContainer, defButtonText } from "./AppStyles";
 import { Button } from "react-native-elements"
 
@@ -13,6 +13,16 @@ export default {
         } else {
             return false
         }
+    },
+
+    showCustomAlert(title, message) {
+        Alert.alert(title, message,
+            [
+                {
+                    text: 'OK', onPress: () => { }
+                }
+            ]
+        )
     },
 
     showSnackbar(message, color) {

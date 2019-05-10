@@ -76,14 +76,15 @@ export default class WebHandler {
                         onFailure(responseJson.message)
                     }
                 }, (error) => {
-                    localDB.getAllChecks(
-                        checksData => {
-                            onOffLineData(checksData)
-                        },
-                        dbError => {
-                            onFailure(error)
-                        }
-                    )
+                    // localDB.getAllChecks(
+                    //     checksData => {
+                    //         onOffLineData(checksData)
+                    //     },
+                    //     dbError => {
+                    //         onFailure(error)
+                    //     }
+                    // )
+                    onFailure(error)
                 })
             } else {
                 onFailure("User session not exist!")
@@ -194,9 +195,11 @@ export default class WebHandler {
                             shift = "N/A"
                         } else {
                             if (val == 0) {
-                                shift = "Morning"
+                                shift = "1"
                             } else if (val == 1) {
-                                shift = "Evening"
+                                shift = "2"
+                            } else if (val == 1) {
+                                shift = "3"
                             }
                         }
                         onSuccess(line, shift)
@@ -406,6 +409,30 @@ export default class WebHandler {
                     "&to=" + toUserId +
                     "&session_token=" + userData.sessionToken
                 this.sendSimplePostFormRequest(Urls.SEND_MESSAGE_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    submitAsApproved(assignId, comment, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    "&assign_id=" + assignId +
+                    "&review_comments=" + comment
+                this.sendSimplePostFormRequest(Urls.SUBMIT_AS_ACCEPTED_URL, body, (responseJson) => {
                     if (responseJson.status) {
                         onSuccess(responseJson)
                     } else {

@@ -135,7 +135,26 @@ class Checks extends Component {
         )
     }
 
-    renderQAManagerHeader() {
+    renderQATechHeader() {
+        return (
+            <View style={{ flexDirection: "row", padding: 10 }}>
+                <View style={[styles.round_new_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10 }]}>
+                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
+                    <Text style={{ color: "#fff", fontSize: 14 }}>NEW</Text>
+                </View>
+                <View style={[styles.round_overdue_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginHorizontal: 5 }]}>
+                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.overDueChecks}</Text>
+                    <Text style={{ color: "#fff", fontSize: 14 }}>OVER DUE</Text>
+                </View>
+                <View style={[styles.round_submitted_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10 }]}>
+                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
+                    <Text style={{ color: "#fff", fontSize: 14 }}>SUBMITTED</Text>
+                </View>
+            </View>
+        )
+    }
+
+    renderQASpecialistHeader() {
         return (
             <View style={{ flexDirection: "row", padding: 10 }}>
                 <View style={[styles.round_pending_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginEnd: 5 }]}>
@@ -150,20 +169,16 @@ class Checks extends Component {
         )
     }
 
-    renderQATesterHeader() {
+    renderQAManagerHeader() {
         return (
             <View style={{ flexDirection: "row", padding: 10 }}>
-                <View style={[styles.round_new_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10 }]}>
+                <View style={[styles.round_pending_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginEnd: 5 }]}>
                     <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
-                    <Text style={{ color: "#fff", fontSize: 14 }}>NEW</Text>
+                    <Text style={{ color: "#fff", fontSize: 14 }}>PENDING</Text>
                 </View>
-                <View style={[styles.round_overdue_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginHorizontal: 5 }]}>
-                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.overDueChecks}</Text>
-                    <Text style={{ color: "#fff", fontSize: 14 }}>OVER DUE</Text>
-                </View>
-                <View style={[styles.round_submitted_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10 }]}>
+                <View style={[styles.round_reviewed_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginStart: 5 }]}>
                     <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
-                    <Text style={{ color: "#fff", fontSize: 14 }}>SUBMITTED</Text>
+                    <Text style={{ color: "#fff", fontSize: 14 }}>APPROVED</Text>
                 </View>
             </View>
         )
@@ -213,8 +228,9 @@ class Checks extends Component {
                     {this.state.isLoading && MyUtils.renderLoadingView()}
                     {(!this.state.isLoading && !this.state.isError) &&
                         <View style={styles.container}>
-                            {this.state.userRole === prefManager.AGENT && this.renderQATesterHeader()}
-                            {this.state.userRole === prefManager.EDITOR && this.renderQAManagerHeader()}
+                            {this.state.userRole === prefManager.AGENT && this.renderQATechHeader()}
+                            {this.state.userRole === prefManager.EDITOR && this.renderQASpecialistHeader()}
+                            {this.state.userRole === prefManager.ADMIN && this.renderQAManagerHeader()}
                             {!MyUtils.isEmptyArray(this.state.checksData) &&
                                 <FlatList
                                     style={{ flex: 1 }}
@@ -256,10 +272,11 @@ class Checks extends Component {
                 _title: item.checkname,
                 onReload: () => { this.handleRefresh() }
             })
-        } else if (this.state.userRole == prefManager.EDITOR) {
+        } else if (this.state.userRole == prefManager.EDITOR || this.state.userRole == prefManager.ADMIN) {
             this.props.navigation.navigate("CheckDetailView", {
                 _id: item.assign_id,
                 _title: item.checkname,
+                _user_type: this.state.userRole,
                 onReload: () => { this.handleRefresh() }
             })
         }
