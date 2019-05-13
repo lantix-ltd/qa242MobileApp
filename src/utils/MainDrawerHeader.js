@@ -55,12 +55,12 @@ export default class MainDrawerHeader extends React.Component {
     render() {
         return (
             <SafeAreaView style={{ flex: 1 }}>
-                <View style={{ height: 200 }}>
-                    <Image
+                <View style={{ height: 160 }}>
+                    {/* <Image
                         style={{ height: 200, width: width }}
                         resizeMode="stretch"
                         source={require('../assets/images/cover.png')}
-                    />
+                    /> */}
                     {this.state.isLoggedIn &&
                         <View style={styles.header}>
                             {this.state.isImageUploading &&
@@ -79,7 +79,7 @@ export default class MainDrawerHeader extends React.Component {
                                     </TouchableOpacity>
                                 </View>
                             }
-                            <Text style={{ fontSize: 22, padding: 6, color: "#FFFFFF", }}>{this.state.userName}</Text>
+                            <Text style={{ fontSize: 22, padding: 6, color: "#000000", }}>{this.state.userName}</Text>
                         </View>
                     }
                     {this.state.isLoggedIn &&
@@ -88,7 +88,7 @@ export default class MainDrawerHeader extends React.Component {
                                 style={{ padding: 10, }}
                                 onPress={() => { this.logOutUser() }}
                             >
-                                <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 12 }}>Log Out</Text>
+                                <Text style={{ color: "#000", fontWeight: "bold", fontSize: 12 }}>Log Out</Text>
                             </TouchableOpacity>
                         </View>
                     }
@@ -180,17 +180,17 @@ export default class MainDrawerHeader extends React.Component {
         return <TouchableHighlight
             style={{
                 overflow: 'hidden',
-                height: 90,
-                width: 90,
-                borderRadius: 160 / 2,
+                height: 80,
+                width: 80,
+                borderRadius: 150 / 2,
                 elevation: 2
             }}>
             <Image
                 style={{
-                    height: 90,
-                    width: 90,
+                    height: 80,
+                    width: 80,
                     borderRadius: 50,
-                    backgroundColor: '#FFFFFF'
+                    backgroundColor: '#CCCCCC'
                 }}
                 source={imgPath}
             />
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     },
     imageselector: {
         backgroundColor: 'white',
-        borderRadius: 150 / 2,
+        borderRadius: 140 / 2,
         padding: 5,
         elevation: 3
     },

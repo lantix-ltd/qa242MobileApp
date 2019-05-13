@@ -23,7 +23,7 @@ import LinesAndShiftScreen from "./src/components/LinesAndShiftScreen"
 import MyVideoPlayer from "./src/utils/MyVideoPlayer"
 
 import { primaryColor, appGreyColor, appPinkColor } from './src/utils/AppStyles';
-import { Dimensions, Platform, View } from "react-native"
+import { Dimensions, StyleSheet, View } from "react-native"
 
 import PrefManager from "./src/data/local/PrefManager"
 
@@ -113,8 +113,8 @@ const DrawerNavigator = createDrawerNavigator({
         drawerWidth: width,
         contentComponent: MainDrawerHeader,
         contentOptions: {
-            activeBackgroundColor: "rgba(255,107,129,0.2)",
-            activeTintColor: appPinkColor,
+            activeBackgroundColor: appPinkColor,
+            activeTintColor: "#fff",
             inactiveTintColor: appGreyColor,
         }
     }
@@ -168,6 +168,17 @@ export default class App extends React.Component {
         );
     }
 }
+
+const styles = StyleSheet.create({
+    circledPickBG: {
+        backgroundColor: appPinkColor,
+        borderRadius: 40,
+        height: 40,
+        width: 40,
+        padding: 7,
+        alignSelf: "center", justifyContent: "center", alignItems: "center", alignContent: "center"
+    }
+});
 
 const initialState = {
     counter: 0

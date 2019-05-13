@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, Alert } from "react-native";
 import Icon from 'react-native-vector-icons/Feather'
+import MyUtils from "../../utils/MyUtils";
 
 class QuesDetailView extends Component {
 
@@ -17,7 +18,7 @@ class QuesDetailView extends Component {
 
     componentDidMount() {
         const qData = this.state.checkQuesData
-        if (qData != undefined && qData != null) {
+        if (qData != undefined && qData != null && !MyUtils.isEmptyArray(qData.givenanswers)) {
             if (qData.question_type === "Dropdown" || qData.question_type === "Fixed") {
                 this.setState({
                     selectedAnsValue: qData.givenanswers[0].given_answer,

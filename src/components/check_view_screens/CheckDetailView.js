@@ -6,7 +6,6 @@ import {
 import { Button } from 'react-native-elements'
 import Modal from "react-native-modal";
 import Sound from 'react-native-sound';
-import Icon from 'react-native-vector-icons/Feather';
 
 import { appPinkColor, appYellowColor, appGreyColor } from "../../utils/AppStyles";
 import MyUtils from "../../utils/MyUtils";
@@ -35,7 +34,9 @@ class CheckDetailView extends Component {
             isError: false, errorMsg: "",
             checkQuesRefs: [],
             isFormSubmitting: false,
-            reviewerComment: ""
+            reviewerComment: "",
+            isReAssign: false,
+            isReAssignAnswered: false
         }
     }
 
@@ -55,6 +56,8 @@ class CheckDetailView extends Component {
             (responseJson) => {
                 this.setState({
                     checkDetail: responseJson.data,
+                    isReAssign: responseJson.reassign,
+                    isReAssignAnswered: responseJson.reassing_answer,
                     isLoading: false, refreshing: false
                 })
             },
@@ -68,10 +71,10 @@ class CheckDetailView extends Component {
     renderTVRow(title, value) {
         return (
             <View style={{ flexDirection: "row" }}>
-                <Text style={{ flex: 1, fontSize: 15 }}>
+                <Text style={{ flex: 1, fontSize: 14 }}>
                     {title}
                 </Text>
-                <Text style={{ flex: 1, fontSize: 17, color: "#000" }}>
+                <Text style={{ flex: 1, fontSize: 15, color: "#000" }}>
                     {value}
                 </Text>
             </View>
@@ -82,13 +85,42 @@ class CheckDetailView extends Component {
         return (
             <View style={[styles.round_white_bg_container, { marginTop: 5 }]}>
                 <Text style={{
-                    fontSize: 16, fontWeight: "bold",
+                    fontSize: 14, fontWeight: "bold",
                     color: appPinkColor, marginBottom: 5
                 }}>Submitted By:</Text>
                 {fullName != undefined && this.renderTVRow("Name", fullName)}
                 {lineNo != undefined && this.renderTVRow("Working Line(s)", lineNo)}
                 {shiftNo != undefined && this.renderTVRow("Working Shift", shiftNo)}
                 {dateTime != undefined && this.renderTVRow("Date & Time", dateTime)}
+            </View>
+        )
+    }
+
+    renderReSubmittedByView(lineNo, shiftNo, fullName) {
+        return (
+            <View style={[styles.round_white_bg_container, { marginTop: 5 }]}>
+                <Text style={{
+                    fontSize: 14, fontWeight: "bold",
+                    color: appPinkColor, marginBottom: 5
+                }}>Submitted By:</Text>
+                {fullName != undefined && this.renderTVRow("Name", fullName)}
+                {lineNo != undefined && this.renderTVRow("Working Line(s)", lineNo)}
+                {shiftNo != undefined && this.renderTVRow("Working Shift", shiftNo)}
+                {/* {dateTime != undefined && this.renderTVRow("Date & Time", dateTime)} */}
+            </View>
+        )
+    }
+
+    renderReviewedByView(fullName, dateTime, comment) {
+        return (
+            <View style={[styles.round_white_bg_container, { marginTop: 5 }]}>
+                <Text style={{
+                    fontSize: 16, fontWeight: "bold",
+                    color: appPinkColor, marginBottom: 5
+                }}>Reviewed By:</Text>
+                {fullName != undefined && this.renderTVRow("Name", fullName)}
+                {dateTime != undefined && this.renderTVRow("Date & Time", dateTime)}
+                {comment != undefined && this.renderTVRow("Comment", comment)}
             </View>
         )
     }
@@ -115,14 +147,10 @@ class CheckDetailView extends Component {
         )
     }
 
-    renderCheckView(item, index) {
+    renderCheckView(questions) {
         return (
-            <View style={{ marginHorizontal: 10 }}>
-                <Text style={{
-                    fontSize: 16, textAlign: "center",
-                    fontWeight: "bold", marginVertical: 10
-                }}>{item.productname}</Text>
-                {item.questions.map((quest, q_index) => {
+            <View style={{ marginHorizontal: 5 }}>
+                {questions.map((quest, q_index) => {
                     return (
                         <View key={q_index}>
                             {(quest.question_type === "Dropdown" || quest.question_type === "Fixed") &&
@@ -162,24 +190,27 @@ class CheckDetailView extends Component {
                         </View>
                     )
                 })}
+            </View>
+        )
+    }
 
-                <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
-                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                        <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Media Files:</Text>
-                    </View>
-                    {
-                        this.state.mediaFiles.map((item, index) => {
-                            if (item.type == "image") {
-                                return this.renderImageFileView(item, index)
-                            } else if (item.type == "audio") {
-                                return this.renderAudioFileView(item, index)
-                            } else if (item.type == "video") {
-                                return this.renderVideoFileView(item, index)
-                            } 
-                        })
-                    }
+    renderCheckMediaFiles(mediaFiles) {
+        return (
+            <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
+                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                    <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Media Files:</Text>
                 </View>
-
+                {
+                    mediaFiles.map((item, index) => {
+                        if (item.type == "image") {
+                            return this.renderImageFileView(item, index)
+                        } else if (item.type == "audio") {
+                            return this.renderAudioFileView(item, index)
+                        } else if (item.type == "video") {
+                            return this.renderVideoFileView(item, index)
+                        }
+                    })
+                }
             </View>
         )
     }
@@ -209,13 +240,44 @@ class CheckDetailView extends Component {
                         <View style={{ flex: 1 }}>
 
                             <ScrollView style={{ flex: 1 }}>
-                                {this.renderCheckView(this.state.checkDetail[0], 0)}
+                                <Text style={{
+                                    fontSize: 16, textAlign: "center",
+                                    fontWeight: "bold", marginTop: 10
+                                }}>{this.state.checkDetail[0].productname}</Text>
+
+                                {this.renderCheckView(this.state.checkDetail[0].questions)}
+                                {this.renderCheckMediaFiles(this.state.mediaFiles)}
                                 {this.renderSubmittedByView(
                                     this.state.checkDetail[0].line_no,
                                     this.state.checkDetail[0].shift_no,
                                     this.state.checkDetail[0].full_name,
                                     this.state.checkDetail[0].complete_datetime
                                 )}
+
+                                {this.state.isReAssign &&
+                                    <View>
+                                        <Text style={{
+                                            fontSize: 16, textAlign: "center",
+                                            fontWeight: "bold", marginTop: 10
+                                        }}>Check Re-Assign Data</Text>
+                                        {this.renderCheckView(this.state.checkDetail[0].reassign_data.question)}
+                                        {this.renderCheckMediaFiles(this.state.mediaFiles)}
+                                        {this.state.isReAssignAnswered && this.renderReSubmittedByView(
+                                            this.state.checkDetail[0].reassign_data.line_no,
+                                            this.state.checkDetail[0].reassign_data.shift_no,
+                                            this.state.checkDetail[0].reassign_data.name,
+                                            // this.state.checkDetail[0].reassign_data.complete_datetime
+                                        )}
+                                    </View>
+                                }
+
+                                {this.state.userRole == prefManager.ADMIN &&
+                                    this.renderReviewedByView(
+                                        this.state.checkDetail[0].review_user,
+                                        this.state.checkDetail[0].reviewer_datetime,
+                                        this.state.checkDetail[0].review_comments
+                                    )
+                                }
                                 {this.renderCommentView()}
                             </ScrollView>
 
@@ -260,6 +322,10 @@ class CheckDetailView extends Component {
     }
 
     acceptDataForReview() {
+        if (this.state.isReAssign && !this.state.isReAssignAnswered) {
+            MyUtils.showSnackbar("Re-Assigned check hasn't been answered yet", "")
+            return
+        }
         this.setState({ isFormSubmitting: true })
         webHandler.submitAsReviewd(this.state.checkId, this.state.reviewerComment,
             (responseJson) => {
@@ -274,6 +340,10 @@ class CheckDetailView extends Component {
     }
 
     acceptDataForApproval() {
+        if (this.state.isReAssign && !this.state.isReAssignAnswered) {
+            MyUtils.showSnackbar("Re-Assigned check hasn't been answered yet", "")
+            return
+        }
         this.setState({ isFormSubmitting: true })
         webHandler.submitAsApproved(this.state.checkId, this.state.reviewerComment,
             (responseJson) => {

@@ -43,10 +43,10 @@ class NotificationsScreen extends Component {
 
     renderItem(item, index) {
         return (
-            <TouchableOpacity onPress={() => this.handleOnItemClick(item)}>
+            <TouchableOpacity style={[styles.round_white_bg, { margin: 10 }]} onPress={() => this.handleOnItemClick(item)}>
                 <View>
                     <View style={{ flex: 1, padding: 10, flexDirection: "row" }}>
-                        <Icon style={{ alignSelf: "center", justifyContent: "center" }} name="bell" size={40} color="#ccc" />
+                        {this.renderCircledNotificationIcon()}
                         <View style={{ flex: 1, marginStart: 10, paddingHorizontal: 10, justifyContent: "center" }}>
                             <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item.title}</Text>
                             <Text style={{ fontSize: 13 }} ellipsizeMode="tail" numberOfLines={2}>
@@ -55,7 +55,7 @@ class NotificationsScreen extends Component {
                         </View>
                     </View>
                     <Text style={{ alignSelf: "flex-end", paddingHorizontal: 5 }}>{item.datetime}</Text>
-                    <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
+                    {/* <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} /> */}
                 </View>
             </TouchableOpacity>
         )
@@ -88,6 +88,27 @@ class NotificationsScreen extends Component {
                 </View>
             </SafeAreaView>
         );
+    }
+
+    renderCircledNotificationIcon() {
+        return <View
+            style={{
+                overflow: 'hidden',
+                height: 50,
+                width: 50,
+                borderRadius: 100 / 2,
+                elevation: 2
+            }}>
+            <View
+                style={{
+                    height: 50,
+                    width: 50,
+                    borderRadius: 50,
+                    backgroundColor: '#FCEBBF', justifyContent: "center", alignItems: "center",
+                }}>
+                <Icon name="bell" size={25} color="#464646" />
+            </View>
+        </View>
     }
 
     handleOnItemClick(item) {
@@ -129,8 +150,13 @@ class NotificationsScreen extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
-    }
+        backgroundColor: '#F8F8F8',
+    },
+    round_white_bg: {
+        backgroundColor: '#ffffff',
+        overflow: 'hidden',
+        borderRadius: 10
+    },
 });
 
 export default NotificationsScreen;
