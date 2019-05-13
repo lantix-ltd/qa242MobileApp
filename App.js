@@ -169,17 +169,6 @@ export default class App extends React.Component {
     }
 }
 
-const styles = StyleSheet.create({
-    circledPickBG: {
-        backgroundColor: appPinkColor,
-        borderRadius: 40,
-        height: 40,
-        width: 40,
-        padding: 7,
-        alignSelf: "center", justifyContent: "center", alignItems: "center", alignContent: "center"
-    }
-});
-
 const initialState = {
     counter: 0
 }
