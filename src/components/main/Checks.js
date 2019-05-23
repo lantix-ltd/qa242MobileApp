@@ -41,7 +41,6 @@ class Checks extends Component {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
                 this.setState({ userRole: userData.userPrimaryType })
-                this.loadDataFromServer()
             }
         })
         this.setUpForMessaging()
@@ -97,11 +96,6 @@ class Checks extends Component {
                 isLoading: false, refreshing: false
             })
             this.props.updateCounter(responseJson.total_notification)
-            // prefManager.getLastOpenedForm(result => {
-            //     if (result != null) {
-            //         this.handleOnItemClick(result)
-            //     }
-            // })
         }, (errorMsg) => {
             MyUtils.showSnackbar(errorMsg, "")
             this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: errorMsg })
@@ -128,7 +122,10 @@ class Checks extends Component {
             >
                 <View style={{ height: 380, padding: 5 }}>
                     <LinesAndShift
-                        onSavePress={() => { this.setState({ modalVisible: false }) }}
+                        onSavePress={() => {
+                            this.setState({ modalVisible: false })
+                            this.loadDataFromServer()
+                        }}
                     />
                 </View>
             </Modal>

@@ -61,29 +61,35 @@ export default class WebHandler {
     getUserChecks(pageNo, onSuccess, onFailure, onOffLineData) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
-                var body =
-                    "user_id=" + userData.id +
-                    "&outlet_id=" + userData.businessId +
-                    "&role=" + userData.userPrimaryType +
-                    "&group_id=" + userData.userPrimaryGId +
-                    "&session_token=" + userData.sessionToken +
-                    "&page_number=" + pageNo
-                this.sendSimplePostFormRequest(Urls.CHECKS_LIST_URL, body, (responseJson) => {
-                    if (responseJson.status) {
-                        localDB.addNewChecks(responseJson.data)
-                        onSuccess(responseJson)
-                    } else {
-                        onFailure(responseJson.message)
-                    }
-                }, (error) => {
-                    // localDB.getAllChecks(
-                    //     checksData => {
-                    //         onOffLineData(checksData)
-                    //     },
-                    //     dbError => {
-                    //         onFailure(error)
-                    //     }
-                    // )
+                this.getSelectedLinesAndShift((line, shift) => {
+                    var body =
+                        "user_id=" + userData.id +
+                        "&outlet_id=" + userData.businessId +
+                        "&role=" + userData.userPrimaryType +
+                        "&group_id=" + userData.userPrimaryGId +
+                        "&session_token=" + userData.sessionToken +
+                        "&line_timing=" + line.substring(0, line.lastIndexOf(",")) +
+                        "&shift_timing=" + shift +
+                        "&page_number=" + pageNo
+                    this.sendSimplePostFormRequest(Urls.CHECKS_LIST_URL, body, (responseJson) => {
+                        if (responseJson.status) {
+                            localDB.addNewChecks(responseJson.data)
+                            onSuccess(responseJson)
+                        } else {
+                            onFailure(responseJson.message)
+                        }
+                    }, (error) => {
+                        // localDB.getAllChecks(
+                        //     checksData => {
+                        //         onOffLineData(checksData)
+                        //     },
+                        //     dbError => {
+                        //         onFailure(error)
+                        //     }
+                        // )
+                        onFailure(error)
+                    })
+                }, error => {
                     onFailure(error)
                 })
             } else {
