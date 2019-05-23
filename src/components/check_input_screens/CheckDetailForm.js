@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import {
     View, Text, Image, StyleSheet, SafeAreaView, ScrollView,
-    TouchableHighlight, TouchableOpacity, ActivityIndicator
+    TouchableOpacity, ActivityIndicator
 } from "react-native";
-import { RadioButton } from "react-native-paper"
+import { Chip } from "react-native-paper"
 import { Button } from 'react-native-elements'
 import Modal from "react-native-modal";
 import ImagePicker from 'react-native-image-crop-picker';
@@ -11,14 +11,25 @@ import Sound from 'react-native-sound';
 import Icon from 'react-native-vector-icons/Feather';
 
 import { appPinkColor, appYellowColor, appGreyColor } from "../../utils/AppStyles";
-import Panel from "../../utils/Panel"
 import MyUtils from "../../utils/MyUtils";
 import WebHandler from "../../data/remote/WebHandler"
 import QuesDetailForm from "./QuesDetailForm"
 import SelectOptionModal from "../../utils/SelectOptionModal"
+import SelectMultiOptionModal from "../../utils/SelectMultiOptionModal"
 import MyAudioRecorder from "../../utils/MyAudioRecorder"
 import FullImageView from "../../utils/FullImageView"
 
+const programType = [
+    { id: 1, key: "Seafood", isSelecetd: false },
+    { id: 2, key: "USDA", isSelecetd: false },
+    { id: 3, key: "FDA", isSelecetd: false },
+    { id: 4, key: "Gluten free", isSelecetd: false },
+    { id: 5, key: "Organic", isSelecetd: false },
+    { id: 6, key: "TKosher", isSelecetd: false },
+    { id: 7, key: "Halal", isSelecetd: false },
+    { id: 8, key: "Non- GMO", isSelecetd: false },
+    { id: 9, key: "5S Program", isSelecetd: false },
+]
 const webHandler = new WebHandler()
 var count = 0
 
@@ -38,7 +49,8 @@ class CheckDetailForm extends Component {
             checkDetail: [],
             isError: false, errorMsg: "",
             checkQuesRefs: [],
-            isFormSubmitting: false
+            isFormSubmitting: false,
+            selectedProgramtypes: programType
         }
     }
 
@@ -149,6 +161,27 @@ class CheckDetailForm extends Component {
                         })
                     }
                 </View>
+                <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
+                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                        <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Program Types:</Text>
+                        <TouchableOpacity
+                            onPress={() => { this.refs._selectMultiOptionModal.showProgramsTypes(this.state.selectedProgramtypes) }}
+                        >
+                            <Icon name="edit" color={appGreyColor} size={24} />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                        {
+                            this.state.selectedProgramtypes.map((item, index) => {
+                                if (item.isSelecetd) {
+                                    return (
+                                        <Chip key={index} style={{ margin: 5 }}>{item.key}</Chip>
+                                    )
+                                }
+                            })
+                        }
+                    </View>
+                </View>
             </View>
         )
     }
@@ -203,6 +236,10 @@ class CheckDetailForm extends Component {
                             <SelectOptionModal
                                 ref="_selectOptionModal"
                                 onItemPress={(type) => this.handleMediaFileAction(type)}
+                            />
+                            <SelectMultiOptionModal
+                                ref="_selectMultiOptionModal"
+                                onDonePress={(types) => this.setState({ selectedProgramtypes: types })}
                             />
                             <MyAudioRecorder
                                 ref="_myAudioRecorder"
@@ -281,6 +318,13 @@ class CheckDetailForm extends Component {
             }
         })
 
+        var pTypes = this.getSelectedProgramTypes()
+        if (pTypes == "") {
+            MyUtils.showSnackbar("Please select a program type.", "")
+            isAllOK = false
+            return
+        }
+
         if (isAllOK) {
             this.submitData(JSON.stringify(topicResp))
         }
@@ -301,6 +345,16 @@ class CheckDetailForm extends Component {
             })
 
         // alert(quesResp) 
+    }
+
+    getSelectedProgramTypes() {
+        var values = ""
+        this.state.selectedProgramtypes.map(item => {
+            if (item.isSelecetd) {
+                values = values + item.key + ","
+            }
+        })
+        return values;
     }
 
     renderImageFileView(item, index) {
