@@ -19,17 +19,7 @@ import SelectMultiOptionModal from "../../utils/SelectMultiOptionModal"
 import MyAudioRecorder from "../../utils/MyAudioRecorder"
 import FullImageView from "../../utils/FullImageView"
 
-const programType = [
-    { id: 1, key: "Seafood", isSelecetd: false },
-    { id: 2, key: "USDA", isSelecetd: false },
-    { id: 3, key: "FDA", isSelecetd: false },
-    { id: 4, key: "Gluten free", isSelecetd: false },
-    { id: 5, key: "Organic", isSelecetd: false },
-    { id: 6, key: "TKosher", isSelecetd: false },
-    { id: 7, key: "Halal", isSelecetd: false },
-    { id: 8, key: "Non- GMO", isSelecetd: false },
-    { id: 9, key: "5S Program", isSelecetd: false },
-]
+const GEN_QA_CHECK = "general qa check"
 const webHandler = new WebHandler()
 var count = 0
 
@@ -46,11 +36,12 @@ class CheckDetailForm extends Component {
 
             checkId: props.navigation.getParam("_id", ""),
             checkTitle: props.navigation.getParam("_title", ""),
+            checkType: props.navigation.getParam("_check_type", ""),
             checkDetail: [],
             isError: false, errorMsg: "",
             checkQuesRefs: [],
             isFormSubmitting: false,
-            selectedProgramtypes: programType
+            selectedProgramtypes: []
         }
     }
 
@@ -62,6 +53,18 @@ class CheckDetailForm extends Component {
 
     componentDidMount() {
         this.setState({ isLoading: true })
+        var programType = [
+            { id: 1, key: "Seafood", isSelecetd: false },
+            { id: 2, key: "USDA", isSelecetd: false },
+            { id: 3, key: "FDA", isSelecetd: false },
+            { id: 4, key: "Gluten free", isSelecetd: false },
+            { id: 5, key: "Organic", isSelecetd: false },
+            { id: 6, key: "TKosher", isSelecetd: false },
+            { id: 7, key: "Halal", isSelecetd: false },
+            { id: 8, key: "Non- GMO", isSelecetd: false },
+            { id: 9, key: "5S Program", isSelecetd: false },
+        ]
+        this.setState({ selectedProgramtypes: programType })
         this.loadData()
     }
 
@@ -161,27 +164,31 @@ class CheckDetailForm extends Component {
                         })
                     }
                 </View>
-                <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
-                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                        <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Program Types:</Text>
-                        <TouchableOpacity
-                            onPress={() => { this.refs._selectMultiOptionModal.showProgramsTypes(this.state.selectedProgramtypes) }}
-                        >
-                            <Icon name="edit" color={appGreyColor} size={24} />
-                        </TouchableOpacity>
+
+                {this.state.checkType == GEN_QA_CHECK &&
+                    <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
+                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                            <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Program Types:</Text>
+                            <TouchableOpacity
+                                onPress={() => { this.refs._selectMultiOptionModal.showProgramsTypes(this.state.selectedProgramtypes) }}
+                            >
+                                <Icon name="edit" color={appGreyColor} size={24} />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                            {
+                                this.state.selectedProgramtypes.map((item, index) => {
+                                    if (item.isSelecetd) {
+                                        return (
+                                            <Chip key={index} style={{ margin: 5 }}>{item.key}</Chip>
+                                        )
+                                    }
+                                })
+                            }
+                        </View>
                     </View>
-                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                        {
-                            this.state.selectedProgramtypes.map((item, index) => {
-                                if (item.isSelecetd) {
-                                    return (
-                                        <Chip key={index} style={{ margin: 5 }}>{item.key}</Chip>
-                                    )
-                                }
-                            })
-                        }
-                    </View>
-                </View>
+                }
+
             </View>
         )
     }
@@ -297,6 +304,7 @@ class CheckDetailForm extends Component {
     verifyForSubmit(topicId, quesData) {
         var allResp = [...this.state.checkQuesRefs]
         var topicResp = []
+        var pTypes = ""
 
         allResp.map((item, index) => {
             if (item.topicId == topicId) {
@@ -318,22 +326,24 @@ class CheckDetailForm extends Component {
             }
         })
 
-        var pTypes = this.getSelectedProgramTypes()
-        if (pTypes == "") {
-            MyUtils.showSnackbar("Please select a program type.", "")
-            isAllOK = false
-            return
+        if (this.state.checkType == GEN_QA_CHECK) {
+            pTypes = this.getSelectedProgramTypes()
+            if (pTypes == "") {
+                MyUtils.showSnackbar("Please select a program type.", "")
+                isAllOK = false
+                return
+            }
         }
 
         if (isAllOK) {
-            this.submitData(JSON.stringify(topicResp))
+            this.submitData(JSON.stringify(topicResp), pTypes)
         }
     }
 
-    submitData(quesResp) {
+    submitData(quesResp, PTypes) {
         this.setState({ isFormSubmitting: true })
         webHandler.submitCheck(this.state.checkId,
-            this.state.checkTitle, quesResp,
+            this.state.checkTitle, quesResp, PTypes,
             (responseJson) => {
                 MyUtils.showSnackbar("Form submitted successfully!", "")
                 this.setState({ isFormSubmitting: false })

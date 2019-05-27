@@ -267,6 +267,7 @@ class Checks extends Component {
             this.props.navigation.navigate("CheckDetailForm", {
                 _id: item.assign_id,
                 _title: item.checkname,
+                _check_type: item.checktype,
                 onReload: () => { this.handleRefresh() }
             })
         } else if (this.state.userRole == prefManager.EDITOR || this.state.userRole == prefManager.ADMIN) {
@@ -274,6 +275,7 @@ class Checks extends Component {
                 _id: item.assign_id,
                 _title: item.checkname,
                 _user_type: this.state.userRole,
+                _check_type: item.checktype,
                 onReload: () => { this.handleRefresh() }
             })
         }

@@ -123,7 +123,7 @@ export default class WebHandler {
         })
     }
 
-    submitCheck(assignId, assignName, quesResp, onSuccess, onFailure) {
+    submitCheck(assignId, assignName, quesResp, pTypes, onSuccess, onFailure) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
                 this.getSelectedLinesAndShift((line, shift) => {
@@ -135,6 +135,7 @@ export default class WebHandler {
                         "&shift_no=" + shift +
                         "&user_id=" + userData.id +
                         "&outlet_id=" + userData.businessId +
+                        "&program_types=" + pTypes +
                         "&session_token=" + userData.sessionToken
 
                     this.sendSimplePostFormRequest(Urls.SUBMIT_CHECK_URL, body, (responseJson) => {

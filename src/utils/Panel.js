@@ -1,6 +1,7 @@
 import React from 'react';
 import { Component, StyleSheet, Text, View, TouchableHighlight, Animated, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+
 class Panel extends React.Component {
     constructor(props) {
         super(props);
