@@ -205,7 +205,7 @@ export default class WebHandler {
                                 shift = "1"
                             } else if (val == 1) {
                                 shift = "2"
-                            } else if (val == 1) {
+                            } else if (val == 2) {
                                 shift = "3"
                             }
                         }
