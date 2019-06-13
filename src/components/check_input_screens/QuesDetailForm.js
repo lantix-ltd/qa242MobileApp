@@ -212,7 +212,7 @@ class QuesDetailForm extends Component {
     }
 
     updateQuesComment(txt) {
-        this.setState({ quesComment: txt, isInputDialogVisible: false })
+        this.setState({ quesComment: txt })
         this.updateMyResponse(
             this.state.selectedAnsValue,
             this.state.fixedValInput,

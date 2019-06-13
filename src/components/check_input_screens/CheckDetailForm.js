@@ -430,7 +430,7 @@ class CheckDetailForm extends Component {
 
             </View>
         )
-    }
+    }  
 
     handleMediaFileAction(type) {
         if (type == "photo") {

@@ -30,6 +30,7 @@ class CheckDetailView extends Component {
             checkId: props.navigation.getParam("_id", ""),
             checkTitle: props.navigation.getParam("_title", ""),
             userRole: props.navigation.getParam("_user_type", ""),
+            isUserCompletedView: props.navigation.getParam("_is_user_completed", false),
             checkDetail: [],
             isError: false, errorMsg: "",
             checkQuesRefs: [],
@@ -52,20 +53,37 @@ class CheckDetailView extends Component {
     }
 
     loadData() {
-        webHandler.getCheckListDetail(this.state.checkId,
-            (responseJson) => {
-                this.setState({
-                    checkDetail: responseJson.data,
-                    isReAssign: responseJson.reassign,
-                    isReAssignAnswered: responseJson.reassing_answer,
-                    isLoading: false, refreshing: false
-                })
-            },
-            (error) => {
-                MyUtils.showSnackbar(error, "")
-                this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: error })
-            }
-        )
+        if (this.state.isUserCompletedView) {
+            webHandler.getCheckListDetailForCompleted(this.state.checkId,
+                (responseJson) => {
+                    this.setState({
+                        checkDetail: responseJson.data,
+                        isReAssign: responseJson.reassign,
+                        isReAssignAnswered: responseJson.reassing_answer,
+                        isLoading: false, refreshing: false
+                    })
+                },
+                (error) => {
+                    MyUtils.showSnackbar(error, "")
+                    this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: error })
+                }
+            )
+        } else {
+            webHandler.getCheckListDetail(this.state.checkId,
+                (responseJson) => {
+                    this.setState({
+                        checkDetail: responseJson.data,
+                        isReAssign: responseJson.reassign,
+                        isReAssignAnswered: responseJson.reassing_answer,
+                        isLoading: false, refreshing: false
+                    })
+                },
+                (error) => {
+                    MyUtils.showSnackbar(error, "")
+                    this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: error })
+                }
+            )
+        }
     }
 
     renderTVRow(title, value) {
@@ -247,65 +265,74 @@ class CheckDetailView extends Component {
 
                                 {this.renderCheckView(this.state.checkDetail[0].questions)}
                                 {this.renderCheckMediaFiles(this.state.mediaFiles)}
-                                {this.renderSubmittedByView(
-                                    this.state.checkDetail[0].line_no,
-                                    this.state.checkDetail[0].shift_no,
-                                    this.state.checkDetail[0].full_name,
-                                    this.state.checkDetail[0].complete_datetime
-                                )}
 
-                                {this.state.isReAssign &&
+                                {this.state.userRole != prefManager.AGENT &&
                                     <View>
-                                        <Text style={{
-                                            fontSize: 16, textAlign: "center",
-                                            fontWeight: "bold", marginTop: 10
-                                        }}>Check Re-Assign Data</Text>
-                                        {this.renderCheckView(this.state.checkDetail[0].reassign_data.question)}
-                                        {this.renderCheckMediaFiles(this.state.mediaFiles)}
-                                        {this.state.isReAssignAnswered && this.renderReSubmittedByView(
-                                            this.state.checkDetail[0].reassign_data.line_no,
-                                            this.state.checkDetail[0].reassign_data.shift_no,
-                                            this.state.checkDetail[0].reassign_data.name,
-                                            // this.state.checkDetail[0].reassign_data.complete_datetime
+                                        {this.renderSubmittedByView(
+                                            this.state.checkDetail[0].line_no,
+                                            this.state.checkDetail[0].shift_no,
+                                            this.state.checkDetail[0].full_name,
+                                            this.state.checkDetail[0].complete_datetime
                                         )}
+
+                                        {this.state.isReAssign &&
+                                            <View>
+                                                <Text style={{
+                                                    fontSize: 16, textAlign: "center",
+                                                    fontWeight: "bold", marginTop: 10
+                                                }}>Check Re-Assign Data</Text>
+                                                {this.renderCheckView(this.state.checkDetail[0].reassign_data.question)}
+                                                {this.renderCheckMediaFiles(this.state.mediaFiles)}
+                                                {this.state.isReAssignAnswered && this.renderReSubmittedByView(
+                                                    this.state.checkDetail[0].reassign_data.line_no,
+                                                    this.state.checkDetail[0].reassign_data.shift_no,
+                                                    this.state.checkDetail[0].reassign_data.name,
+                                                    // this.state.checkDetail[0].reassign_data.complete_datetime
+                                                )}
+                                            </View>
+                                        }
+
+                                        {this.state.userRole == prefManager.ADMIN &&
+                                            this.renderReviewedByView(
+                                                this.state.checkDetail[0].review_user,
+                                                this.state.checkDetail[0].reviewer_datetime,
+                                                this.state.checkDetail[0].review_comments
+                                            )
+                                        }
+
+                                        {!this.state.isUserCompletedView && this.renderCommentView()}
+
                                     </View>
                                 }
-
-                                {this.state.userRole == prefManager.ADMIN &&
-                                    this.renderReviewedByView(
-                                        this.state.checkDetail[0].review_user,
-                                        this.state.checkDetail[0].reviewer_datetime,
-                                        this.state.checkDetail[0].review_comments
-                                    )
-                                }
-                                {this.renderCommentView()}
                             </ScrollView>
 
-                            <View style={{ flexDirection: "row", padding: 10 }}>
-                                {this.state.userRole == prefManager.EDITOR &&
+                            {!this.state.isUserCompletedView &&
+                                <View style={{ flexDirection: "row", padding: 10 }}>
+                                    {this.state.userRole == prefManager.EDITOR &&
+                                        <Button
+                                            title="REVIEWED"
+                                            containerStyle={{ flex: 1 }}
+                                            buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                                            onPress={() => { this.acceptDataForReview() }}
+                                        />
+                                    }
+                                    {this.state.userRole == prefManager.ADMIN &&
+                                        <Button
+                                            title="APPROVED"
+                                            containerStyle={{ flex: 1 }}
+                                            buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                                            onPress={() => { this.acceptDataForApproval() }}
+                                        />
+                                    }
                                     <Button
-                                        title="REVIEWED"
+                                        title="CANCEL"
+                                        style={{ width: "50%" }}
                                         containerStyle={{ flex: 1 }}
-                                        buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
-                                        onPress={() => { this.acceptDataForReview() }}
+                                        buttonStyle={{ backgroundColor: "red", marginStart: 5 }}
+                                        onPress={() => { this.props.navigation.goBack() }}
                                     />
-                                }
-                                {this.state.userRole == prefManager.ADMIN &&
-                                    <Button
-                                        title="APPROVED"
-                                        containerStyle={{ flex: 1 }}
-                                        buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
-                                        onPress={() => { this.acceptDataForApproval() }}
-                                    />
-                                }
-                                <Button
-                                    title="CANCEL"
-                                    style={{ width: "50%" }}
-                                    containerStyle={{ flex: 1 }}
-                                    buttonStyle={{ backgroundColor: "red", marginStart: 5 }}
-                                    onPress={() => { this.props.navigation.goBack() }}
-                                />
-                            </View>
+                                </View>
+                            }
 
                             <FullImageView
                                 ref="_fullImageViewModal"

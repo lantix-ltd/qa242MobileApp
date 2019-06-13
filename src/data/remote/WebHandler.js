@@ -58,18 +58,54 @@ export default class WebHandler {
             });
     }
 
-    getUserChecks(pageNo, onSuccess, onFailure, onOffLineData) {
+    getUserChecks(pageNo, checkTypes, onSuccess, onFailure, onOffLineData) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
-                this.getSelectedLinesAndShift((line, shift) => {
+                if (userData.userPrimaryType == prefManager.AGENT) {
+                    this.getSelectedLinesAndShift((line, shift) => {
+                        if (line === "" || shift === "") {
+                            onFailure("Please define your Lines & Shift")
+                        } else {
+                            var body =
+                                "user_id=" + userData.id +
+                                "&outlet_id=" + userData.businessId +
+                                "&role=" + userData.userPrimaryType +
+                                "&group_id=" + userData.userPrimaryGId +
+                                "&session_token=" + userData.sessionToken +
+                                "&line_timing=" + line.substring(0, line.lastIndexOf(",")) +
+                                "&shift_timing=" + shift +
+                                "&calling_status=" + checkTypes +
+                                "&page_number=" + pageNo
+                            this.sendSimplePostFormRequest(Urls.CHECKS_LIST_URL, body, (responseJson) => {
+                                if (responseJson.status) {
+                                    localDB.addNewChecks(responseJson.data)
+                                    onSuccess(responseJson)
+                                } else {
+                                    onFailure(responseJson.message)
+                                }
+                            }, (error) => {
+                                // localDB.getAllChecks(
+                                //     checksData => {
+                                //         onOffLineData(checksData)
+                                //     },
+                                //     dbError => {
+                                //         onFailure(error)
+                                //     }
+                                // )
+                                onFailure(error)
+                            })
+                        }
+                    }, error => {
+                        onFailure(error)
+                    })
+                } else {
                     var body =
                         "user_id=" + userData.id +
                         "&outlet_id=" + userData.businessId +
                         "&role=" + userData.userPrimaryType +
                         "&group_id=" + userData.userPrimaryGId +
                         "&session_token=" + userData.sessionToken +
-                        "&line_timing=" + line.substring(0, line.lastIndexOf(",")) +
-                        "&shift_timing=" + shift +
+                        "&calling_status=" + checkTypes +
                         "&page_number=" + pageNo
                     this.sendSimplePostFormRequest(Urls.CHECKS_LIST_URL, body, (responseJson) => {
                         if (responseJson.status) {
@@ -79,19 +115,9 @@ export default class WebHandler {
                             onFailure(responseJson.message)
                         }
                     }, (error) => {
-                        // localDB.getAllChecks(
-                        //     checksData => {
-                        //         onOffLineData(checksData)
-                        //     },
-                        //     dbError => {
-                        //         onFailure(error)
-                        //     }
-                        // )
                         onFailure(error)
                     })
-                }, error => {
-                    onFailure(error)
-                })
+                }
             } else {
                 onFailure("User session not exist!")
             }
@@ -106,6 +132,31 @@ export default class WebHandler {
                     "&user_id=" + userData.id +
                     "&outlet_id=" + userData.businessId +
                     "&role=" + userData.userPrimaryType +
+                    "&group_id=" + userData.userPrimaryGId +
+                    "&session_token=" + userData.sessionToken + "&api_key=" + API_KEY
+                this.sendSimplePostFormRequest(Urls.CHECK_LIST_DETAIL_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    getCheckListDetailForCompleted(assignId, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "assign_id=" + assignId +
+                    "&user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&role=editor" +
                     "&group_id=" + userData.userPrimaryGId +
                     "&session_token=" + userData.sessionToken + "&api_key=" + API_KEY
                 this.sendSimplePostFormRequest(Urls.CHECK_LIST_DETAIL_URL, body, (responseJson) => {

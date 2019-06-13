@@ -32,7 +32,8 @@ class Checks extends Component {
             currentPage: 1,
             newChecks: 0, overDueChecks: 0, submittedChecks: 0,
             userRole: "",
-            isError: false, errorMsg: ""
+            isError: false, errorMsg: "",
+            openedCheck: "Open"
         }
     }
 
@@ -41,6 +42,9 @@ class Checks extends Component {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
                 this.setState({ userRole: userData.userPrimaryType })
+                if (userData.userPrimaryType != prefManager.AGENT) {
+                    this.loadDataFromServer(this.state.openedCheck)
+                }
             }
         })
         this.setUpForMessaging()
@@ -84,8 +88,8 @@ class Checks extends Component {
         )
     }
 
-    loadDataFromServer() {
-        webHandler.getUserChecks(1, (responseJson) => {
+    loadDataFromServer(checkType) {
+        webHandler.getUserChecks(1, checkType, (responseJson) => {
             this.setState({
                 checksData: responseJson.data,
                 totalPages: responseJson.total_pages,
@@ -118,13 +122,16 @@ class Checks extends Component {
             <Modal
                 isVisible={this.state.modalVisible}
                 // onBackdropPress={() => this.setState({ modalVisible: false })}
-                onBackButtonPress={() => this.setState({ modalVisible: false })}
+                onBackButtonPress={() => this.setState({
+                    isLoading: false, refreshing: false, modalVisible: false,
+                    isError: true, errorMsg: "Please define your Lines & Shift"
+                })}
             >
                 <View style={{ height: 380, padding: 5 }}>
                     <LinesAndShift
                         onSavePress={() => {
                             this.setState({ modalVisible: false })
-                            this.loadDataFromServer()
+                            this.loadDataFromServer(this.state.openedCheck)
                         }}
                     />
                 </View>
@@ -135,18 +142,24 @@ class Checks extends Component {
     renderQATechHeader() {
         return (
             <View style={{ flexDirection: "row", padding: 10 }}>
-                <View style={[styles.round_new_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10 }]}>
-                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
-                    <Text style={{ color: "#fff", fontSize: 14 }}>NEW</Text>
-                </View>
-                <View style={[styles.round_overdue_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginHorizontal: 5 }]}>
-                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.overDueChecks}</Text>
-                    <Text style={{ color: "#fff", fontSize: 14 }}>OVER DUE</Text>
-                </View>
-                <View style={[styles.round_submitted_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10 }]}>
-                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
-                    <Text style={{ color: "#fff", fontSize: 14 }}>SUBMITTED</Text>
-                </View>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleHeaderItemClick("Open") }}>
+                    <View style={[styles.round_new_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10 }]}>
+                        <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
+                        <Text style={{ color: "#fff", fontSize: 14 }}>NEW</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleHeaderItemClick("OverDue") }}>
+                    <View style={[styles.round_overdue_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10, marginHorizontal: 5 }]}>
+                        <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.overDueChecks}</Text>
+                        <Text style={{ color: "#fff", fontSize: 14 }}>OVER DUE</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleHeaderItemClick("Completed") }}>
+                    <View style={[styles.round_submitted_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10 }]}>
+                        <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
+                        <Text style={{ color: "#fff", fontSize: 14 }}>SUBMITTED</Text>
+                    </View>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -154,14 +167,18 @@ class Checks extends Component {
     renderQASpecialistHeader() {
         return (
             <View style={{ flexDirection: "row", padding: 10 }}>
-                <View style={[styles.round_pending_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginEnd: 5 }]}>
-                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
-                    <Text style={{ color: "#fff", fontSize: 14 }}>PENDING</Text>
-                </View>
-                <View style={[styles.round_reviewed_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginStart: 5 }]}>
-                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
-                    <Text style={{ color: "#fff", fontSize: 14 }}>REVIEWED</Text>
-                </View>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleHeaderItemClick("Open") }}>
+                    <View style={[styles.round_pending_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10, marginEnd: 5 }]}>
+                        <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
+                        <Text style={{ color: "#fff", fontSize: 14 }}>PENDING</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleHeaderItemClick("Completed") }}>
+                    <View style={[styles.round_reviewed_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10, marginStart: 5 }]}>
+                        <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
+                        <Text style={{ color: "#fff", fontSize: 14 }}>REVIEWED</Text>
+                    </View>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -254,20 +271,27 @@ class Checks extends Component {
                     }
                     {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
                         this.setState({ isLoading: true, isError: false })
-                        this.loadDataFromServer()
+                        this.loadDataFromServer(this.state.openedCheck)
                     })}
                 </View>
             </SafeAreaView>
         );
     }
 
+    handleHeaderItemClick(type) {
+        this.setState({ isLoading: true, openedCheck: type })
+        this.loadDataFromServer(type)
+    }
+
     handleOnItemClick(item) {
         prefManager.updateLastOpenedForm(item)
         if (this.state.userRole == prefManager.AGENT) {
-            this.props.navigation.navigate("CheckDetailForm", {
+            this.props.navigation.navigate(this.state.openedCheck == "Completed" ? "CheckDetailView" : "CheckDetailForm", {
                 _id: item.assign_id,
                 _title: item.checkname,
+                _user_type: this.state.userRole,
                 _check_type: item.checktype,
+                _is_user_completed: this.state.openedCheck == "Completed",
                 onReload: () => { this.handleRefresh() }
             })
         } else if (this.state.userRole == prefManager.EDITOR || this.state.userRole == prefManager.ADMIN) {
@@ -276,6 +300,7 @@ class Checks extends Component {
                 _title: item.checkname,
                 _user_type: this.state.userRole,
                 _check_type: item.checktype,
+                _is_user_completed: this.state.openedCheck == "Completed",
                 onReload: () => { this.handleRefresh() }
             })
         }
@@ -283,7 +308,7 @@ class Checks extends Component {
 
     handleRefresh() {
         this.setState({ refreshing: true })
-        this.loadDataFromServer()
+        this.loadDataFromServer(this.state.openedCheck)
     }
 
     handleLoadMore() {
@@ -291,7 +316,7 @@ class Checks extends Component {
         page++;
         if (page <= this.state.totalPages) {
             this.setState({ refreshing: true })
-            webHandler.getUserChecks(page, (responseJson) => {
+            webHandler.getUserChecks(page, this.state.openedCheck, (responseJson) => {
                 this.setState({
                     checksData: [...this.state.checksData, ...responseJson.data],
                     currentPage: page,
