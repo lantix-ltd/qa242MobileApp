@@ -157,7 +157,8 @@ const AppContainer = createAppContainer(RootStack);
 export default class App extends React.Component {
 
     componentWillUnmount() {
-        prefManager.cleanLinesAndShiftData()
+        // prefManager.cleanLinesAndShiftData()
+        prefManager.destroyUserSession()
     }
 
     render() {

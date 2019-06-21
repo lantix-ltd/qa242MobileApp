@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ToastAndroid } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import PrefManager from "../data/local/PrefManager"
 import { defButtonContainer, defButtonText, appGreyColor, primaryColor, } from "./AppStyles";
 import { CheckBox, ButtonGroup } from 'react-native-elements'
+import MyUtils from "./MyUtils";
 
 const prefManager = new PrefManager()
 class LinesAndShift extends Component {
@@ -10,115 +11,172 @@ class LinesAndShift extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            line1Checked: false,
-            line2Checked: false,
-            line3Checked: false,
-            selectedShiftIndex: 0,
+            selectedShiftIndex: -1,
+            selectedPlantIndex: -1,
             isLineNA: false,
             isShiftNA: false,
+            isPlantNA: false,
             isLineCheckExist: false,
             isShiftCheckExist: false,
+
+            linesData: [],
+            shiftsData: [],
+            plantsData: [],
+
+            plantsWithLines: []
         }
     }
 
     componentDidMount() {
-        this.loadData()
+        prefManager.getDummyLinesAndShiftsData((shifts, plantsWithLines) => {
+            let ShiftsD = [], PlantsD = []
+
+            plantsWithLines.map(item => {
+                PlantsD.push({ id: item.plant_id, val: item.plant_name })
+            })
+
+            shifts.map(item => {
+                ShiftsD.push({ id: item.shift_id, val: item.shift_name })
+            })
+
+            this.setState({
+                plantsWithLines: plantsWithLines, shiftsData: ShiftsD, plantsData: PlantsD,
+            })
+
+            this.loadData()
+        })
     }
 
     loadData() {
-        prefManager.getLineCheckData((isLineNA, isLine1, isLine2, isLine3) => {
+        prefManager.getPlantCheckData((isPlantNA, selectedIndx, selecetedVal) => {
             this.setState({
-                isLineNA: isLineNA,
-                line1Checked: isLine1,
-                line2Checked: isLine2,
-                line3Checked: isLine3
+                isPlantNA: isPlantNA,
+                selectedPlantIndex: selectedIndx
             })
         })
 
-        prefManager.getShiftCheckData((isShiftNA, val) => {
+        prefManager.getLineCheckData((isLineNA, linesData) => {
+            if (!MyUtils.isEmptyArray(linesData)) {
+                this.setState({
+                    isLineNA: isLineNA,
+                    linesData: linesData
+                })
+            }
+        })
+
+        prefManager.getShiftCheckData((isShiftNA, selectedIndx, selecetedVal) => {
             this.setState({
                 isShiftNA: isShiftNA,
-                selectedShiftIndex: val
+                selectedShiftIndex: selectedIndx
             })
         })
     }
 
     render() {
-        const shifts = ['One', 'Two', 'Three']
+        const shifts = [], plants = []
+        this.state.plantsData.map((item) => {
+            plants.push(item.val)
+        })
+        this.state.shiftsData.map((item) => {
+            shifts.push(item.val)
+        })
         return (
-            <View style={styles.container}>
-                <View style={{ alignItems: "flex-start", marginTop: 5 }}>
-                    <Text
-                        style={{ fontSize: 16, padding: 5, fontWeight: "bold", color: "#000" }}>
-                        * Which lines you're working on? </Text>
-                    {!this.state.isLineNA &&
-                        <View
-                            pointerEvents={this.state.isLineNA ? "none" : "auto"}
-                            style={{ flexDirection: "row", }}>
+            <ScrollView style={styles.container}>
+                <View >
+
+                    <View>
+                        <Text style={{ fontSize: 16, padding: 5, fontWeight: "bold", color: "#000" }}> * Which plants you're working on? </Text>
+                        <View>
+                            {!this.state.isPlantNA &&
+                                <ButtonGroup
+                                    onPress={(index) => this.handlePlantChange(index)}
+                                    selectedIndex={this.state.selectedPlantIndex}
+                                    buttons={plants}
+                                    containerStyle={{ height: 50 }}
+                                />
+                            }
+                        </View>
+                        <CheckBox
+                            title='Not Applicable'
+                            checkedColor="red"
+                            textStyle={{ color: "red" }}
+                            containerStyle={{ alignSelf: "center" }}
+                            checked={this.state.isPlantNA}
+                            onPress={() => { this.setState({ isPlantNA: !this.state.isPlantNA }) }}
+                        />
+                    </View>
+
+                    {(this.state.selectedPlantIndex > -1 && !this.state.isPlantNA) &&
+                        <View style={{ alignItems: "flex-start", marginTop: 5 }}>
+                            <Text
+                                style={{ fontSize: 16, padding: 5, fontWeight: "bold", color: "#000" }}>
+                                * Which lines you're working on? </Text>
+                            {!this.state.isLineNA &&
+                                <View
+                                    pointerEvents={this.state.isLineNA ? "none" : "auto"}
+                                    style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                                    {
+                                        this.state.linesData.map((item, index) => {
+                                            return (
+                                                <CheckBox
+                                                    key={index}
+                                                    // containerStyle={{ flex: 1 }}
+                                                    title={"Line " + item.val}
+                                                    textStyle={{ fontSize: 12, color: appGreyColor }}
+                                                    checked={item.isChecked}
+                                                    onPress={() => { this.handleLineChange(item) }}
+                                                />
+                                            )
+                                        })
+                                    }
+                                </View>
+                            }
                             <CheckBox
-                                containerStyle={{ flex: 1 }}
-                                title='Line 1'
-                                textStyle={{ fontSize: 12, color: appGreyColor }}
-                                checked={this.state.line1Checked}
-                                onPress={() => { this.handleLine1Check(!this.state.line1Checked) }}
-                            />
-                            <CheckBox
-                                containerStyle={{ flex: 1 }}
-                                title='Line 2'
-                                textStyle={{ fontSize: 12, color: appGreyColor }}
-                                checked={this.state.line2Checked}
-                                onPress={() => { this.handleLine2Check(!this.state.line2Checked) }}
-                            />
-                            <CheckBox
-                                containerStyle={{ flex: 1 }}
-                                title='Line 3'
-                                textStyle={{ fontSize: 12, color: appGreyColor }}
-                                checked={this.state.line3Checked}
-                                onPress={() => { this.handleLine3Check(!this.state.line3Checked) }}
+                                title='Not Applicable'
+                                containerStyle={{ alignSelf: "center" }}
+                                checked={this.state.isLineNA}
+                                textStyle={{ color: "red" }}
+                                checkedColor="red"
+                                onPress={() => { this.setState({ isLineNA: !this.state.isLineNA }) }}
                             />
                         </View>
                     }
-                    <CheckBox
-                        title='Not Applicable'
-                        containerStyle={{ alignSelf: "center" }}
-                        checked={this.state.isLineNA}
-                        textStyle={{ color: "red" }}
-                        checkedColor="red"
-                        onPress={() => { this.handleLineNACheck(!this.state.isLineNA) }}
-                    />
-                </View>
 
-                <View style={{ alignItems: "flex-start", }}>
-                    <Text style={{ fontSize: 16, padding: 5, fontWeight: "bold", color: "#000" }}> * Which shift you're working on? </Text>
-                    {!this.state.isShiftNA &&
-                        <ButtonGroup
-                            onPress={(index) => this.handleShiftChange(index)}
-                            selectedIndex={this.state.selectedShiftIndex}
-                            buttons={shifts}
-                            containerStyle={{ height: 50 }}
+                    <View style={{ alignItems: "flex-start", }}>
+                        <Text style={{ fontSize: 16, padding: 5, fontWeight: "bold", color: "#000" }}> * Which shift you're working on? </Text>
+                        {!this.state.isShiftNA &&
+                            <ButtonGroup
+                                onPress={(index) => this.setState({ selectedShiftIndex: index })}
+                                selectedIndex={this.state.selectedShiftIndex}
+                                buttons={shifts}
+                                containerStyle={{ height: 50 }}
+                            />
+                        }
+                        <CheckBox
+                            title='Not Applicable'
+                            checkedColor="red"
+                            textStyle={{ color: "red" }}
+                            containerStyle={{ alignSelf: "center" }}
+                            checked={this.state.isShiftNA}
+                            onPress={() => { this.handleShiftNACheck(!this.state.isShiftNA) }}
                         />
-                    }
-                    <CheckBox
-                        title='Not Applicable'
-                        checkedColor="red"
-                        textStyle={{ color: "red" }}
-                        containerStyle={{ alignSelf: "center" }}
-                        checked={this.state.isShiftNA}
-                        onPress={() => { this.handleShiftNACheck(!this.state.isShiftNA) }}
-                    />
+                    </View>
+
+                    <View style={{ flex: 1 }} />
+
+                    <TouchableOpacity activeOpacity={0.9}
+                        style={[defButtonContainer, {
+                            margin: 10,
+                            width: "90%", justifyContent: "center",
+                            alignSelf: "center"
+                        }]}
+                        onPress={() => { this.handleSaveAction() }}>
+                        <Text style={defButtonText}>SAVE</Text>
+                    </TouchableOpacity>
+
                 </View>
 
-                <TouchableOpacity activeOpacity={0.9}
-                    style={[defButtonContainer, {
-                        margin: 10,
-                        width: "90%", justifyContent: "center",
-                        alignSelf: "center"
-                    }]}
-                    onPress={() => { this.handleSaveAction() }}>
-                    <Text style={defButtonText}>SAVE</Text>
-                </TouchableOpacity>
-
-            </View>
+            </ScrollView>
         );
     }
 
@@ -126,58 +184,58 @@ class LinesAndShift extends Component {
         this.setState({ isShiftNA: isNA })
         if (isNA) {
             this.setState({ selectedShiftIndex: -1 })
-            // prefManager.setShiftCheckData(true, -1)
         } else {
             this.setState({ selectedShiftIndex: 0 })
-            // prefManager.setShiftCheckData(false, 0)
         }
     }
 
-    handleShiftChange(val) {
-        this.setState({ selectedShiftIndex: val })
-        // prefManager.setShiftCheckData(false, val)
+    handleLineChange(item) {
+        let _LD = this.state.linesData
+        let isChecked_old = item.isChecked
+
+        let indx = _LD.findIndex(opt => opt.id == item.id)
+        let mod_item = { id: item.id, val: item.val, isChecked: !isChecked_old }
+
+        _LD[indx] = mod_item
+
+        this.setState({ linesData: _LD })
     }
 
-    handleLineNACheck(isNA) {
-        this.setState({ isLineNA: isNA })
-        if (isNA) {
-            this.setState({
-                line1Checked: false,
-                line2Checked: false,
-                line3Checked: false,
-            })
-            // prefManager.setLineCheckData(true, false, false, false)
-        } else {
-            // prefManager.setLineCheckData(false, false, false, false)
-        }
-    }
+    handlePlantChange(index) {
+        let selecetedPlantItem = this.state.plantsWithLines[index]
 
-    handleLine1Check(val) {
-        this.setState({ line1Checked: val })
-        // prefManager.setLineCheckData(false, val, this.state.line2Checked, this.state.line3Checked)
-    }
+        var lines = []
+        selecetedPlantItem.lines.map(item => {
+            lines.push({ id: item.line_id, val: item.line_name, isChecked: false })
+        })
 
-    handleLine2Check(val) {
-        this.setState({ line2Checked: val })
-        // prefManager.setLineCheckData(false, this.state.line1Checked, val, this.state.line3Checked)
-    }
-
-    handleLine3Check(val) {
-        this.setState({ line3Checked: val })
-        // prefManager.setLineCheckData(false, this.state.line1Checked, this.state.line2Checked, val)
+        this.setState({ selectedPlantIndex: index, linesData: lines })
     }
 
     handleSaveAction() {
-        prefManager.setLineCheckData(
-            this.state.isLineNA,
-            this.state.line1Checked,
-            this.state.line2Checked,
-            this.state.line3Checked
+        let plantVal = ""
+        if (!MyUtils.isEmptyArray(this.state.plantsData) && this.state.selectedPlantIndex > -1) {
+            plantVal = this.state.plantsData[this.state.selectedPlantIndex].val
+        }
+        prefManager.setPlantCheckData(
+            this.state.isPlantNA,
+            this.state.selectedPlantIndex,
+            plantVal
         )
 
+        prefManager.setLineCheckData(
+            this.state.isLineNA,
+            JSON.stringify(this.state.linesData),
+        )
+
+        let shiftVal = ""
+        if (!MyUtils.isEmptyArray(this.state.shiftsData) && this.state.selectedShiftIndex > -1) {
+            shiftVal = this.state.shiftsData[this.state.selectedShiftIndex].val
+        }
         prefManager.setShiftCheckData(
             this.state.isShiftNA,
-            this.state.selectedShiftIndex
+            this.state.selectedShiftIndex,
+            shiftVal
         )
 
         if (this.props.onSavePress != undefined) {
@@ -190,7 +248,7 @@ class LinesAndShift extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
     }
 });
 

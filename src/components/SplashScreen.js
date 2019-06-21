@@ -11,7 +11,8 @@ class SplashScreen extends Component {
 
     componentDidMount() {
         this.timeoutHandle = setTimeout(async () => {
-            this.checkForUserSession()
+            // this.checkForUserSession()
+            this.navigateToLogin()
         }, 2000);
     }
 

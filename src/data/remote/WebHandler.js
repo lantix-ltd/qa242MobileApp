@@ -36,7 +36,8 @@ export default class WebHandler {
                     })
                     var userData = {
                         userId: data.user_id,
-                        userName: data.name,
+                        userName: userName,
+                        userPassword: password,
                         email: data.email,
                         picPath: data.user_image,
                         userFName: data.first_name,
@@ -62,7 +63,7 @@ export default class WebHandler {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
                 if (userData.userPrimaryType == prefManager.AGENT) {
-                    this.getSelectedLinesAndShift((line, shift) => {
+                    this.getSelectedLinesAndShift((plant, line, shift) => {
                         if (line === "" || shift === "") {
                             onFailure("Please define your Lines & Shift")
                         } else {
@@ -74,6 +75,7 @@ export default class WebHandler {
                                 "&session_token=" + userData.sessionToken +
                                 "&line_timing=" + line.substring(0, line.lastIndexOf(",")) +
                                 "&shift_timing=" + shift +
+                                "&plant_name=" + plant +
                                 "&calling_status=" + checkTypes +
                                 "&page_number=" + pageNo
                             this.sendSimplePostFormRequest(Urls.CHECKS_LIST_URL, body, (responseJson) => {
@@ -177,7 +179,7 @@ export default class WebHandler {
     submitCheck(assignId, assignName, quesResp, pTypes, onSuccess, onFailure) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
-                this.getSelectedLinesAndShift((line, shift) => {
+                this.getSelectedLinesAndShift((plant, line, shift) => {
                     var body =
                         "assign_id=" + assignId +
                         "&assign_name=" + assignName +
@@ -232,35 +234,33 @@ export default class WebHandler {
     getSelectedLinesAndShift(onSuccess, onFailure) {
         prefManager.getLineAndShiftStatus((isLineDataExist, isShiftDataExist) => {
             if (isLineDataExist && isShiftDataExist) {
+                var plant = ""
                 var line = ""
                 var shift = ""
-                prefManager.getLineCheckData((isLineNA, isLine1, isLine2, isLine3) => {
-                    if (isLineNA) {
-                        line = "N/A"
+                prefManager.getPlantCheckData((isPlantNA, selectedIndx, selecetedVal) => {
+                    if (isPlantNA) {
+                        plant = "N/A"
                     } else {
-                        if (isLine1) {
-                            line = line + "1,"
-                        }
-                        if (isLine2) {
-                            line = line + "2,"
-                        }
-                        if (isLine3) {
-                            line = line + "3,"
-                        }
+                        plant = selecetedVal
                     }
-                    prefManager.getShiftCheckData((isShiftNA, val) => {
-                        if (isShiftNA) {
-                            shift = "N/A"
+                    prefManager.getLineCheckData((isLineNA, linesData) => {
+                        if (isLineNA) {
+                            line = "N/A"
                         } else {
-                            if (val == 0) {
-                                shift = "1"
-                            } else if (val == 1) {
-                                shift = "2"
-                            } else if (val == 2) {
-                                shift = "3"
-                            }
+                            linesData.map((item, index) => {
+                                if (item.isChecked) {
+                                    line = line + item.val + ","
+                                }
+                            })
                         }
-                        onSuccess(line, shift)
+                        prefManager.getShiftCheckData((isShiftNA, selectedIndx, selecetedVal) => {
+                            if (isShiftNA) {
+                                shift = "N/A"
+                            } else {
+                                shift = selecetedVal
+                            }
+                            onSuccess(plant, line, shift)
+                        })
                     })
                 })
             } else {

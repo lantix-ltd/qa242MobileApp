@@ -25,6 +25,16 @@ class UserLogin extends Component {
         })
     }
 
+    componentDidMount() {
+        prefManager.isUserLoggedIn(result => {
+            if (result) {
+                prefManager.getLoginCredential((userName, userPass) => {
+                    this.setState({ email: userName, password: userPass })
+                })
+            }
+        })
+    }
+
     render() {
         return (
             <KeyboardAvoidingView style={{ flex: 1 }}>
@@ -48,7 +58,7 @@ class UserLogin extends Component {
                                 autoCorrect={false}
                                 keyboardType='email-address'
                                 returnKeyType="next"
-                                value={this.state.username}
+                                value={this.state.email}
                                 placeholder='User Name'
                                 onChangeText={(text) => this.setState({ email: text })}
                                 placeholderTextColor='#AAAAAA' />
@@ -126,6 +136,7 @@ class UserLogin extends Component {
             }
             webHandler.loginUser(email, password, myFcmToken,
                 (responseJson) => {
+                    prefManager.setDummyLinesAndShiftsData(responseJson.data.shifts, responseJson.data.plants)
                     setTimeout(() => {
                         this.navigateToHome()
                     }, 2000)
