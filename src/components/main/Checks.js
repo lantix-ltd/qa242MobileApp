@@ -127,7 +127,7 @@ class Checks extends Component {
                     isError: true, errorMsg: "Please define your Lines & Shift"
                 })}
             >
-                <View style={{ flex:1, flexWrap:"wrap", padding: 5 }}>
+                <View style={{ flex: 1, flexWrap: "wrap", padding: 5 }}>
                     <LinesAndShift
                         onSavePress={() => {
                             this.setState({ modalVisible: false })
@@ -266,6 +266,11 @@ class Checks extends Component {
                                     <Text style={{ alignSelf: "center", fontSize: 16 }}>No checks found</Text>
                                 </View>
                             }
+                            <Button
+                                title="Add Inspection Record"
+                                onPress={() => { this.handleInspectionForm() }}
+                                containerStyle={{ margin: 5 }}
+                            />
 
                         </View>
                     }
@@ -276,6 +281,10 @@ class Checks extends Component {
                 </View>
             </SafeAreaView>
         );
+    }
+
+    handleInspectionForm() {
+        this.props.navigation.navigate("FormNo1")
     }
 
     handleHeaderItemClick(type) {

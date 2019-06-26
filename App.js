@@ -22,14 +22,19 @@ import CheckDetailView from './src/components/check_view_screens/CheckDetailView
 import LinesAndShiftScreen from "./src/components/LinesAndShiftScreen"
 import MyVideoPlayer from "./src/utils/MyVideoPlayer"
 
+import FormNo1 from "./src/components/static_forms/FormNo1"
+
 import { primaryColor, appGreyColor, appPinkColor } from './src/utils/AppStyles';
 import { Dimensions, StyleSheet, View } from "react-native"
 
 import PrefManager from "./src/data/local/PrefManager"
+import WebHandler from "./src/data/remote/WebHandler"
+
 
 const win = Dimensions.get('window');
 const width = win.width * 70 / 100
 const prefManager = new PrefManager()
+const webHandler = new WebHandler()
 
 const BottomNavigation = createBottomTabNavigator({
     Checks: {
@@ -150,6 +155,9 @@ const RootStack = createStackNavigator({
     },
     MyVideoPlayer: {
         screen: MyVideoPlayer,
+    },
+    FormNo1: {
+        screen: FormNo1,
     }
 })
 const AppContainer = createAppContainer(RootStack);
@@ -159,6 +167,13 @@ export default class App extends React.Component {
     componentWillUnmount() {
         // prefManager.cleanLinesAndShiftData()
         prefManager.destroyUserSession()
+        webHandler.logOutUser(
+            (responseJson) => {
+                console.log("Logged Out!")
+            },
+            (error) => {
+                console.log("LogOut Error: " + error)
+            })
     }
 
     render() {
