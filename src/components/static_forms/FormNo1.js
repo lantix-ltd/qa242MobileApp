@@ -1,21 +1,33 @@
 
 import React, { Component } from "react";
-import { View, Text, TextInput, StyleSheet, Dimensions, ScrollView } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
 import { CheckBox, ButtonGroup, Button } from 'react-native-elements'
+import WebHandler from "../../data/remote/WebHandler"
+import Modal from "react-native-modal";
+import MyUtils from "../../utils/MyUtils";
+import { appPinkColor } from "../../utils/AppStyles";
+import DateTimePicker from "react-native-modal-datetime-picker";
 
 const yesNo = ["Yes", "No"]
 const productTempTypes = ["Nose", "Mid", "Tail"]
 const allergenContent = ["W", "E", "D", "TN", "SH", "GF", "None"]
 const acceptOrNot = ["Acceptable", "Not Acceptable"]
 const acceptHoldReject = ["Accept", "Hold", "Reject"]
+const webHandler = new WebHandler()
 
 class FormNo1 extends Component {
+
+    static navigationOptions = ({ navigation }) => {
+        return {
+            title: "Receiving Inspection Log",
+        }
+    };
 
     constructor(props) {
         super(props)
         this.state = {
             monitorName: "",
-            time: "",
+            time: "00:00:00",
             InvoiceNo: "",
             itemName: "",
             supplierName: "",
@@ -36,17 +48,50 @@ class FormNo1 extends Component {
             markedWithExpDateIndx: 0,
             inspectionSummaryIndx: 0,
             followUpAction: "",
-            correctiveActionDetail: ""
+            correctiveActionDetail: "",
+            isFormSubmitting: false,
+            isDateTimePickerVisible: false
         }
     }
 
+    renderLoadingDialog() {
+        return (
+            <Modal
+                isVisible={this.state.isFormSubmitting}
+                // onBackdropPress={() => this.setState({ modalVisible: false })}
+                onBackButtonPress={() => this.setState({ isFormSubmitting: false })}
+            >
+                <View style={{ backgroundColor: "#fff", height: 100, justifyContent: "center", alignItems: "center" }}>
+                    <ActivityIndicator size="large" color={appPinkColor} />
+                    <Text>Please Wait...</Text>
+                </View>
+            </Modal>
+        )
+    }
+
+    handleTimePicked(date) {
+        this.setState({ isDateTimePickerVisible: false })
+        var d = new Date(date)
+        this.setState({ time: d.toLocaleTimeString() })
+    }
 
     render() {
+        const hintColor = "#ccc"
         return (
             <ScrollView style={styles.container}>
 
+                <DateTimePicker
+                    isVisible={this.state.isDateTimePickerVisible}
+                    mode={"time"}
+                    date={new Date()}
+                    onConfirm={(date) => this.handleTimePicked(date)}
+                    onCancel={() => this.setState({ isDateTimePickerVisible: false })}
+                />
+
+                {this.renderLoadingDialog()}
+
                 <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
-                    <Text>Monitor (Receiver) Name/ Initials: </Text>
+                    <Text> Monitor (Receiver) Name/ Initials: </Text>
                     <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
                         autoCapitalize="none"
                         autoCorrect={false}
@@ -57,22 +102,16 @@ class FormNo1 extends Component {
                         multiline={false}
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ monitorName: text })}
-                        placeholderTextColor='#797979' />
+                        placeholderTextColor={hintColor} />
                 </View>
 
                 <View style={[styles.round_white_bg_container]}>
                     <Text>Time: </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.time}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.setState({ time: text })}
-                        placeholderTextColor='#797979' />
+                    <TouchableOpacity
+                        onPress={() => { this.setState({ isDateTimePickerVisible: true }) }}
+                    >
+                        <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.time} </Text>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={[styles.round_white_bg_container]}>
@@ -87,7 +126,7 @@ class FormNo1 extends Component {
                         multiline={false}
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ InvoiceNo: text })}
-                        placeholderTextColor='#797979' />
+                        placeholderTextColor={hintColor} />
                 </View>
 
                 <View style={[styles.round_white_bg_container]}>
@@ -102,7 +141,7 @@ class FormNo1 extends Component {
                         multiline={false}
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ itemName: text })}
-                        placeholderTextColor='#797979' />
+                        placeholderTextColor={hintColor} />
                 </View>
 
                 <View style={[styles.round_white_bg_container]}>
@@ -117,7 +156,7 @@ class FormNo1 extends Component {
                         multiline={false}
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ supplierName: text })}
-                        placeholderTextColor='#797979' />
+                        placeholderTextColor={hintColor} />
                 </View>
 
                 <View style={[styles.round_white_bg_container]}>
@@ -142,7 +181,7 @@ class FormNo1 extends Component {
                         multiline={false}
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ carrierName: text })}
-                        placeholderTextColor='#797979' />
+                        placeholderTextColor={hintColor} />
                 </View>
 
                 <View style={[styles.round_white_bg_container]}>
@@ -157,7 +196,7 @@ class FormNo1 extends Component {
                         multiline={false}
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ truckLPlate: text })}
-                        placeholderTextColor='#797979' />
+                        placeholderTextColor={hintColor} />
                 </View>
 
                 <View style={[styles.round_white_bg_container]}>
@@ -172,7 +211,7 @@ class FormNo1 extends Component {
                         multiline={false}
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ trailerLPlate: text })}
-                        placeholderTextColor='#797979' />
+                        placeholderTextColor={hintColor} />
                 </View>
 
                 <View style={[styles.round_white_bg_container]}>
@@ -187,7 +226,7 @@ class FormNo1 extends Component {
                         multiline={false}
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ driverLInfo: text })}
-                        placeholderTextColor='#797979' />
+                        placeholderTextColor={hintColor} />
                 </View>
 
                 <View style={[styles.round_white_bg_container, { flexDirection: "row" }]}>
@@ -313,7 +352,7 @@ class FormNo1 extends Component {
                         multiline={false}
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ followUpAction: text })}
-                        placeholderTextColor='#797979' />
+                        placeholderTextColor={hintColor} />
                 </View>
 
                 <View style={[styles.round_white_bg_container]}>
@@ -328,7 +367,7 @@ class FormNo1 extends Component {
                         multiline={false}
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ correctiveActionDetail: text })}
-                        placeholderTextColor='#797979' />
+                        placeholderTextColor={hintColor} />
                 </View>
 
                 <View style={{ flexDirection: "row" }}>
@@ -341,7 +380,7 @@ class FormNo1 extends Component {
 
                     <Button
                         title="Cancel"
-                        onPress={() => { this.handleInspectionForm() }}
+                        onPress={() => { this.props.navigation.goBack() }}
                         containerStyle={{ margin: 5, flex: 1 }}
                         buttonStyle={{ backgroundColor: "red", marginEnd: 5 }}
                     />
@@ -352,7 +391,54 @@ class FormNo1 extends Component {
     }
 
     submitForm() {
+        this.setState({ isFormSubmitting: true })
 
+        let v1 = yesNo[this.state.SPApprovedIndex]
+        let v2 = yesNo[this.state.trailerSealedIndx]
+        let v3 = yesNo[this.state.trailerLockedIndx]
+        let v4 = yesNo[this.state.materialsFreeIndex]
+        let v5 = yesNo[this.state.truckInsideIndx]
+        let v6 = yesNo[this.state.productCondtionIndx]
+
+        let v7 = productTempTypes[this.state.productTempIndx]
+        let v8 = yesNo[this.state.vvOfProductIndx]
+        let v9 = allergenContent[this.state.allergenContentIndx]
+        let v10 = yesNo[this.state.allergentaqggedIndx]
+        let v11 = acceptOrNot[this.state.markedWithExpDateIndx]
+        let v12 = acceptHoldReject[this.state.inspectionSummaryIndx]
+
+        let formData = {
+            monitorName: this.state.monitorName,
+            time: this.state.time,
+            InvoiceNo: this.state.InvoiceNo,
+            itemName: this.state.itemName,
+            supplierName: this.state.supplierName,
+            SPApprovedIndex: v1,
+            carrierName: this.state.carrierName,
+            truckLPlate: this.state.truckLPlate,
+            driverLInfo: this.state.driverLInfo,
+            trailerSealedIndx: v2,
+            trailerLockedIndx: v3,
+            materialsFreeIndex: v4,
+            truckInsideIndx: v5,
+            productCondtionIndx: v6,
+            productTempIndx: v7,
+            vvOfProductIndx: v8,
+            allergenContentIndx: v9,
+            allergentaqggedIndx: v10,
+            markedWithExpDateIndx: v11,
+            inspectionSummaryIndx: v12,
+            followUpAction: this.state.followUpAction,
+            correctiveActionDetail: this.state.correctiveActionDetail
+        }
+
+        webHandler.submitTrcuckInspectionForm(formData, (responseJson) => {
+            this.setState({ isFormSubmitting: false })
+            this.props.navigation.goBack()
+        }, (error) => {
+            MyUtils.showSnackbar(error, "")
+            this.setState({ isFormSubmitting: false })
+        })
     }
 }
 

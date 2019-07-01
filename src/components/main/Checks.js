@@ -266,12 +266,6 @@ class Checks extends Component {
                                     <Text style={{ alignSelf: "center", fontSize: 16 }}>No checks found</Text>
                                 </View>
                             }
-                            <Button
-                                title="Add Inspection Record"
-                                onPress={() => { this.handleInspectionForm() }}
-                                containerStyle={{ margin: 5 }}
-                            />
-
                         </View>
                     }
                     {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
@@ -281,10 +275,6 @@ class Checks extends Component {
                 </View>
             </SafeAreaView>
         );
-    }
-
-    handleInspectionForm() {
-        this.props.navigation.navigate("FormNo1")
     }
 
     handleHeaderItemClick(type) {

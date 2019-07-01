@@ -505,6 +505,133 @@ export default class WebHandler {
         })
     }
 
+    submitTrcuckInspectionForm(inspectionData, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    
+                    "&monitorName=" + inspectionData.monitorName +
+                    "&time=" + inspectionData.time +
+                    "&InvoiceNo=" + inspectionData.InvoiceNo +
+                    "&itemName=" + inspectionData.itemName +
+                    "&supplierName=" + inspectionData.supplierName +
+                    "&SPApprovedIndex=" + inspectionData.SPApprovedIndex +
+                    "&carrierName=" + inspectionData.carrierName +
+                    "&truckLPlate=" + inspectionData.truckLPlate +
+                    "&trailerLPlate=" + inspectionData.trailerLPlate +
+                    "&driverLInfo=" + inspectionData.driverLInfo +
+                    "&trailerSealedIndx=" + inspectionData.trailerSealedIndx +
+                    "&trailerLockedIndx=" + inspectionData.trailerLockedIndx +
+                    "&materialsFreeIndex=" + inspectionData.materialsFreeIndex +
+                    "&truckInsideIndx=" + inspectionData.truckInsideIndx +
+                    "&productCondtionIndx=" + inspectionData.productCondtionIndx +
+                    "&productTempIndx=" + inspectionData.productTempIndx +
+                    "&vvOfProductIndx=" + inspectionData.vvOfProductIndx +
+                    "&allergenContentIndx=" + inspectionData.allergenContentIndx +
+                    "&allergentaqggedIndx=" + inspectionData.allergentaqggedIndx +
+                    "&markedWithExpDateIndx=" + inspectionData.markedWithExpDateIndx +
+                    "&inspectionSummaryIndx=" + inspectionData.inspectionSummaryIndx +
+                    "&followUpAction=" + inspectionData.followUpAction +
+                    "&correctiveActionDetail=" + inspectionData.correctiveActionDetail 
+
+
+                this.sendSimplePostFormRequest(Urls.TRUCK_INSPECT_FORM_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    submitShippingInspectionForm(inspectionData, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    
+                    "&monitorName=" + inspectionData.monitorName +
+                    "&checkIntime=" + inspectionData.checkIntime +
+                    "&soNo=" + inspectionData.soNo +
+                    "&itemName=" + inspectionData.itemName +
+                    "&customerName=" + inspectionData.customerName +
+                    "&carrierName=" + inspectionData.carrierName +
+                    "&truckTrailerLPlate=" + inspectionData.truckTrailerLPlate +
+                    "&driverLInfo=" + inspectionData.driverLInfo +
+                    "&truckSetTemp=" + inspectionData.truckSetTemp +
+                    "&truckReadingTemp=" + inspectionData.truckReadingTemp +
+                    "&truckCondiAcceptable=" + inspectionData.truckCondiAcceptable +
+                    "&frozenProductTemp=" + inspectionData.frozenProductTemp +
+                    "&refrigeratedProductTemp=" + inspectionData.refrigeratedProductTemp +
+                    "&firstProductSurfaceTemp=" + inspectionData.firstProductSurfaceTemp +
+                    "&lastProductSurfaceTemp=" + inspectionData.lastProductSurfaceTemp +
+                    "&productCondiAcceptable=" + inspectionData.productCondiAcceptable +
+                    "&signOfTemparing=" + inspectionData.signOfTemparing +
+                    "&isSecured=" + inspectionData.isSecured +
+                    "&sealNo=" + inspectionData.sealNo +
+                    "&isBOL=" + inspectionData.isBOL +
+                    "&inspectionSummary=" + inspectionData.inspectionSummary +
+                    "&checkOutTime=" + inspectionData.checkOutTime +
+                    "&followUpAction=" + inspectionData.followUpAction +
+                    "&correctiveAction=" + inspectionData.correctiveAction 
+
+                this.sendSimplePostFormRequest(Urls.SHIPPING_INSPECT_FORM_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    submitpalletizingInspectionForm(inspectionData, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +                
+
+                    "&time=" + inspectionData.time +                
+                    "&itemNumber=" + inspectionData.itemNumber +                
+                    "&cases=" + inspectionData.cases +                
+                    "&usedByDate=" + inspectionData.usedByDate +                
+                    "&codeDate=" + inspectionData.codeDate +                
+                    "&initials=" + inspectionData.initials                 
+
+                this.sendSimplePostFormRequest(Urls.PALLETIZING_FORM_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+
     sendSimplePostFormRequest(url, _body, onResponse, onError) {
         var dt = Date.now().toString()
         var data = dt + url
@@ -525,8 +652,9 @@ export default class WebHandler {
             .then((responseJson) => {
                 onResponse(responseJson)
             }).catch((error) => {
+                onError(error.message)
                 // controller.abort();
-                onError('Something went wrong while connecting to server.')
+                // onError('Something went wrong while connecting to server.')
             });
     }
 

@@ -12,6 +12,8 @@ import NotificationsScreen from './src/components/NotificationsScreen'
 import Checks from './src/components/main/Checks'
 import Chats from './src/components/main/Chats'
 import Contact from './src/components/main/Contact'
+import InputForms from './src/components/main/InputForms'
+
 import MainDrawerHeader from "./src/utils/MainDrawerHeader"
 import ConversationScreen from "./src/components/ConversationScreen"
 import AboutUs from './src/components/AbouUs'
@@ -23,6 +25,8 @@ import LinesAndShiftScreen from "./src/components/LinesAndShiftScreen"
 import MyVideoPlayer from "./src/utils/MyVideoPlayer"
 
 import FormNo1 from "./src/components/static_forms/FormNo1"
+import FormNo2 from "./src/components/static_forms/FormNo2"
+import FormNo3 from "./src/components/static_forms/FormNo3"
 
 import { primaryColor, appGreyColor, appPinkColor } from './src/utils/AppStyles';
 import { Dimensions, StyleSheet, View } from "react-native"
@@ -53,6 +57,12 @@ const BottomNavigation = createBottomTabNavigator({
         screen: Contact, navigationOptions: {
             tabBarLabel: 'Contact',
             tabBarIcon: ({ tintColor }) => <Icon size={22} style={{ marginVertical: 2 }} name="users" color={tintColor} />
+        }
+    },
+    InputForms: {
+        screen: InputForms, navigationOptions: {
+            tabBarLabel: 'Forms',
+            tabBarIcon: ({ tintColor }) => <Icon size={22} style={{ marginVertical: 2 }} name="clipboard" color={tintColor} />
         }
     },
 },
@@ -158,6 +168,12 @@ const RootStack = createStackNavigator({
     },
     FormNo1: {
         screen: FormNo1,
+    },
+    FormNo2: {
+        screen: FormNo2,
+    },
+    FormNo3: {
+        screen: FormNo3,
     }
 })
 const AppContainer = createAppContainer(RootStack);

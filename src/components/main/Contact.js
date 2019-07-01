@@ -45,7 +45,7 @@ class Contact extends Component {
         return (
             <View style={[styles.round_white_bg, { marginHorizontal: 10, marginBottom: 10 }]}>
                 <TouchableOpacity onPress={() => this.handleOnItemClick(item)}>
-                    <View>
+                    <View style={{ flexDirection: "row" }}>
                         <View style={{ flex: 1, padding: 10, flexDirection: "row" }}>
                             <Text style={{ alignSelf: "center", fontSize: 15, marginEnd: 10 }}>
                                 {("0" + (index + 1)).slice(-2)}.
@@ -55,6 +55,12 @@ class Contact extends Component {
                                 <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item.name}</Text>
                             </View>
                         </View>
+                        {(item.type == "user" && item.is_online) &&
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <Icon name="circle" style={{ marginTop: 3 }} size={14} color="green" />
+                            </View>
+                        }
+
                         {/* <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} /> */}
                     </View>
                 </TouchableOpacity>

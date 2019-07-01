@@ -56,6 +56,12 @@ class Chats extends Component {
                                 <Text style={{ fontWeight: "bold" }}>{item.name}</Text>
                                 <Text>{item.last_message}</Text>
                             </View>
+                            {(item.type == "user" && item.is_online) &&
+                                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                    <Icon name="circle" style={{ marginTop: 3 }} size={14} color="green" />
+                                </View>
+                            }
+
                             {/* <View style={{ alignItems: "center", justifyContent: "center" }}>
                             <Text >{item.online_time}</Text>
                             {item.online &&
