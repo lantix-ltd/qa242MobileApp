@@ -15,4 +15,7 @@ export default {
     CHAT_HISTORY_URL: SERVER + "user-chat-list",
     SEND_MESSAGE_URL: SERVER + "send-user-message",
     SUBMIT_AS_ACCEPTED_URL: SERVER + "change-status-for-approve",
+    TRUCK_INSPECT_FORM_URL: SERVER + "submit-truck-inspection",
+    SHIPPING_INSPECT_FORM_URL: SERVER + "submit-shipping-inspection",
+    PALLETIZING_FORM_URL: SERVER + "submit-palletizing-inspection",
 }
