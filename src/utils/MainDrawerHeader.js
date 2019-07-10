@@ -104,10 +104,12 @@ export default class MainDrawerHeader extends React.Component {
                         onItemPress={({ route, focused }) => {
                             if (route.key == "Quit") {
                                 BackHandler.exitApp()
-                            } else if (this.state.userRole != prefManager.AGENT &&
-                                route.key == "LinesAndShift") {
-                                MyUtils.showSnackbar("This action is not applicable.")
-                            } else {
+                            }
+                            // else if (this.state.userRole != prefManager.AGENT &&
+                            //     route.key == "LinesAndShift") {
+                            //     MyUtils.showSnackbar("This action is not applicable.")
+                            // }
+                            else {
                                 this.props.onItemPress({ route, focused })
                             }
                         }}

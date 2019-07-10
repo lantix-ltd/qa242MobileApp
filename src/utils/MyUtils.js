@@ -7,12 +7,22 @@ export default {
 
     APP_NAME: "cQcheck",
 
+    isEmptyString(txt) {
+        return (txt == undefined || txt == null || txt.trim() == "" || txt.length == 0)
+    },
+
     isEmptyArray(array) {
         if (array == undefined || array == null || array == "" || array.length == 0) {
             return true
         } else {
             return false
         }
+    },
+
+     getWith0Digit(num) {
+        let n = parseInt(num)
+        let pad = (n < 10) ? '0' : '';
+        return pad + num;
     },
 
     showCustomAlert(title, message) {

@@ -377,7 +377,6 @@ class FormNo1 extends Component {
                         containerStyle={{ margin: 5, flex: 1 }}
                         buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
                     />
-
                     <Button
                         title="Cancel"
                         onPress={() => { this.props.navigation.goBack() }}
@@ -391,49 +390,70 @@ class FormNo1 extends Component {
     }
 
     submitForm() {
-        this.setState({ isFormSubmitting: true })
+        let v1 = this.state.monitorName
+        let v2 = this.state.time
+        let v3 = this.state.InvoiceNo
+        let v4 = this.state.itemName
+        let v5 = this.state.supplierName
 
-        let v1 = yesNo[this.state.SPApprovedIndex]
-        let v2 = yesNo[this.state.trailerSealedIndx]
-        let v3 = yesNo[this.state.trailerLockedIndx]
-        let v4 = yesNo[this.state.materialsFreeIndex]
-        let v5 = yesNo[this.state.truckInsideIndx]
-        let v6 = yesNo[this.state.productCondtionIndx]
+        let v6 = yesNo[this.state.SPApprovedIndex]
 
-        let v7 = productTempTypes[this.state.productTempIndx]
-        let v8 = yesNo[this.state.vvOfProductIndx]
-        let v9 = allergenContent[this.state.allergenContentIndx]
-        let v10 = yesNo[this.state.allergentaqggedIndx]
-        let v11 = acceptOrNot[this.state.markedWithExpDateIndx]
-        let v12 = acceptHoldReject[this.state.inspectionSummaryIndx]
+        let v7 = this.state.carrierName
+        let v8 = this.state.truckLPlate
+        let v9 = this.state.driverLInfo
 
-        let formData = {
-            monitorName: this.state.monitorName,
-            time: this.state.time,
-            InvoiceNo: this.state.InvoiceNo,
-            itemName: this.state.itemName,
-            supplierName: this.state.supplierName,
-            SPApprovedIndex: v1,
-            carrierName: this.state.carrierName,
-            truckLPlate: this.state.truckLPlate,
-            driverLInfo: this.state.driverLInfo,
-            trailerSealedIndx: v2,
-            trailerLockedIndx: v3,
-            materialsFreeIndex: v4,
-            truckInsideIndx: v5,
-            productCondtionIndx: v6,
-            productTempIndx: v7,
-            vvOfProductIndx: v8,
-            allergenContentIndx: v9,
-            allergentaqggedIndx: v10,
-            markedWithExpDateIndx: v11,
-            inspectionSummaryIndx: v12,
-            followUpAction: this.state.followUpAction,
-            correctiveActionDetail: this.state.correctiveActionDetail
+        let v10 = yesNo[this.state.trailerSealedIndx]
+        let v11 = yesNo[this.state.trailerLockedIndx]
+        let v12 = yesNo[this.state.materialsFreeIndex]
+        let v13 = yesNo[this.state.truckInsideIndx]
+        let v14 = yesNo[this.state.productCondtionIndx]
+        let v15 = productTempTypes[this.state.productTempIndx]
+        let v16 = yesNo[this.state.vvOfProductIndx]
+        let v17 = allergenContent[this.state.allergenContentIndx]
+        let v18 = yesNo[this.state.allergentaqggedIndx]
+        let v19 = acceptOrNot[this.state.markedWithExpDateIndx]
+        let v20 = acceptHoldReject[this.state.inspectionSummaryIndx]
+
+        let v21 = this.state.followUpAction
+        let v22 = this.state.correctiveActionDetail
+
+        if (MyUtils.isEmptyString(v1) || MyUtils.isEmptyString(v2) || MyUtils.isEmptyString(v3) || MyUtils.isEmptyString(v4) ||
+            MyUtils.isEmptyString(v5) || MyUtils.isEmptyString(v7) || MyUtils.isEmptyString(v8) || MyUtils.isEmptyString(v9) ||
+            MyUtils.isEmptyString(v21) || MyUtils.isEmptyString(v22)) {
+            MyUtils.showSnackbar("Please fill all required (*) fields", "")
+            return;
         }
 
+        let formData = {
+            monitorName: v1,
+            time: v2,
+            InvoiceNo: v3,
+            itemName: v4,
+            supplierName: v5,
+            SPApprovedIndex: v6,
+            carrierName: v7,
+            truckLPlate: v8,
+            driverLInfo: v9,
+            trailerSealedIndx: v10,
+            trailerLockedIndx: v11,
+            materialsFreeIndex: v12,
+            truckInsideIndx: v13,
+            productCondtionIndx: v14,
+            productTempIndx: v15,
+            vvOfProductIndx: v16,
+            allergenContentIndx: v17,
+            allergentaqggedIndx: v18,
+            markedWithExpDateIndx: v19,
+            inspectionSummaryIndx: v20,
+
+            followUpAction: v21,
+            correctiveActionDetail: v22
+        }
+
+        this.setState({ isFormSubmitting: true })
         webHandler.submitTrcuckInspectionForm(formData, (responseJson) => {
             this.setState({ isFormSubmitting: false })
+            MyUtils.showSnackbar("form submitted successfully", "")
             this.props.navigation.goBack()
         }, (error) => {
             MyUtils.showSnackbar(error, "")

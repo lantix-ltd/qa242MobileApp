@@ -19,7 +19,7 @@ class QuesDetailView extends Component {
     componentDidMount() {
         const qData = this.state.checkQuesData
         if (qData != undefined && qData != null && !MyUtils.isEmptyArray(qData.givenanswers)) {
-            if (qData.question_type === "Dropdown" || qData.question_type === "Fixed") {
+            if (qData.question_type === "Dropdown" || qData.question_type === "Choice") {
                 this.setState({
                     selectedAnsValue: qData.givenanswers[0].given_answer,
                     quesComment: qData.givenanswers[0].comments,
@@ -31,6 +31,12 @@ class QuesDetailView extends Component {
                     quesComment: qData.givenanswers[0].comments,
                 })
                 this.handleRangeInputChange(qData.givenanswers[0].range)
+            } else if (qData.question_type === "Fixed") {
+                this.setState({
+                    selectedAnsValue: qData.givenanswers[0].given_answer,
+                    quesComment: qData.givenanswers[0].comments,
+                    isAcceptableAnswer: MyUtils.isEmptyString(qData.givenanswers[0].comments)
+                })
             }
         }
     }
@@ -58,7 +64,8 @@ class QuesDetailView extends Component {
     render() {
         return (
             <View style={styles.container}>
-                {(this.state.checkQuesData.question_type === "Dropdown" || this.state.checkQuesData.question_type === "Fixed") &&
+                {(this.state.checkQuesData.question_type === "Dropdown" || this.state.checkQuesData.question_type === "Fixed" ||
+                    this.state.checkQuesData.question_type === "Choice") &&
                     <View style={styles.round_white_bg_container}>
                         <Text style={{ paddingHorizontal: 10, fontSize: 15 }}>
                             {this.state.selectedAnsValue}

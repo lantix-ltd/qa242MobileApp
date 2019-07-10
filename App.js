@@ -27,6 +27,9 @@ import MyVideoPlayer from "./src/utils/MyVideoPlayer"
 import FormNo1 from "./src/components/static_forms/FormNo1"
 import FormNo2 from "./src/components/static_forms/FormNo2"
 import FormNo3 from "./src/components/static_forms/FormNo3"
+import FormNo4 from "./src/components/static_forms/FormNo4"
+import FormNo5 from "./src/components/static_forms/FormNo5"
+import FormNo6 from "./src/components/static_forms/FormNo6"
 
 import { primaryColor, appGreyColor, appPinkColor } from './src/utils/AppStyles';
 import { Dimensions, StyleSheet, View } from "react-native"
@@ -174,6 +177,15 @@ const RootStack = createStackNavigator({
     },
     FormNo3: {
         screen: FormNo3,
+    },
+    FormNo4: {
+        screen: FormNo4,
+    },
+    FormNo5: {
+        screen: FormNo5,
+    },
+    FormNo6: {
+        screen: FormNo6,
     }
 })
 const AppContainer = createAppContainer(RootStack);

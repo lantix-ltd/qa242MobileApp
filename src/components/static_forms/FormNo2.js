@@ -102,7 +102,7 @@ class FormNo2 extends Component {
 
                 {this.renderLoadingDialog()}
 
-                <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
+                {/* <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
                     <Text> Monitor Name / Initials: </Text>
                     <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
                         autoCapitalize="none"
@@ -115,7 +115,7 @@ class FormNo2 extends Component {
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ monitorName: text })}
                         placeholderTextColor={hintColor} />
-                </View>
+                </View> */}
 
                 <View style={[styles.round_white_bg_container]}>
                     <Text>Check In Time: </Text>
@@ -446,44 +446,77 @@ class FormNo2 extends Component {
     }
 
     submitForm() {
-        this.setState({ isFormSubmitting: true })
+        //let v1 = this.state.monitorName
+        let v2 = this.state.checkIntime
+        let v3 = this.state.soNo
+        let v4 = this.state.itemName
+        let v5 = this.state.customerName
+        let v6 = this.state.carrierName
+        let v7 = this.state.truckTrailerLPlate
+        let v8 = this.state.driverLInfo
+        let v9 = this.state.truckSetTemp
+        let v10 = this.state.truckReadingTemp
 
-        let v1 = yesNo[this.state.truckCondiAcceptable]
-        let v2 = yesNo[this.state.productCondiAcceptable]
-        let v3 = yesNo[this.state.signOfTemparing]
-        let v4 = yesNo[this.state.isSecured]
-        let v5 = yesNo[this.state.isBOL]
-        let v6 = releaseHold[this.state.inspectionSummary]
+        let v11 = yesNo[this.state.truckCondiAcceptable]
 
-        let formData = {
-            monitorName: this.state.monitorName,
-            checkIntime: this.state.checkIntime,
-            soNo: this.state.soNo,
-            itemName: this.state.itemName,
-            customerName: this.state.customerName,
-            carrierName: this.state.carrierName,
-            truckTrailerLPlate: this.state.truckTrailerLPlate,
-            driverLInfo: this.state.driverLInfo,
-            truckSetTemp: this.state.truckSetTemp,
-            truckReadingTemp: this.state.truckReadingTemp,
-            truckCondiAcceptable: v1,
-            frozenProductTemp: this.state.frozenProductTemp,
-            refrigeratedProductTemp: this.state.refrigeratedProductTemp,
-            firstProductSurfaceTemp: this.state.firstProductSurfaceTemp,
-            lastProductSurfaceTemp: this.state.lastProductSurfaceTemp,
-            productCondiAcceptable: v2,
-            signOfTemparing: v3,
-            isSecured: v4,
-            sealNo: this.state.sealNo,
-            isBOL: v5,
-            inspectionSummary: v6,
-            checkOutTime: this.state.checkOutTime,
-            followUpAction: this.state.followUpAction,
-            correctiveAction: this.state.correctiveAction
+        let v12 = this.state.frozenProductTemp
+        let v13 = this.state.refrigeratedProductTemp
+        let v14 = this.state.firstProductSurfaceTemp
+        let v15 = this.state.lastProductSurfaceTemp
+
+        let v16 = yesNo[this.state.productCondiAcceptable]
+        let v17 = yesNo[this.state.signOfTemparing]
+        let v18 = yesNo[this.state.isSecured]
+
+        let v19 = this.state.sealNo
+
+        let v20 = yesNo[this.state.isBOL]
+        let v21 = releaseHold[this.state.inspectionSummary]
+
+        let v22 = this.state.checkOutTime
+        let v23 = this.state.followUpAction
+        let v24 = this.state.correctiveAction
+
+        if (MyUtils.isEmptyString(v2) || MyUtils.isEmptyString(v3) || MyUtils.isEmptyString(v5) ||
+            MyUtils.isEmptyString(v6) || MyUtils.isEmptyString(v7) || MyUtils.isEmptyString(v8) || MyUtils.isEmptyString(v9) ||
+            MyUtils.isEmptyString(v10) || MyUtils.isEmptyString(v12) || MyUtils.isEmptyString(v13) || MyUtils.isEmptyString(v14) ||
+            MyUtils.isEmptyString(v15) || MyUtils.isEmptyString(v19) || MyUtils.isEmptyString(v22) || MyUtils.isEmptyString(v23) ||
+            MyUtils.isEmptyString(v24)) {
+            MyUtils.showSnackbar("Please fill all required (*) fields", "")
+            return;
         }
 
+        let formData = {
+            //monitorName: v1,
+            checkIntime: v2,
+            soNo: v3,
+            itemName: v4,
+            customerName: v5,
+            carrierName: v6,
+            truckTrailerLPlate: v7,
+            driverLInfo: v8,
+            truckSetTemp: v9,
+            truckReadingTemp: v10,
+            truckCondiAcceptable: v11,
+            frozenProductTemp: v12,
+            refrigeratedProductTemp: v13,
+            firstProductSurfaceTemp: v14,
+            lastProductSurfaceTemp: v15,
+            productCondiAcceptable: v16,
+            signOfTemparing: v17,
+            isSecured: v18,
+            sealNo: v19,
+            isBOL: v20,
+            inspectionSummary: v21,
+            checkOutTime: v22,
+            followUpAction: v23,
+            correctiveAction: v24
+        }
+
+        this.setState({ isFormSubmitting: true })
         webHandler.submitShippingInspectionForm(formData, (responseJson) => {
             this.setState({ isFormSubmitting: false })
+            MyUtils.showSnackbar("form submitted successfully", "")
             this.props.navigation.goBack()
         }, error => {
             MyUtils.showSnackbar(error, "")

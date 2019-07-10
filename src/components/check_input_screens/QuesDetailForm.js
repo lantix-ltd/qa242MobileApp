@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, Alert } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TextInput, ToastAndroid, TouchableOpacity, Image, Alert } from "react-native";
 import { RadioButton } from "react-native-paper"
 import Icon from 'react-native-vector-icons/Feather'
 import MyValuePicker from "../../utils/MyValuePicker"
@@ -60,14 +60,14 @@ class QuesDetailForm extends Component {
         this.props.onResponse(resp)
     }
 
-    // handleAnswereChange(selecetdAnsId) {
-    //     var answers = this.state.checkQuesData.answers
-    //     var indx = answers.findIndex(item => item.answer_id == selecetdAnsId)
-    //     var my_ans = answers[indx]
-    //     var val = my_ans.is_acceptable == "1"
-    //     this.setState({ isAcceptableAnswer: val, selectedAnsValue: selecetdAnsId })
-    //     this.updateMyResponse(selecetdAnsId, "", this.state.rangeInput, this.state.quesComment, val)
-    // }
+    handleChoiceChange(selecetdAnsId) {
+        var answers = this.state.checkQuesData.answers
+        var indx = answers.findIndex(item => item.answer_id == selecetdAnsId)
+        var my_ans = answers[indx]
+        var val = my_ans.is_acceptable == "1"
+        this.setState({ isAcceptableAnswer: val, selectedAnsValue: selecetdAnsId })
+        this.updateMyResponse(selecetdAnsId, my_ans.possible_answer, this.state.rangeInput, this.state.quesComment, val)
+    }
 
     handleDropDownChange(selecetdItem) {
         var answers = this.state.checkQuesData.answers
@@ -91,9 +91,9 @@ class QuesDetailForm extends Component {
         this.setState({ fixedValInput: txt })
         var myVal = this.state.checkQuesData.answers[0].possible_answer
         var ansId = ""
-        var isAcceptable = false
-        if (myVal == txt) {
-            isAcceptable = true
+        var isAcceptable = true
+        if (!MyUtils.isEmptyString(myVal)) {
+            isAcceptable = (myVal == txt)
             ansId = this.state.checkQuesData.answers[0].answer_id
         }
         this.setState({
@@ -124,10 +124,6 @@ class QuesDetailForm extends Component {
                             options={shapeOptions}
                             selectedVal={this.state.selectedShapeOptId}
                             onItemPress={(val) => {
-                                // this.setState({
-                                //     selectedAnsValue: val.id,
-                                //     selectedAnsTitle: val.title
-                                // })
                                 this.handleDropDownChange(val)
                             }}
                         />
@@ -140,22 +136,24 @@ class QuesDetailForm extends Component {
                             </View>
                         </TouchableOpacity>
 
-                        {/* <RadioButton.Group
-                            onValueChange={value => this.handleAnswereChange(value)}
-                            value={this.state.selectedAnsValue}
-                        >
-                            {this.state.checkQuesData.answers.map((item, index) => {
-                                return (
-                                    <View key={index}
-                                        style={{ flexDirection: "row", flex: 1, alignItems: "center", justifyContent: "flex-start" }}>
-                                        <RadioButton color={appPinkColor} value={item.answer_id} />
-                                        <Text>{item.possible_answer}</Text>
-                                    </View>
-                                )
-                            })}
-                        </RadioButton.Group> */}
-
                     </View>
+                }
+
+                {this.state.checkQuesData.question_type === "Choice" &&
+                    <RadioButton.Group
+                        onValueChange={value => this.handleChoiceChange(value)}
+                        value={this.state.selectedAnsValue}
+                    >
+                        {this.state.checkQuesData.answers.map((item, index) => {
+                            return (
+                                <View key={index}
+                                    style={{ flexDirection: "row", flex: 1, alignItems: "center", justifyContent: "flex-start" }}>
+                                    <RadioButton color={appPinkColor} value={item.answer_id} />
+                                    <Text>{item.possible_answer}</Text>
+                                </View>
+                            )
+                        })}
+                    </RadioButton.Group>
                 }
 
                 {this.state.checkQuesData.question_type === "Fixed" &&
@@ -163,7 +161,7 @@ class QuesDetailForm extends Component {
                         <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
                             autoCapitalize="none"
                             autoCorrect={false}
-                            keyboardType='number-pad'
+                            keyboardType='default'
                             returnKeyType="done"
                             value={this.state.fixedValInput}
                             numberOfLines={1}
@@ -179,7 +177,7 @@ class QuesDetailForm extends Component {
                         <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
                             autoCapitalize="none"
                             autoCorrect={false}
-                            keyboardType='number-pad'
+                            keyboardType='default'
                             returnKeyType="done"
                             value={this.state.rangeInput}
                             numberOfLines={1}

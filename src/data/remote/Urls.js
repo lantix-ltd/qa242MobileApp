@@ -18,4 +18,7 @@ export default {
     TRUCK_INSPECT_FORM_URL: SERVER + "submit-truck-inspection",
     SHIPPING_INSPECT_FORM_URL: SERVER + "submit-shipping-inspection",
     PALLETIZING_FORM_URL: SERVER + "submit-palletizing-inspection",
+    CLEANING_INSPECT_URL: SERVER + "submit-cleaning-inspection",
+    BULK_INSPECT_URL: SERVER + "submit-bulk-inspection",
+    REPACK_INSPECT_URL: SERVER + "submit-recode-inspection",
 }

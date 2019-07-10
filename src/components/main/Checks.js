@@ -42,9 +42,9 @@ class Checks extends Component {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
                 this.setState({ userRole: userData.userPrimaryType })
-                if (userData.userPrimaryType != prefManager.AGENT) {
-                    this.loadDataFromServer(this.state.openedCheck)
-                }
+                // if (userData.userPrimaryType != prefManager.AGENT) {
+                //     this.loadDataFromServer(this.state.openedCheck)
+                // }
             }
         })
         this.setUpForMessaging()
@@ -225,7 +225,8 @@ class Checks extends Component {
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1, backgroundColor: '#F8F8F8' }}>
-                    {this.state.userRole == prefManager.AGENT && this.renderLineAndShiftModal()}
+                    {this.renderLineAndShiftModal()}
+                    {/* {this.state.userRole == prefManager.AGENT && this.renderLineAndShiftModal()} */}
                     <View style={{ padding: 5, height: 60, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: primaryColor }}>
                         <TouchableOpacity
                             style={{ padding: 10, }}

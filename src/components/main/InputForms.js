@@ -6,6 +6,11 @@ import MyUtils from "../../utils/MyUtils";
 import { primaryColor } from "../../utils/AppStyles";
 import { DrawerActions } from 'react-navigation';
 import WebHandler from "../../data/remote/WebHandler"
+import PrefManager from "../../data/local/PrefManager"
+
+const prefManager = new PrefManager()
+
+const WAREHOUSE = "warehouse", PRODUCTION = "production", PACKING_TECH = "packingtech"
 
 class InputForms extends Component {
 
@@ -23,11 +28,37 @@ class InputForms extends Component {
 
     componentDidMount() {
         var forms = [
-            { id: 1, title: "Receiving Inspection Log", value: "FormNo1" },
-            { id: 2, title: "PPC-7 Shipping Inspection", value: "FormNo2" },
-            { id: 3, title: "Palletizing Record", value: "FormNo3" },
+            { id: 1, title: "Receiving Inspection Log", value: "FormNo1", responsible: WAREHOUSE },
+            { id: 2, title: "PPC-7 Shipping Inspection", value: "FormNo2", responsible: WAREHOUSE },
+            { id: 3, title: "Palletizing Record", value: "FormNo3", responsible: PRODUCTION },
+            { id: 4, title: "PPC-2 Cleaning Inspection", value: "FormNo4", responsible: PACKING_TECH },
+            { id: 5, title: "Bulk product Temperature Monitoring", value: "FormNo5", responsible: PRODUCTION },
+            { id: 6, title: "Repack/ Recode Form", value: "FormNo6", responsible: PACKING_TECH },
         ]
-        this.setState({ inputForms: forms })
+        this.setState({ isLoading: true })
+        prefManager.getUserSessionData(data => {
+            if (data != null) {
+                let pr = data.userPrimaryType
+                let sr = data.userSecondaryType
+                let resp = ""
+                if (pr == WAREHOUSE || sr == WAREHOUSE) {
+                    resp = WAREHOUSE
+                } else if (pr == PRODUCTION || sr == PRODUCTION) {
+                    resp = PRODUCTION
+                } else if (pr == PACKING_TECH || sr == PACKING_TECH) {
+                    resp = PACKING_TECH
+                }
+                let respForms = []
+                forms.map((item, index) => {
+                    if (item.responsible == resp) {
+                        respForms.push(item)
+                    }
+                })
+                this.setState({ inputForms: respForms, isLoading: false })
+            } else {
+                this.setState({ inputForms: null, isLoading: false })
+            }
+        })
     }
 
     render() {
@@ -67,7 +98,7 @@ class InputForms extends Component {
                                     justifyContent: "center",
                                     alignItems: "center",
                                 }}>
-                                    <Text style={{ alignSelf: "center", fontSize: 16 }}>No checks found</Text>
+                                    <Text style={{ alignSelf: "center", fontSize: 16 }}>No forms for you</Text>
                                 </View>
                             }
                         </View>

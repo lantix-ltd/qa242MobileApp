@@ -171,7 +171,7 @@ class CheckDetailView extends Component {
                 {questions.map((quest, q_index) => {
                     return (
                         <View key={q_index}>
-                            {(quest.question_type === "Dropdown" || quest.question_type === "Fixed") &&
+                            {(quest.question_type === "Dropdown" || quest.question_type === "Fixed" || quest.question_type === "Choice") &&
                                 <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
                                     <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
                                         {(q_index + 1) + ". "}

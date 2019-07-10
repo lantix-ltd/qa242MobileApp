@@ -126,7 +126,7 @@ class UserLogin extends Component {
         var em = email.toString().trim();
         var pwd = password.toString().trim();
         if (em == "" || pwd == "") {
-            MyUtils.showSnackbar("Empty fields not allowed", "")
+            MyUtils.showSnackbar("Please type valid username & password", "")
         } else {
             this.setState({ isLoading: true })
             let myFcmToken = ""

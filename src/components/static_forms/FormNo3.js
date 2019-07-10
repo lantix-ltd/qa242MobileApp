@@ -23,8 +23,8 @@ class FormNo3 extends Component {
             time: "00:00:00",
             itemNumber: "",
             cases: "",
-            usedByDate: "0000-00-00",
-            codeDate: "0000-00-00",
+            usedByDate: "MM-DD-YYYY",
+            codeDate: "MM-DD-YYYY",
             initials: "",
             isTimePickerVisible: false,
             isUsedByDateVisible: false,
@@ -56,21 +56,15 @@ class FormNo3 extends Component {
     handleUsedByDatePicker(date) {
         this.setState({ isUsedByDateVisible: false })
         var d = new Date(date)
-        let dt = d.getFullYear() + "-" + this.getWith0Digit((d.getMonth() + 1)) + "-" + this.getWith0Digit(d.getDay())
+        let dt = MyUtils.getWith0Digit((d.getMonth() + 1)) + "-" + MyUtils.getWith0Digit(d.getDate()) + "-" + d.getFullYear()
         this.setState({ usedByDate: dt })
     }
 
     handleCodeDatePicker(date) {
         this.setState({ isCodeDateVisible: false })
         var d = new Date(date)
-        let dt = d.getFullYear() + "-" + this.getWith0Digit((d.getMonth() + 1)) + "-" + this.getWith0Digit(d.getDay())
+        let dt = MyUtils.getWith0Digit((d.getMonth() + 1)) + "-" + MyUtils.getWith0Digit(d.getDate()) + "-" + d.getFullYear()
         this.setState({ codeDate: dt })
-    }
-
-    getWith0Digit(num) {
-        let n = parseInt(num)
-        let pad = (n < 10) ? '0' : '';
-        return pad + num;
     }
 
     render() {
@@ -161,7 +155,7 @@ class FormNo3 extends Component {
                     </TouchableOpacity>
                 </View>
 
-                <View style={[styles.round_white_bg_container]}>
+                {/* <View style={[styles.round_white_bg_container]}>
                     <Text>Initials: </Text>
                     <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
                         autoCapitalize="none"
@@ -174,7 +168,7 @@ class FormNo3 extends Component {
                         placeholder='* Type here'
                         onChangeText={(text) => this.setState({ initials: text })}
                         placeholderTextColor={hintColor} />
-                </View>
+                </View> */}
 
                 <View style={{ flexDirection: "row" }}>
                     <Button
@@ -197,17 +191,32 @@ class FormNo3 extends Component {
     }
 
     submitForm() {
-        this.setState({ isFormSubmitting: true })
-        let formData = {
-            time: this.state.time,
-            itemNumber: this.state.itemNumber,
-            cases: this.state.cases,
-            usedByDate: this.state.usedByDate,
-            codeDate: this.state.codeDate,
-            initials: this.state.initials
+        let v1 = this.state.time
+        let v2 = this.state.itemNumber
+        let v3 = this.state.cases
+        let v4 = this.state.usedByDate
+        let v5 = this.state.codeDate
+        // let v6 = this.state.initials
+
+        if (MyUtils.isEmptyString(v1) || MyUtils.isEmptyString(v2) || MyUtils.isEmptyString(v3) || MyUtils.isEmptyString(v4) ||
+            MyUtils.isEmptyString(v5)) {
+            MyUtils.showSnackbar("Please fill all required (*) fields", "")
+            return;
         }
+
+        let formData = {
+            time: v1,
+            itemNumber: v2,
+            cases: v3,
+            usedByDate: v4,
+            codeDate: v5,
+            // initials: v6
+        }
+
+        this.setState({ isFormSubmitting: true })
         webHandler.submitpalletizingInspectionForm(formData, (responseJson) => {
             this.setState({ isFormSubmitting: false })
+            MyUtils.showSnackbar("form submitted successfully", "")
             this.props.navigation.goBack()
         }, error => {
             MyUtils.showSnackbar(error, "")
