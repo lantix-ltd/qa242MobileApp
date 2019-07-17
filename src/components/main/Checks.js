@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, SafeAreaView
 import PrefManager from "../../data/local/PrefManager"
 import MyUtils from "../../utils/MyUtils";
 import NotificationIcon from '../../utils/NotificationIcon'
-import { primaryColor, appPinkColor, appYellowColor } from "../../utils/AppStyles";
+import { primaryColor } from "../../utils/AppStyles";
 import Icon from 'react-native-vector-icons/Feather'
 import { DrawerActions } from 'react-navigation';
 import { Button } from 'react-native-elements'
@@ -11,11 +11,9 @@ import Panel from "../../utils/Panel"
 import LinesAndShift from "../../utils/LinesAndShiftForm"
 import Modal from "react-native-modal";
 import WebHandler from "../../data/remote/WebHandler"
-import LocalDBManager from "../../data/local/LocalDBManager"
 import firebase from 'react-native-firebase';
 import { connect } from "react-redux"
 
-const localDB = new LocalDBManager()
 const webHandler = new WebHandler()
 const prefManager = new PrefManager()
 
@@ -240,12 +238,16 @@ class Checks extends Component {
                         <View style={{ flex: 1 }} />
                         <NotificationIcon navigation={this.props.navigation} />
                     </View>
+                    {this.state.userRole === prefManager.EDITOR && this.renderQASpecialistHeader()}
+                    {this.state.userRole === prefManager.ADMIN && this.renderQAManagerHeader()}
+                    {(
+                        this.state.userRole !== prefManager.EDITOR &&
+                        this.state.userRole !== prefManager.ADMIN
+                    ) && this.renderQATechHeader()}
+
                     {this.state.isLoading && MyUtils.renderLoadingView()}
                     {(!this.state.isLoading && !this.state.isError) &&
                         <View style={styles.container}>
-                            {this.state.userRole === prefManager.AGENT && this.renderQATechHeader()}
-                            {this.state.userRole === prefManager.EDITOR && this.renderQASpecialistHeader()}
-                            {this.state.userRole === prefManager.ADMIN && this.renderQAManagerHeader()}
                             {!MyUtils.isEmptyArray(this.state.checksData) &&
                                 <FlatList
                                     style={{ flex: 1 }}
@@ -285,8 +287,8 @@ class Checks extends Component {
 
     handleOnItemClick(item) {
         prefManager.updateLastOpenedForm(item)
-        if (this.state.userRole == prefManager.AGENT) {
-            this.props.navigation.navigate(this.state.openedCheck == "Completed" ? "CheckDetailView" : "CheckDetailForm", {
+        if (this.state.userRole == prefManager.EDITOR || this.state.userRole == prefManager.ADMIN) {
+            this.props.navigation.navigate("CheckDetailView", {
                 _id: item.assign_id,
                 _title: item.checkname,
                 _user_type: this.state.userRole,
@@ -294,8 +296,8 @@ class Checks extends Component {
                 _is_user_completed: this.state.openedCheck == "Completed",
                 onReload: () => { this.handleRefresh() }
             })
-        } else if (this.state.userRole == prefManager.EDITOR || this.state.userRole == prefManager.ADMIN) {
-            this.props.navigation.navigate("CheckDetailView", {
+        } else {
+            this.props.navigation.navigate(this.state.openedCheck == "Completed" ? "CheckDetailView" : "CheckDetailForm", {
                 _id: item.assign_id,
                 _title: item.checkname,
                 _user_type: this.state.userRole,

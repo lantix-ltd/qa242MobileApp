@@ -30,6 +30,7 @@ import FormNo3 from "./src/components/static_forms/FormNo3"
 import FormNo4 from "./src/components/static_forms/FormNo4"
 import FormNo5 from "./src/components/static_forms/FormNo5"
 import FormNo6 from "./src/components/static_forms/FormNo6"
+import FormNo7 from "./src/components/static_forms/FormNo7"
 
 import { primaryColor, appGreyColor, appPinkColor } from './src/utils/AppStyles';
 import { Dimensions, StyleSheet, View } from "react-native"
@@ -186,6 +187,9 @@ const RootStack = createStackNavigator({
     },
     FormNo6: {
         screen: FormNo6,
+    },
+    FormNo7: {
+        screen: FormNo7,
     }
 })
 const AppContainer = createAppContainer(RootStack);

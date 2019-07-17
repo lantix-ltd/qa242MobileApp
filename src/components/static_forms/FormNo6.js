@@ -1,13 +1,14 @@
 import React, { Component } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, SafeAreaView } from "react-native";
 import { CheckBox, ButtonGroup, Button } from 'react-native-elements'
 import Modal from "react-native-modal";
 import { appPinkColor } from "../../utils/AppStyles";
 import WebHandler from "../../data/remote/WebHandler"
-import FormNo4QView from "./FormNo4QView"
+import { RadioButton } from "react-native-paper"
 import MyUtils from "../../utils/MyUtils";
 import DateTimePicker from "react-native-modal-datetime-picker";
 
+const sources = ["Yuba City Bulk", "Yuba City Finished Good", "Forest City Bulk", "Forest City Finished Good"]
 const webHandler = new WebHandler()
 class FormNo6 extends Component {
 
@@ -22,6 +23,7 @@ class FormNo6 extends Component {
         this.state = {
             isFormSubmitting: false,
 
+            selectedSourceIndex: 0,
             source_item_no: "",
             source_product_temp: "",
             source_brand_name: "",
@@ -77,28 +79,43 @@ class FormNo6 extends Component {
     render() {
         const hintColor = "#ccc"
         return (
-            <ScrollView style={styles.container}>
-                {this.renderLoadingDialog()}
+            <SafeAreaView style={{ flex: 1 }}>
+                <ScrollView style={styles.container}>
+                    {this.renderLoadingDialog()}
 
-                <DateTimePicker
-                    isVisible={this.state.isSourceProductionDateVis}
-                    mode={"date"}
-                    date={new Date()}
-                    onConfirm={(date) => this.handleSourceProductionDatePicker(date)}
-                    onCancel={() => this.setState({ isSourceProductionDateVis: false })}
-                />
+                    <DateTimePicker
+                        isVisible={this.state.isSourceProductionDateVis}
+                        mode={"date"}
+                        date={new Date()}
+                        onConfirm={(date) => this.handleSourceProductionDatePicker(date)}
+                        onCancel={() => this.setState({ isSourceProductionDateVis: false })}
+                    />
 
-                <DateTimePicker
-                    isVisible={this.state.isPackToExpDateVis}
-                    mode={"date"}
-                    date={new Date()}
-                    onConfirm={(date) => this.handlePackToExpDatePicker(date)}
-                    onCancel={() => this.setState({ isPackToExpDateVis: false })}
-                />
+                    <DateTimePicker
+                        isVisible={this.state.isPackToExpDateVis}
+                        mode={"date"}
+                        date={new Date()}
+                        onConfirm={(date) => this.handlePackToExpDatePicker(date)}
+                        onCancel={() => this.setState({ isPackToExpDateVis: false })}
+                    />
 
-                <View style={[styles.round_white_bg_container]}>
-
-                    <Text style={{ color: "#000", fontSize: 20, marginBottom: 10 }}>Source:</Text>
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Source: </Text>
+                        <RadioButton.Group
+                            onValueChange={value => this.setState({ selectedSourceIndex: value })}
+                            value={this.state.selectedSourceIndex}
+                        >
+                            {sources.map((item, index) => {
+                                return (
+                                    <View key={index}
+                                        style={{ flexDirection: "row", flex: 1, alignItems: "center", justifyContent: "flex-start" }}>
+                                        <RadioButton color={appPinkColor} value={index} />
+                                        <Text>{item}</Text>
+                                    </View>
+                                )
+                            })}
+                        </RadioButton.Group>
+                    </View>
 
                     <View style={[styles.round_white_bg_container]}>
                         <Text>Item Number: </Text>
@@ -215,134 +232,135 @@ class FormNo6 extends Component {
                             placeholderTextColor={hintColor} />
                     </View>
 
-                </View>
+                    <View style={[styles.round_white_bg_container]}>
 
-                <View style={[styles.round_white_bg_container]}>
+                        <Text style={{ color: "#000", fontSize: 20, marginBottom: 10 }}>Pack To:</Text>
 
-                    <Text style={{ color: "#000", fontSize: 20, marginBottom: 10 }}>Pack To:</Text>
+                        <View style={[styles.round_white_bg_container]}>
+                            <Text>Item Number: </Text>
+                            <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                keyboardType='default'
+                                returnKeyType="done"
+                                value={this.state.pack_to_item_no}
+                                numberOfLines={1}
+                                multiline={false}
+                                placeholder='* Type here'
+                                onChangeText={(text) => this.setState({ pack_to_item_no: text })}
+                                placeholderTextColor={hintColor} />
+                        </View>
+
+                        <View style={[styles.round_white_bg_container]}>
+                            <Text>Brand Name: </Text>
+                            <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                keyboardType='default'
+                                returnKeyType="done"
+                                value={this.state.pack_to_brand_name}
+                                numberOfLines={1}
+                                multiline={false}
+                                placeholder='* Type here'
+                                onChangeText={(text) => this.setState({ pack_to_brand_name: text })}
+                                placeholderTextColor={hintColor} />
+                        </View>
+
+                        <View style={[styles.round_white_bg_container]}>
+                            <Text>Product Name: </Text>
+                            <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                keyboardType='default'
+                                returnKeyType="done"
+                                value={this.state.pack_to_product_name}
+                                numberOfLines={1}
+                                multiline={false}
+                                placeholder='* Type here'
+                                onChangeText={(text) => this.setState({ pack_to_product_name: text })}
+                                placeholderTextColor={hintColor} />
+                        </View>
+
+                        <View style={[styles.round_white_bg_container]}>
+                            <Text>Allergen(s) Content (list all allergens): </Text>
+                            <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                keyboardType='default'
+                                returnKeyType="done"
+                                value={this.state.pack_to_allergens}
+                                numberOfLines={1}
+                                multiline={false}
+                                placeholder='* Type here'
+                                onChangeText={(text) => this.setState({ pack_to_allergens: text })}
+                                placeholderTextColor={hintColor} />
+                        </View>
+
+                        <View style={[styles.round_white_bg_container]}>
+                            <Text>Cases Made: </Text>
+                            <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                keyboardType='default'
+                                returnKeyType="done"
+                                value={this.state.pack_to_cases_made}
+                                numberOfLines={1}
+                                multiline={false}
+                                placeholder='* Type here'
+                                onChangeText={(text) => this.setState({ pack_to_cases_made: text })}
+                                placeholderTextColor={hintColor} />
+                        </View>
+
+                        <View style={[styles.round_white_bg_container]}>
+                            <Text>Expiration Date:</Text>
+                            <TouchableOpacity
+                                onPress={() => { this.setState({ isPackToExpDateVis: true }) }}
+                            >
+                                <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.pack_to_exp_date} </Text>
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
 
                     <View style={[styles.round_white_bg_container]}>
-                        <Text>Item Number: </Text>
+                        <Text>Comments: </Text>
                         <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
                             autoCapitalize="none"
                             autoCorrect={false}
                             keyboardType='default'
                             returnKeyType="done"
-                            value={this.state.pack_to_item_no}
+                            value={this.state.comments}
                             numberOfLines={1}
                             multiline={false}
-                            placeholder='* Type here'
-                            onChangeText={(text) => this.setState({ pack_to_item_no: text })}
+                            placeholder='Type here'
+                            onChangeText={(text) => this.setState({ comments: text })}
                             placeholderTextColor={hintColor} />
                     </View>
 
-                    <View style={[styles.round_white_bg_container]}>
-                        <Text>Brand Name: </Text>
-                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            keyboardType='default'
-                            returnKeyType="done"
-                            value={this.state.pack_to_brand_name}
-                            numberOfLines={1}
-                            multiline={false}
-                            placeholder='* Type here'
-                            onChangeText={(text) => this.setState({ pack_to_brand_name: text })}
-                            placeholderTextColor={hintColor} />
+                    <View style={{ flexDirection: "row" }}>
+                        <Button
+                            title="Submit"
+                            onPress={() => { this.submitForm() }}
+                            containerStyle={{ margin: 5, flex: 1 }}
+                            buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                        />
+
+                        <Button
+                            title="Cancel"
+                            onPress={() => { this.props.navigation.goBack() }}
+                            containerStyle={{ margin: 5, flex: 1 }}
+                            buttonStyle={{ backgroundColor: "red", marginEnd: 5 }}
+                        />
                     </View>
 
-                    <View style={[styles.round_white_bg_container]}>
-                        <Text>Product Name: </Text>
-                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            keyboardType='default'
-                            returnKeyType="done"
-                            value={this.state.pack_to_product_name}
-                            numberOfLines={1}
-                            multiline={false}
-                            placeholder='* Type here'
-                            onChangeText={(text) => this.setState({ pack_to_product_name: text })}
-                            placeholderTextColor={hintColor} />
-                    </View>
-
-                    <View style={[styles.round_white_bg_container]}>
-                        <Text>Allergen(s) Content (list all allergens): </Text>
-                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            keyboardType='default'
-                            returnKeyType="done"
-                            value={this.state.pack_to_allergens}
-                            numberOfLines={1}
-                            multiline={false}
-                            placeholder='* Type here'
-                            onChangeText={(text) => this.setState({ pack_to_allergens: text })}
-                            placeholderTextColor={hintColor} />
-                    </View>
-
-                    <View style={[styles.round_white_bg_container]}>
-                        <Text>Cases Made: </Text>
-                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            keyboardType='default'
-                            returnKeyType="done"
-                            value={this.state.pack_to_cases_made}
-                            numberOfLines={1}
-                            multiline={false}
-                            placeholder='* Type here'
-                            onChangeText={(text) => this.setState({ pack_to_cases_made: text })}
-                            placeholderTextColor={hintColor} />
-                    </View>
-
-                    <View style={[styles.round_white_bg_container]}>
-                        <Text>Expiration Date:</Text>
-                        <TouchableOpacity
-                            onPress={() => { this.setState({ isPackToExpDateVis: true }) }}
-                        >
-                            <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.pack_to_exp_date} </Text>
-                        </TouchableOpacity>
-                    </View>
-
-                </View>
-
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Comments: </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.comments}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='Type here'
-                        onChangeText={(text) => this.setState({ comments: text })}
-                        placeholderTextColor={hintColor} />
-                </View>
-
-                <View style={{ flexDirection: "row" }}>
-                    <Button
-                        title="Submit"
-                        onPress={() => { this.submitForm() }}
-                        containerStyle={{ margin: 5, flex: 1 }}
-                        buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
-                    />
-
-                    <Button
-                        title="Cancel"
-                        onPress={() => { this.props.navigation.goBack() }}
-                        containerStyle={{ margin: 5, flex: 1 }}
-                        buttonStyle={{ backgroundColor: "red", marginEnd: 5 }}
-                    />
-                </View>
-
-            </ScrollView>
+                </ScrollView>
+            </SafeAreaView>
         )
     }
 
     submitForm() {
+
+        let v0 = sources[this.state.selectedSourceIndex]
         let v1 = this.state.source_item_no
         let v2 = this.state.source_product_temp
         let v3 = this.state.source_brand_name
@@ -368,6 +386,7 @@ class FormNo6 extends Component {
         }
 
         let formData = {
+            selected_source: v0,
             source_item_no: v1,
             source_product_temp: v2,
             source_brand_name: v3,

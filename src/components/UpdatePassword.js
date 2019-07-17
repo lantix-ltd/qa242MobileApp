@@ -110,7 +110,17 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
         padding: 15
-    }
+    },
+    round_pink_btn_bg: {
+        backgroundColor: '#F75473',
+        overflow: 'hidden',
+        borderRadius: 5
+    },
+    round_white_bg_container: {
+        backgroundColor: '#fff',
+        margin: 7,
+        borderRadius: 5
+    },
 });
 
 export default UpdatePassword;

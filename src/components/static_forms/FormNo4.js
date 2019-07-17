@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, TextInput, StyleSheet, ActivityIndicator, ScrollView, SafeAreaView } from "react-native";
 import { CheckBox, ButtonGroup, Button } from 'react-native-elements'
 import Modal from "react-native-modal";
 import { appPinkColor } from "../../utils/AppStyles";
@@ -93,200 +93,202 @@ class FormNo4 extends Component {
     render() {
         const hintColor = "#ccc"
         return (
-            <ScrollView style={styles.container}>
-                {this.renderLoadingDialog()}
+            <SafeAreaView style={{ flex: 1 }}>
+                <ScrollView style={styles.container}>
+                    {this.renderLoadingDialog()}
 
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Circle: </Text>
-                    <ButtonGroup
-                        selectedIndex={this.state.circleSelectedVal}
-                        onPress={(index) => this.setState({ circleSelectedVal: index })}
-                        buttons={circleOptions}
-                        containerStyle={{ height: 45 }}
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Circle: </Text>
+                        <ButtonGroup
+                            selectedIndex={this.state.circleSelectedVal}
+                            onPress={(index) => this.setState({ circleSelectedVal: index })}
+                            buttons={circleOptions}
+                            containerStyle={{ height: 45 }}
+                        />
+                    </View>
+
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Product Last Produced: </Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='default'
+                            returnKeyType="done"
+                            value={this.state.plProduced}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Type here'
+                            onChangeText={(text) => this.setState({ plProduced: text })}
+                            placeholderTextColor={hintColor} />
+                    </View>
+
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Allergn Profile: </Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='default'
+                            returnKeyType="done"
+                            value={this.state.allergenProfile1}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Type here'
+                            onChangeText={(text) => this.setState({ allergenProfile1: text })}
+                            placeholderTextColor={hintColor} />
+                    </View>
+
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Product to be Started: </Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='default'
+                            returnKeyType="done"
+                            value={this.state.ptbStarted}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Type here'
+                            onChangeText={(text) => this.setState({ ptbStarted: text })}
+                            placeholderTextColor={hintColor} />
+                    </View>
+
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Allergn Profile: </Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='default'
+                            returnKeyType="done"
+                            value={this.state.allergenProfile2}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Type here'
+                            onChangeText={(text) => this.setState({ allergenProfile2: text })}
+                            placeholderTextColor={hintColor} />
+                    </View>
+
+                    <FormNo4QView
+                        title={"No visible food debris or contaminants on exposed food contact surfaces after allergen cleaning. (Pre-Op check list conforming)"}
+                        onButtonChange={(index) => this.setState({ q1SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q1CorrectiveAction: txt })}
                     />
-                </View>
-
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Product Last Produced: </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.plProduced}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.setState({ plProduced: text })}
-                        placeholderTextColor={hintColor} />
-                </View>
-
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Allergn Profile: </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.allergenProfile1}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.setState({ allergenProfile1: text })}
-                        placeholderTextColor={hintColor} />
-                </View>
-
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Product to be Started: </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.ptbStarted}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.setState({ ptbStarted: text })}
-                        placeholderTextColor={hintColor} />
-                </View>
-
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Allergn Profile: </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.allergenProfile2}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.setState({ allergenProfile2: text })}
-                        placeholderTextColor={hintColor} />
-                </View>
-
-                <FormNo4QView
-                    title={"No visible food debris or contaminants on exposed food contact surfaces after allergen cleaning. (Pre-Op check list conforming)"}
-                    onButtonChange={(index) => this.setState({ q1SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q1CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Verify product formulation and ingredients"}
-                    onButtonChange={(index) => this.setState({ q2SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q2CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"All food contact surfaces conform to the Parameters/ Limits (Negative - protein indicator swabbing example seafood, gluten, etc.)"}
-                    onButtonChange={(index) => this.setState({ q3SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q3CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Filling mixer/ Dough mixer"}
-                    onButtonChange={(index) => this.setState({ q4SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q4CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"770's / Agnelli machine parts, clean and knobs intact"}
-                    onButtonChange={(index) => this.setState({ q5SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q5CorrectiveAction: txt })}
-                />
-
-                <FormNo4QView
-                    title={"Beginning of pasteurizer - shaker/spreader"}
-                    onButtonChange={(index) => this.setState({ q6SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q6CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"End of pasteurizer - vibrator"}
-                    onButtonChange={(index) => this.setState({ q7SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q7CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Conveyors - pasteurizer & cooling conveyors"}
-                    onButtonChange={(index) => this.setState({ q8SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q8CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Product entry to spiral freezer - Guides, Edges"}
-                    onButtonChange={(index) => this.setState({ q9SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q9CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Spiral freezer, clean and light covers intact"}
-                    onButtonChange={(index) => this.setState({ q10SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q10CorrectiveAction: txt })}
-                />
-
-                <FormNo4QView
-                    title={"Spiral discharge area"}
-                    onButtonChange={(index) => this.setState({ q11SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q11CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Incline conveyor's"}
-                    onButtonChange={(index) => this.setState({ q12SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q12CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Pasta weighing machine-Ishida scale"}
-                    onButtonChange={(index) => this.setState({ q13SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q13CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Discharge shoot to packaging"}
-                    onButtonChange={(index) => this.setState({ q14SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q14CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Verify the bulk product by checking the filling"}
-                    onButtonChange={(index) => this.setState({ q15SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q15CorrectiveAction: txt })}
-                />
-
-                <FormNo4QView
-                    title={"No product or residue from previews run (packaging)"}
-                    onButtonChange={(index) => this.setState({ q16SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q16CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Employee glove & sleeve changes performed as necessary."}
-                    onButtonChange={(index) => this.setState({ q17SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q17CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Coats/smocks and aprons changed"}
-                    onButtonChange={(index) => this.setState({ q18SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q18CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Labeling is correct (All other labels removed from line)"}
-                    onButtonChange={(index) => this.setState({ q19SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q19CorrectiveAction: txt })}
-                />
-                <FormNo4QView
-                    title={"Metal detector rejects removed (Reject units documented on PPC-5)"}
-                    onButtonChange={(index) => this.setState({ q20SelectedVal: index })}
-                    onTextChange={(txt) => this.setState({ q20CorrectiveAction: txt })}
-                />
-
-                <View style={{ flexDirection: "row" }}>
-                    <Button
-                        title="Submit"
-                        onPress={() => { this.submitForm() }}
-                        containerStyle={{ margin: 5, flex: 1 }}
-                        buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                    <FormNo4QView
+                        title={"Verify product formulation and ingredients"}
+                        onButtonChange={(index) => this.setState({ q2SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q2CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"All food contact surfaces conform to the Parameters/ Limits (Negative - protein indicator swabbing example seafood, gluten, etc.)"}
+                        onButtonChange={(index) => this.setState({ q3SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q3CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Filling mixer/ Dough mixer"}
+                        onButtonChange={(index) => this.setState({ q4SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q4CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"770's / Agnelli machine parts, clean and knobs intact"}
+                        onButtonChange={(index) => this.setState({ q5SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q5CorrectiveAction: txt })}
                     />
 
-                    <Button
-                        title="Cancel"
-                        onPress={() => { this.props.navigation.goBack() }}
-                        containerStyle={{ margin: 5, flex: 1 }}
-                        buttonStyle={{ backgroundColor: "red", marginEnd: 5 }}
+                    <FormNo4QView
+                        title={"Beginning of pasteurizer - shaker/spreader"}
+                        onButtonChange={(index) => this.setState({ q6SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q6CorrectiveAction: txt })}
                     />
-                </View>
+                    <FormNo4QView
+                        title={"End of pasteurizer - vibrator"}
+                        onButtonChange={(index) => this.setState({ q7SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q7CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Conveyors - pasteurizer & cooling conveyors"}
+                        onButtonChange={(index) => this.setState({ q8SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q8CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Product entry to spiral freezer - Guides, Edges"}
+                        onButtonChange={(index) => this.setState({ q9SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q9CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Spiral freezer, clean and light covers intact"}
+                        onButtonChange={(index) => this.setState({ q10SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q10CorrectiveAction: txt })}
+                    />
 
-            </ScrollView>
+                    <FormNo4QView
+                        title={"Spiral discharge area"}
+                        onButtonChange={(index) => this.setState({ q11SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q11CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Incline conveyor's"}
+                        onButtonChange={(index) => this.setState({ q12SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q12CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Pasta weighing machine-Ishida scale"}
+                        onButtonChange={(index) => this.setState({ q13SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q13CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Discharge shoot to packaging"}
+                        onButtonChange={(index) => this.setState({ q14SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q14CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Verify the bulk product by checking the filling"}
+                        onButtonChange={(index) => this.setState({ q15SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q15CorrectiveAction: txt })}
+                    />
+
+                    <FormNo4QView
+                        title={"No product or residue from previews run (packaging)"}
+                        onButtonChange={(index) => this.setState({ q16SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q16CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Employee glove & sleeve changes performed as necessary."}
+                        onButtonChange={(index) => this.setState({ q17SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q17CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Coats/smocks and aprons changed"}
+                        onButtonChange={(index) => this.setState({ q18SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q18CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Labeling is correct (All other labels removed from line)"}
+                        onButtonChange={(index) => this.setState({ q19SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q19CorrectiveAction: txt })}
+                    />
+                    <FormNo4QView
+                        title={"Metal detector rejects removed (Reject units documented on PPC-5)"}
+                        onButtonChange={(index) => this.setState({ q20SelectedVal: index })}
+                        onTextChange={(txt) => this.setState({ q20CorrectiveAction: txt })}
+                    />
+
+                    <View style={{ flexDirection: "row" }}>
+                        <Button
+                            title="Submit"
+                            onPress={() => { this.submitForm() }}
+                            containerStyle={{ margin: 5, flex: 1 }}
+                            buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                        />
+
+                        <Button
+                            title="Cancel"
+                            onPress={() => { this.props.navigation.goBack() }}
+                            containerStyle={{ margin: 5, flex: 1 }}
+                            buttonStyle={{ backgroundColor: "red", marginEnd: 5 }}
+                        />
+                    </View>
+
+                </ScrollView>
+            </SafeAreaView>
         )
     }
 

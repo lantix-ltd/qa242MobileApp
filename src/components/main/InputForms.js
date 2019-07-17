@@ -1,15 +1,13 @@
 
 import React, { Component } from "react";
-import { View, Text, Image, StyleSheet, FlatList, TouchableHighlight, TouchableOpacity, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView } from "react-native";
 import Icon from 'react-native-vector-icons/Feather';
 import MyUtils from "../../utils/MyUtils";
 import { primaryColor } from "../../utils/AppStyles";
 import { DrawerActions } from 'react-navigation';
-import WebHandler from "../../data/remote/WebHandler"
 import PrefManager from "../../data/local/PrefManager"
 
 const prefManager = new PrefManager()
-
 const WAREHOUSE = "warehouse", PRODUCTION = "production", PACKING_TECH = "packingtech"
 
 class InputForms extends Component {
@@ -32,8 +30,9 @@ class InputForms extends Component {
             { id: 2, title: "PPC-7 Shipping Inspection", value: "FormNo2", responsible: WAREHOUSE },
             { id: 3, title: "Palletizing Record", value: "FormNo3", responsible: PRODUCTION },
             { id: 4, title: "PPC-2 Cleaning Inspection", value: "FormNo4", responsible: PACKING_TECH },
-            { id: 5, title: "Bulk product Temperature Monitoring", value: "FormNo5", responsible: PRODUCTION },
+            { id: 5, title: "Bulk Pasta Temp Log (Every Tub)", value: "FormNo5", responsible: PRODUCTION },
             { id: 6, title: "Repack/ Recode Form", value: "FormNo6", responsible: PACKING_TECH },
+            { id: 7, title: "Bulk Pasta Temp Log (Every Bulk Form)", value: "FormNo7", responsible: PRODUCTION },
         ]
         this.setState({ isLoading: true })
         prefManager.getUserSessionData(data => {

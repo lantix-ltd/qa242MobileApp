@@ -153,7 +153,7 @@ class CheckDetailView extends Component {
                 <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
                     autoCapitalize="none"
                     autoCorrect={false}
-                    keyboardType='number-pad'
+                    keyboardType='default'
                     returnKeyType="done"
                     value={this.state.reviewerComment}
                     numberOfLines={1}

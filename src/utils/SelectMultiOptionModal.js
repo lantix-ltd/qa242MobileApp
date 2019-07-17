@@ -26,7 +26,7 @@ class SelectMultiOptionModal extends Component {
                     {this.state.selectedProgramtypes != null &&
                         this.state.selectedProgramtypes.map((item, index) => {
                             return (
-                                <View key={index}>
+                                <View style={styles.round_white_bg_container} key={index}>
                                     <CheckBox
                                         containerStyle={{ flex: 1, padding: 15 }}
                                         title={item.key}
@@ -34,17 +34,16 @@ class SelectMultiOptionModal extends Component {
                                         checked={item.isSelecetd}
                                         onPress={() => { this.handleOptionClick(item) }}
                                     />
-                                    <View style={{ backgroundColor: "#ccc", height: 1, marginHorizontal: 10 }} />
                                 </View>
                             )
                         })
                     }
-                    <View style={{ flexDirection: "row", padding: 10, justifyContent: "flex-end", alignItems: "flex-end" }}>
-                        <TouchableOpacity style={{ padding: 10 }} onPress={() => {
+                    <View style={{ flexDirection: "row", padding: 10 }}>
+                        <TouchableOpacity style={[styles.round_pink_btn_bg, { flex: 1, height: 40, justifyContent: "center" }]} onPress={() => {
                             this.onCancel()
                             this.props.onDonePress(this.state.selectedProgramtypes)
                         }}>
-                            <Text style={{ fontSize: 18, color: appPinkColor }}>Save</Text>
+                            <Text style={{ textAlign: "center", fontSize: 17, fontWeight: "bold", color: "#fff" }}>Save</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -81,6 +80,16 @@ class SelectMultiOptionModal extends Component {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white'
+    },
+    round_white_bg_container: {
+        backgroundColor: '#fff',
+        margin: 7,
+        borderRadius: 5
+    },
+    round_pink_btn_bg: {
+        backgroundColor: '#F75473',
+        overflow: 'hidden',
+        borderRadius: 5
     }
 });
 

@@ -1,10 +1,9 @@
 import React, { Component } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, SafeAreaView } from "react-native";
 import { CheckBox, ButtonGroup, Button } from 'react-native-elements'
 import Modal from "react-native-modal";
 import { appPinkColor } from "../../utils/AppStyles";
 import WebHandler from "../../data/remote/WebHandler"
-import FormNo4QView from "./FormNo4QView"
 import MyUtils from "../../utils/MyUtils";
 import DateTimePicker from "react-native-modal-datetime-picker";
 
@@ -13,7 +12,7 @@ class FormNo5 extends Component {
 
     static navigationOptions = ({ navigation }) => {
         return {
-            title: "Bulk Product Temperature Monitoring",
+            title: "Bulk Pasta Temp Log (Every Tub)",
         }
     };
 
@@ -75,152 +74,154 @@ class FormNo5 extends Component {
     render() {
         const hintColor = "#ccc"
         return (
-            <ScrollView style={styles.container}>
-                {this.renderLoadingDialog()}
+            <SafeAreaView style={{ flex: 1 }}>
+                <ScrollView style={styles.container}>
+                    {this.renderLoadingDialog()}
 
-                <DateTimePicker
-                    isVisible={this.state.isTimeInCooerVis}
-                    mode={"time"}
-                    date={new Date()}
-                    onConfirm={(date) => this.handleTimeInCoolerPicker(date)}
-                    onCancel={() => this.setState({ isTimeInCooerVis: false })}
-                />
+                    <DateTimePicker
+                        isVisible={this.state.isTimeInCooerVis}
+                        mode={"time"}
+                        date={new Date()}
+                        onConfirm={(date) => this.handleTimeInCoolerPicker(date)}
+                        onCancel={() => this.setState({ isTimeInCooerVis: false })}
+                    />
 
-                <DateTimePicker
-                    isVisible={this.state.isTimeOutCoolerVis}
-                    mode={"time"}
-                    date={new Date()}
-                    onConfirm={(date) => this.handleTimeOutCoolerPicker(date)}
-                    onCancel={() => this.setState({ isTimeOutCoolerVis: false })}
-                />
+                    <DateTimePicker
+                        isVisible={this.state.isTimeOutCoolerVis}
+                        mode={"time"}
+                        date={new Date()}
+                        onConfirm={(date) => this.handleTimeOutCoolerPicker(date)}
+                        onCancel={() => this.setState({ isTimeOutCoolerVis: false })}
+                    />
 
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Packing Operator: </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.packingOperator}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.setState({ packingOperator: text })}
-                        placeholderTextColor={hintColor} />
-                </View>
-
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Product Name: </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.productName}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.setState({ productName: text })}
-                        placeholderTextColor={hintColor} />
-                </View>
-
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Item Number: </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.itemNumber}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.setState({ itemNumber: text })}
-                        placeholderTextColor={hintColor} />
-                </View>
-
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Container/Pallet # </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.palletNo}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.setState({ palletNo: text })}
-                        placeholderTextColor={hintColor} />
-                </View>
-
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Time In Cooler: </Text>
-                    <TouchableOpacity
-                        onPress={() => { this.setState({ isTimeInCooerVis: true }) }}
-                    >
-                        <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.timeInCooler} </Text>
-                    </TouchableOpacity>
-                </View>
-
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Time out of cooler: </Text>
-                    <TouchableOpacity
-                        onPress={() => { this.setState({ isTimeOutCoolerVis: true }) }}
-                    >
-                        <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.timeOutCooler} </Text>
-                    </TouchableOpacity>
-                </View>
-
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Temperature (must be at or below 40 F) </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='number-pad'
-                        returnKeyType="done"
-                        value={this.state.temp}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.handleTempChange(text)}
-                        placeholderTextColor={hintColor} />
-                </View>
-
-                {this.state.isCorrectiveActionNeeded &&
                     <View style={[styles.round_white_bg_container]}>
-                        <Text>Corrective Action: </Text>
+                        <Text>Packing Operator: </Text>
                         <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
                             autoCapitalize="none"
                             autoCorrect={false}
                             keyboardType='default'
                             returnKeyType="done"
-                            value={this.state.correctiveAction}
+                            value={this.state.packingOperator}
                             numberOfLines={1}
                             multiline={false}
                             placeholder='* Type here'
-                            onChangeText={(text) => this.setState({ correctiveAction: text })}
+                            onChangeText={(text) => this.setState({ packingOperator: text })}
                             placeholderTextColor={hintColor} />
                     </View>
-                }
 
-                <View style={{ flexDirection: "row" }}>
-                    <Button
-                        title="Submit"
-                        onPress={() => { this.submitForm() }}
-                        containerStyle={{ margin: 5, flex: 1 }}
-                        buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
-                    />
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Product Name: </Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='default'
+                            returnKeyType="done"
+                            value={this.state.productName}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Type here'
+                            onChangeText={(text) => this.setState({ productName: text })}
+                            placeholderTextColor={hintColor} />
+                    </View>
 
-                    <Button
-                        title="Cancel"
-                        onPress={() => { this.props.navigation.goBack() }}
-                        containerStyle={{ margin: 5, flex: 1 }}
-                        buttonStyle={{ backgroundColor: "red", marginEnd: 5 }}
-                    />
-                </View>
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Item Number: </Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='default'
+                            returnKeyType="done"
+                            value={this.state.itemNumber}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Type here'
+                            onChangeText={(text) => this.setState({ itemNumber: text })}
+                            placeholderTextColor={hintColor} />
+                    </View>
 
-            </ScrollView>
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Container/Pallet # </Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='default'
+                            returnKeyType="done"
+                            value={this.state.palletNo}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Type here'
+                            onChangeText={(text) => this.setState({ palletNo: text })}
+                            placeholderTextColor={hintColor} />
+                    </View>
+
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Time In Cooler: </Text>
+                        <TouchableOpacity
+                            onPress={() => { this.setState({ isTimeInCooerVis: true }) }}
+                        >
+                            <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.timeInCooler} </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Time out of cooler: </Text>
+                        <TouchableOpacity
+                            onPress={() => { this.setState({ isTimeOutCoolerVis: true }) }}
+                        >
+                            <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.timeOutCooler} </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Temperature (must be at or below 40 F) </Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='number-pad'
+                            returnKeyType="done"
+                            value={this.state.temp}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Type here'
+                            onChangeText={(text) => this.handleTempChange(text)}
+                            placeholderTextColor={hintColor} />
+                    </View>
+
+                    {this.state.isCorrectiveActionNeeded &&
+                        <View style={[styles.round_white_bg_container]}>
+                            <Text>Corrective Action: </Text>
+                            <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                keyboardType='default'
+                                returnKeyType="done"
+                                value={this.state.correctiveAction}
+                                numberOfLines={1}
+                                multiline={false}
+                                placeholder='* Type here'
+                                onChangeText={(text) => this.setState({ correctiveAction: text })}
+                                placeholderTextColor={hintColor} />
+                        </View>
+                    }
+
+                    <View style={{ flexDirection: "row" }}>
+                        <Button
+                            title="Submit"
+                            onPress={() => { this.submitForm() }}
+                            containerStyle={{ margin: 5, flex: 1 }}
+                            buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                        />
+
+                        <Button
+                            title="Cancel"
+                            onPress={() => { this.props.navigation.goBack() }}
+                            containerStyle={{ margin: 5, flex: 1 }}
+                            buttonStyle={{ backgroundColor: "red", marginEnd: 5 }}
+                        />
+                    </View>
+
+                </ScrollView>
+            </SafeAreaView>
         )
     }
 
@@ -255,7 +256,7 @@ class FormNo5 extends Component {
         }
 
         this.setState({ isFormSubmitting: true })
-        webHandler.submitBulkInspectionForm(formData, (responseJson) => {
+        webHandler.submitBulkInspectionForm1(formData, (responseJson) => {
             this.setState({ isFormSubmitting: false })
             MyUtils.showSnackbar("form submitted successfully", "")
             this.props.navigation.goBack()

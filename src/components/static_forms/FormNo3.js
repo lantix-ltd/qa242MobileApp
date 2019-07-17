@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, SafeAreaView } from "react-native";
 import { CheckBox, ButtonGroup, Button } from 'react-native-elements'
 import Modal from "react-native-modal";
 import { appPinkColor } from "../../utils/AppStyles";
@@ -20,6 +20,7 @@ class FormNo3 extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            palletNo: "",
             time: "00:00:00",
             itemNumber: "",
             cases: "",
@@ -70,92 +71,108 @@ class FormNo3 extends Component {
     render() {
         const hintColor = "#ccc"
         return (
-            <ScrollView style={styles.container}>
+            <SafeAreaView style={{ flex: 1 }}>
+                <ScrollView style={styles.container}>
 
-                {this.renderLoadingDialog()}
+                    {this.renderLoadingDialog()}
 
-                <DateTimePicker
-                    isVisible={this.state.isTimePickerVisible}
-                    mode={"time"}
-                    date={new Date()}
-                    onConfirm={(date) => this.handleTimePicker(date)}
-                    onCancel={() => this.setState({ isCheckInTimePickerVisible: false })}
-                />
+                    <DateTimePicker
+                        isVisible={this.state.isTimePickerVisible}
+                        mode={"time"}
+                        date={new Date()}
+                        onConfirm={(date) => this.handleTimePicker(date)}
+                        onCancel={() => this.setState({ isCheckInTimePickerVisible: false })}
+                    />
 
-                <DateTimePicker
-                    isVisible={this.state.isUsedByDateVisible}
-                    mode={"date"}
-                    date={new Date()}
-                    onConfirm={(date) => this.handleUsedByDatePicker(date)}
-                    onCancel={() => this.setState({ isUsedByDateVisible: false })}
-                />
+                    <DateTimePicker
+                        isVisible={this.state.isUsedByDateVisible}
+                        mode={"date"}
+                        date={new Date()}
+                        onConfirm={(date) => this.handleUsedByDatePicker(date)}
+                        onCancel={() => this.setState({ isUsedByDateVisible: false })}
+                    />
 
-                <DateTimePicker
-                    isVisible={this.state.isCodeDateVisible}
-                    mode={"date"}
-                    date={new Date()}
-                    onConfirm={(date) => this.handleCodeDatePicker(date)}
-                    onCancel={() => this.setState({ isCodeDateVisible: false })}
-                />
+                    <DateTimePicker
+                        isVisible={this.state.isCodeDateVisible}
+                        mode={"date"}
+                        date={new Date()}
+                        onConfirm={(date) => this.handleCodeDatePicker(date)}
+                        onCancel={() => this.setState({ isCodeDateVisible: false })}
+                    />
 
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Time: </Text>
-                    <TouchableOpacity
-                        onPress={() => { this.setState({ isTimePickerVisible: true }) }}
-                    >
-                        <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.time} </Text>
-                    </TouchableOpacity>
-                </View>
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Pallet No: </Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='default'
+                            returnKeyType="done"
+                            value={this.state.palletNo}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Type here'
+                            onChangeText={(text) => this.setState({ palletNo: text })}
+                            placeholderTextColor={hintColor} />
+                    </View>
 
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Item Number: </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.itemNumber}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.setState({ itemNumber: text })}
-                        placeholderTextColor={hintColor} />
-                </View>
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Time: </Text>
+                        <TouchableOpacity
+                            onPress={() => { this.setState({ isTimePickerVisible: true }) }}
+                        >
+                            <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.time} </Text>
+                        </TouchableOpacity>
+                    </View>
 
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Cases: </Text>
-                    <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        keyboardType='default'
-                        returnKeyType="done"
-                        value={this.state.cases}
-                        numberOfLines={1}
-                        multiline={false}
-                        placeholder='* Type here'
-                        onChangeText={(text) => this.setState({ cases: text })}
-                        placeholderTextColor={hintColor} />
-                </View>
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Item Number: </Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='default'
+                            returnKeyType="done"
+                            value={this.state.itemNumber}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Type here'
+                            onChangeText={(text) => this.setState({ itemNumber: text })}
+                            placeholderTextColor={hintColor} />
+                    </View>
 
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Used By Date: </Text>
-                    <TouchableOpacity
-                        onPress={() => { this.setState({ isUsedByDateVisible: true }) }}
-                    >
-                        <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.usedByDate} </Text>
-                    </TouchableOpacity>
-                </View>
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Cases: </Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='default'
+                            returnKeyType="done"
+                            value={this.state.cases}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Type here'
+                            onChangeText={(text) => this.setState({ cases: text })}
+                            placeholderTextColor={hintColor} />
+                    </View>
 
-                <View style={[styles.round_white_bg_container]}>
-                    <Text>Code Date (ACC/Unacc): </Text>
-                    <TouchableOpacity
-                        onPress={() => { this.setState({ isCodeDateVisible: true }) }}
-                    >
-                        <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.codeDate} </Text>
-                    </TouchableOpacity>
-                </View>
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Used By Date: </Text>
+                        <TouchableOpacity
+                            onPress={() => { this.setState({ isUsedByDateVisible: true }) }}
+                        >
+                            <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.usedByDate} </Text>
+                        </TouchableOpacity>
+                    </View>
 
-                {/* <View style={[styles.round_white_bg_container]}>
+                    <View style={[styles.round_white_bg_container]}>
+                        <Text>Code Date (ACC/Unacc): </Text>
+                        <TouchableOpacity
+                            onPress={() => { this.setState({ isCodeDateVisible: true }) }}
+                        >
+                            <Text style={{ padding: 5, fontSize: 16, color: "black" }}>{this.state.codeDate} </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* <View style={[styles.round_white_bg_container]}>
                     <Text>Initials: </Text>
                     <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
                         autoCapitalize="none"
@@ -170,27 +187,29 @@ class FormNo3 extends Component {
                         placeholderTextColor={hintColor} />
                 </View> */}
 
-                <View style={{ flexDirection: "row" }}>
-                    <Button
-                        title="Submit"
-                        onPress={() => { this.submitForm() }}
-                        containerStyle={{ margin: 5, flex: 1 }}
-                        buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
-                    />
+                    <View style={{ flexDirection: "row" }}>
+                        <Button
+                            title="Submit"
+                            onPress={() => { this.submitForm() }}
+                            containerStyle={{ margin: 5, flex: 1 }}
+                            buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                        />
 
-                    <Button
-                        title="Cancel"
-                        onPress={() => { this.props.navigation.goBack() }}
-                        containerStyle={{ margin: 5, flex: 1 }}
-                        buttonStyle={{ backgroundColor: "red", marginEnd: 5 }}
-                    />
-                </View>
+                        <Button
+                            title="Cancel"
+                            onPress={() => { this.props.navigation.goBack() }}
+                            containerStyle={{ margin: 5, flex: 1 }}
+                            buttonStyle={{ backgroundColor: "red", marginEnd: 5 }}
+                        />
+                    </View>
 
-            </ScrollView>
+                </ScrollView>
+            </SafeAreaView>
         )
     }
 
     submitForm() {
+        let v0 = this.state.palletNo
         let v1 = this.state.time
         let v2 = this.state.itemNumber
         let v3 = this.state.cases
@@ -198,13 +217,14 @@ class FormNo3 extends Component {
         let v5 = this.state.codeDate
         // let v6 = this.state.initials
 
-        if (MyUtils.isEmptyString(v1) || MyUtils.isEmptyString(v2) || MyUtils.isEmptyString(v3) || MyUtils.isEmptyString(v4) ||
-            MyUtils.isEmptyString(v5)) {
+        if (MyUtils.isEmptyString(v0) || MyUtils.isEmptyString(v1) || MyUtils.isEmptyString(v2) || MyUtils.isEmptyString(v3) ||
+            MyUtils.isEmptyString(v4) || MyUtils.isEmptyString(v5)) {
             MyUtils.showSnackbar("Please fill all required (*) fields", "")
             return;
         }
 
         let formData = {
+            palletNo: v0,
             time: v1,
             itemNumber: v2,
             cases: v3,

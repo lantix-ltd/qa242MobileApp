@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import {
     View, Text, Image, StyleSheet, SafeAreaView, ScrollView,
-    TouchableOpacity, ActivityIndicator
+    TouchableOpacity, ActivityIndicator,
 } from "react-native";
 import { Chip } from "react-native-paper"
 import { Button } from 'react-native-elements'
@@ -33,6 +33,7 @@ class CheckDetailForm extends Component {
             refreshing: false,
             mediaFiles: [],
             isSoundPlaying: false,
+            submitBtnText: "Submit",
 
             checkId: props.navigation.getParam("_id", ""),
             checkTitle: props.navigation.getParam("_title", ""),
@@ -41,7 +42,8 @@ class CheckDetailForm extends Component {
             isError: false, errorMsg: "",
             checkQuesRefs: [],
             isFormSubmitting: false,
-            selectedProgramtypes: []
+            selectedProgramtypes: [],
+            isMediaReUploading: false
         }
     }
 
@@ -223,7 +225,7 @@ class CheckDetailForm extends Component {
 
                             <View style={{ flexDirection: "row", padding: 10 }}>
                                 <Button
-                                    title="SUBMIT"
+                                    title={this.state.submitBtnText.toUpperCase()}
                                     containerStyle={{ flex: 1 }}
                                     buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
                                     onPress={() => {
@@ -342,19 +344,60 @@ class CheckDetailForm extends Component {
 
     submitData(quesResp, PTypes) {
         this.setState({ isFormSubmitting: true })
+        if (this.state.isMediaReUploading) {
+            webHandler.deleteCheckMedia(this.state.checkId, (responseJson) => {
+                this.uploadMedia()
+            }, error => {
+                alert("Unable to upload media files, try again")
+            })
+            return;
+        }
         webHandler.submitCheck(this.state.checkId,
             this.state.checkTitle, quesResp, PTypes,
             (responseJson) => {
                 MyUtils.showSnackbar("Form submitted successfully!", "")
+                if (!MyUtils.isEmptyArray(this.state.mediaFiles)) {
+                    this.setState({ uploadingIndex: 0 })
+                    this.uploadMedia()
+                } else {
+                    this.setState({ isFormSubmitting: false })
+                    this.props.navigation.state.params.onReload()
+                    this.props.navigation.goBack();
+                }
+            }, error => {
+                MyUtils.showCustomAlert("Check Submit Failed", error)
+                this.setState({ isFormSubmitting: false, submitBtnText: "Re-Submit" })
+            })
+        // alert(quesResp) 
+    }
+
+    uploadMedia() {
+        MyUtils.showSnackbar("Uploading file...", "")
+        var uploadPromises = []
+        this.state.mediaFiles.map((item, index) => {
+            var p = new Promise((resolve, reject) => {
+                webHandler.uploadCheckMedia(this.state.checkId, item.file.uri, item.type, (responseJson) => {
+                    resolve("File " + (index + 1) + " uploaded")
+                }, (error) => {
+                    reject(new Error(error))
+                })
+            })
+            uploadPromises.push(p)
+        });
+        Promise.all(uploadPromises).then(result => {
+            if (this.state.mediaFiles.length == result.length) {
+                MyUtils.showSnackbar("All media files uploaded successfully", "")
                 this.setState({ isFormSubmitting: false })
                 this.props.navigation.state.params.onReload()
                 this.props.navigation.goBack();
-            }, error => {
-                MyUtils.showCustomAlert("Check Submit Failed", error)
-                this.setState({ isFormSubmitting: false })
-            })
-
-        // alert(quesResp) 
+            } else {
+                this.setState({ isMediaReUploading: true, submitBtnText: "Re-Upload" })
+                alert("Unable to upload media files, try again")
+            }
+        }).catch(error => {
+            this.setState({ isMediaReUploading: true, submitBtnText: "Re-Upload" })
+            MyUtils.showSnackbar(JSON.stringify(error), "")
+        });
     }
 
     getSelectedProgramTypes() {
@@ -383,7 +426,6 @@ class CheckDetailForm extends Component {
                 <TouchableOpacity style={{ marginLeft: 10 }} onPress={() => { this.removeMediaFile(item) }}>
                     <Icon name="x-circle" size={24} color="red" />
                 </TouchableOpacity>
-
             </View>
         )
     }

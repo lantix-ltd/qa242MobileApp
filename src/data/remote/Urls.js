@@ -20,5 +20,8 @@ export default {
     PALLETIZING_FORM_URL: SERVER + "submit-palletizing-inspection",
     CLEANING_INSPECT_URL: SERVER + "submit-cleaning-inspection",
     BULK_INSPECT_URL: SERVER + "submit-bulk-inspection",
+    BULK_INSPECT_2_URL: SERVER + "submit-bulk-form-inspection",
     REPACK_INSPECT_URL: SERVER + "submit-recode-inspection",
+    UPLOAD_MEDIA_URL: SERVER + "submit-media-file",
+    DELETE_MEDIA_URL: SERVER + "delete-media-file",
 }

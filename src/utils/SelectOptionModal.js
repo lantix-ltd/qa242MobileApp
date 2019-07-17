@@ -8,7 +8,7 @@ import { appGreyColor } from "./AppStyles";
 const options = [
     { id: 1, key: "Take a photo", icon: "camera", type: "photo" },
     { id: 2, key: "Open Gallery", icon: "image", type: "file" },
-    { id: 3, key: "Record Audio", icon: "mic", type: "audio" },
+    // { id: 3, key: "Record Audio", icon: "mic", type: "audio" },
     { id: 4, key: "Record Video", icon: "video", type: "video" },
 ]
 

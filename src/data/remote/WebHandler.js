@@ -578,6 +578,8 @@ export default class WebHandler {
                             "&signOfTemparing=" + inspectionData.signOfTemparing +
                             "&isSecured=" + inspectionData.isSecured +
                             "&sealNo=" + inspectionData.sealNo +
+                            "&lotNoCheck=" + inspectionData.lotNoCheck +
+                            "&lotNo=" + inspectionData.lotNo +
                             "&isBOL=" + inspectionData.isBOL +
                             "&inspectionSummary=" + inspectionData.inspectionSummary +
                             "&checkOutTime=" + inspectionData.checkOutTime +
@@ -619,6 +621,7 @@ export default class WebHandler {
                             "&shift_timing=" + shift +
                             "&plant_name=" + plant +
 
+                            "&palletNo=" + inspectionData.palletNo +
                             "&time=" + inspectionData.time +
                             "&itemNumber=" + inspectionData.itemNumber +
                             "&cases=" + inspectionData.cases +
@@ -728,7 +731,7 @@ export default class WebHandler {
         })
     }
 
-    submitBulkInspectionForm(inspectionData, onSuccess, onFailure) {
+    submitBulkInspectionForm1(inspectionData, onSuccess, onFailure) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
                 this.getSelectedLinesAndShift((plant, line, shift) => {
@@ -772,6 +775,50 @@ export default class WebHandler {
         })
     }
 
+    submitBulkInspectionForm2(inspectionData, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                this.getSelectedLinesAndShift((plant, line, shift) => {
+                    if (line === "" || shift === "") {
+                        onFailure("Please define your Lines & Shift")
+                    } else {
+                        var body =
+                            "user_id=" + userData.id +
+                            "&outlet_id=" + userData.businessId +
+                            "&session_token=" + userData.sessionToken +
+
+                            "&line_timing=" + line.substring(0, line.lastIndexOf(",")) +
+                            "&shift_timing=" + shift +
+                            "&plant_name=" + plant +
+
+                            "&item=" + inspectionData.item +
+                            "&date=" + inspectionData.date +
+                            "&lotCode=" + inspectionData.lotCode +
+                            "&expDate=" + inspectionData.expDate +
+                            "&time=" + inspectionData.time +
+                            "&allergen=" + inspectionData.allergen +
+                            "&qty=" + inspectionData.qty +
+                            "&palletNo=" + inspectionData.palletNo
+
+                        this.sendSimplePostFormRequest(Urls.BULK_INSPECT_2_URL, body, (responseJson) => {
+                            if (responseJson.status) {
+                                onSuccess(responseJson)
+                            } else {
+                                onFailure(responseJson.message)
+                            }
+                        }, (error) => {
+                            onFailure(error)
+                        })
+                    }
+                }, error => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
     submitRepackInspectionForm(inspectionData, onSuccess, onFailure) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
@@ -788,6 +835,7 @@ export default class WebHandler {
                             "&shift_timing=" + shift +
                             "&plant_name=" + plant +
 
+                            "&selected_source=" + inspectionData.selected_source +
                             "&source_item_no=" + inspectionData.source_item_no +
                             "&source_product_temp=" + inspectionData.source_product_temp +
                             "&source_brand_name=" + inspectionData.source_brand_name +
@@ -817,6 +865,59 @@ export default class WebHandler {
                 }, error => {
                     onFailure(error)
                 })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    deleteCheckMedia(assignId, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    "&assign_id=" + assignId
+
+                this.sendSimplePostFormRequest(Urls.DELETE_MEDIA_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    async uploadCheckMedia(assignId, mediaFile, mediaType, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+
+                var formData = new FormData()
+                formData.append("user_id", userData.id)
+                formData.append("outlet_id", userData.businessId)
+                formData.append("session_token", userData.sessionToken)
+                formData.append("assign_id", assignId)
+                formData.append("answer_media", { uri: mediaFile, name: 'MediaFile', type: 'multipart/form-data' })
+                formData.append("media_type", mediaType)
+
+                this.sendMediaPostFormRequest(Urls.UPLOAD_MEDIA_URL, formData, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+
             } else {
                 onFailure("User session not exist!")
             }

@@ -84,7 +84,7 @@ class LinesAndShift extends Component {
             <ScrollView style={styles.container}>
                 <View >
 
-                    <View>
+                    <View style={styles.round_white_bg_container}>
                         <Text style={{ fontSize: 16, padding: 5, fontWeight: "bold", color: "#000" }}> * Which plants you're working on? </Text>
                         <View>
                             {!this.state.isPlantNA &&
@@ -107,20 +107,20 @@ class LinesAndShift extends Component {
                     </View>
 
                     {(this.state.selectedPlantIndex > -1 && !this.state.isPlantNA) &&
-                        <View style={{ alignItems: "flex-start", marginTop: 5 }}>
+                        <View style={[styles.round_white_bg_container, { alignItems: "flex-start" }]} >
                             <Text
                                 style={{ fontSize: 16, padding: 5, fontWeight: "bold", color: "#000" }}>
                                 * Which lines you're working on? </Text>
                             {!this.state.isLineNA &&
                                 <View
                                     pointerEvents={this.state.isLineNA ? "none" : "auto"}
-                                    style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                                    style={{ flexDirection: "row" }}>
                                     {
                                         this.state.linesData.map((item, index) => {
                                             return (
                                                 <CheckBox
                                                     key={index}
-                                                    // containerStyle={{ flex: 1 }}
+                                                    containerStyle={{ flex: 1 }}
                                                     title={"Line " + item.val}
                                                     textStyle={{ fontSize: 12, color: appGreyColor }}
                                                     checked={item.isChecked}
@@ -142,7 +142,7 @@ class LinesAndShift extends Component {
                         </View>
                     }
 
-                    <View style={{ alignItems: "flex-start", }}>
+                    <View style={[styles.round_white_bg_container, { alignItems: "flex-start", }]}>
                         <Text style={{ fontSize: 16, padding: 5, fontWeight: "bold", color: "#000" }}> * Which shift you're working on? </Text>
                         {!this.state.isShiftNA &&
                             <ButtonGroup
@@ -165,8 +165,9 @@ class LinesAndShift extends Component {
                     <View style={{ flex: 1 }} />
 
                     <TouchableOpacity activeOpacity={0.9}
-                        style={[defButtonContainer, {
-                            margin: 10,
+                        style={[styles.round_pink_btn_bg, {
+                            marginTop: 10,
+                            padding: 10,
                             width: "90%", justifyContent: "center",
                             alignSelf: "center"
                         }]}
@@ -248,7 +249,17 @@ class LinesAndShift extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: '#F8F8F8',
+    },
+    round_white_bg_container: {
+        backgroundColor: '#fff',
+        margin: 10,
+        borderRadius: 8
+    },
+    round_pink_btn_bg: {
+        backgroundColor: '#F75473',
+        overflow: 'hidden',
+        borderRadius: 5
     }
 });
 
