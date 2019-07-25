@@ -190,7 +190,6 @@ class CheckDetailForm extends Component {
                         </View>
                     </View>
                 }
-
             </View>
         )
     }
@@ -217,49 +216,60 @@ class CheckDetailForm extends Component {
                     {this.renderLoadingDialog()}
                     {this.state.isLoading && MyUtils.renderLoadingView()}
                     {(!this.state.isLoading && !this.state.isError && !MyUtils.isEmptyArray(this.state.checkDetail)) &&
+
                         <View style={{ flex: 1 }}>
+                            {MyUtils.isEmptyArray(this.state.checkDetail[0].questions) &&
+                                MyUtils.renderErrorView("Check detail is not available", () => {
+                                    this.setState({ isLoading: true, isError: false })
+                                    this.loadData()
+                                })
+                            }
+                            {!MyUtils.isEmptyArray(this.state.checkDetail[0].questions) &&
+                                <View style={{ flex: 1 }}>
 
-                            <ScrollView style={{ flex: 1 }}>
-                                {this.renderItem(this.state.checkDetail[0], 0)}
-                            </ScrollView>
+                                    <ScrollView style={{ flex: 1 }}>
+                                        {this.renderItem(this.state.checkDetail[0], 0)}
+                                    </ScrollView>
 
-                            <View style={{ flexDirection: "row", padding: 10 }}>
-                                <Button
-                                    title={this.state.submitBtnText.toUpperCase()}
-                                    containerStyle={{ flex: 1 }}
-                                    buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
-                                    onPress={() => {
-                                        this.verifyForSubmit(
-                                            this.state.checkDetail[0].productid,
-                                            this.state.checkDetail[0].questions)
-                                    }}
-                                />
-                                <Button
-                                    title="CANCEL"
-                                    containerStyle={{ flex: 1 }}
-                                    buttonStyle={{ backgroundColor: "red", marginStart: 5 }}
-                                    onPress={() => { this.props.navigation.goBack() }}
-                                />
-                            </View>
+                                    <View style={{ flexDirection: "row", padding: 10 }}>
+                                        <Button
+                                            title={this.state.submitBtnText.toUpperCase()}
+                                            containerStyle={{ flex: 1 }}
+                                            buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
+                                            onPress={() => {
+                                                this.verifyForSubmit(
+                                                    this.state.checkDetail[0].productid,
+                                                    this.state.checkDetail[0].questions)
+                                            }}
+                                        />
+                                        <Button
+                                            title="CANCEL"
+                                            containerStyle={{ flex: 1 }}
+                                            buttonStyle={{ backgroundColor: "red", marginStart: 5 }}
+                                            onPress={() => { this.props.navigation.goBack() }}
+                                        />
+                                    </View>
 
-                            <SelectOptionModal
-                                ref="_selectOptionModal"
-                                onItemPress={(type) => this.handleMediaFileAction(type)}
-                            />
-                            <SelectMultiOptionModal
-                                ref="_selectMultiOptionModal"
-                                onDonePress={(types) => this.setState({ selectedProgramtypes: types })}
-                            />
-                            <MyAudioRecorder
-                                ref="_myAudioRecorder"
-                                onDone={(filePath) => {
-                                    count++
-                                    this.addNewMediaFile(count, filePath, "audio")
-                                }}
-                            />
-                            <FullImageView
-                                ref="_fullImageViewModal"
-                            />
+                                    <SelectOptionModal
+                                        ref="_selectOptionModal"
+                                        onItemPress={(type) => this.handleMediaFileAction(type)}
+                                    />
+                                    <SelectMultiOptionModal
+                                        ref="_selectMultiOptionModal"
+                                        onDonePress={(types) => this.setState({ selectedProgramtypes: types })}
+                                    />
+                                    <MyAudioRecorder
+                                        ref="_myAudioRecorder"
+                                        onDone={(filePath) => {
+                                            count++
+                                            this.addNewMediaFile(count, filePath, "audio")
+                                        }}
+                                    />
+                                    <FullImageView
+                                        ref="_fullImageViewModal"
+                                    />
+                                </View>
+                            }
                         </View>
                     }
                     {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {

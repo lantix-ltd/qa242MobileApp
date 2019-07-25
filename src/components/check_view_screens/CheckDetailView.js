@@ -60,6 +60,7 @@ class CheckDetailView extends Component {
                         checkDetail: responseJson.data,
                         isReAssign: responseJson.reassign,
                         isReAssignAnswered: responseJson.reassing_answer,
+                        mediaFiles: responseJson.data[0].media_files,
                         isLoading: false, refreshing: false
                     })
                 },
@@ -75,6 +76,7 @@ class CheckDetailView extends Component {
                         checkDetail: responseJson.data,
                         isReAssign: responseJson.reassign,
                         isReAssignAnswered: responseJson.reassing_answer,
+                        mediaFiles: responseJson.data[0].media_files,
                         isLoading: false, refreshing: false
                     })
                 },
@@ -220,13 +222,15 @@ class CheckDetailView extends Component {
                 </View>
                 {
                     mediaFiles.map((item, index) => {
-                        if (item.type == "image") {
-                            return this.renderImageFileView(item, index)
-                        } else if (item.type == "audio") {
-                            return this.renderAudioFileView(item, index)
-                        } else if (item.type == "video") {
-                            return this.renderVideoFileView(item, index)
+                        if (item.media_type == "image") {
+                            return this.renderImageFileView(item.media_name, index)
+                        } else if (item.media_type == "video") {
+                            return this.renderVideoFileView(item.media_name, index)
                         }
+                        // else if (item.media_type == "audio") {
+                        //     return this.renderAudioFileView(item, index)
+                        // }
+
                     })
                 }
             </View>
@@ -384,17 +388,17 @@ class CheckDetailView extends Component {
             })
     }
 
-    renderImageFileView(item, index) {
+    renderImageFileView(imgPath, index) {
         return (
             <View key={index} style={{ marginTop: 5, flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.refs._fullImageViewModal.loadImage(item.file.uri) }}>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.refs._fullImageViewModal.loadImage(imgPath) }}>
                     <Image key={index}
                         style={{
                             height: 200,
                             width: "80%",
                             padding: 5,
                         }}
-                        source={{ uri: item.file.uri }} />
+                        source={{ uri: imgPath }} />
                 </TouchableOpacity>
             </View>
         )
@@ -417,10 +421,10 @@ class CheckDetailView extends Component {
         )
     }
 
-    renderVideoFileView(item, index) {
+    renderVideoFileView(videoPath, index) {
         return (
             <View key={index} style={{ marginTop: 5, flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleVideoPlay(item) }}>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleVideoPlay(videoPath) }}>
                     <Image
                         style={{
                             height: 120,
@@ -460,11 +464,9 @@ class CheckDetailView extends Component {
         }
     }
 
-    handleVideoPlay(fileData) {
+    handleVideoPlay(videoPath) {
         this.props.navigation.navigate("MyVideoPlayer", {
-            _videoUri: fileData.file.path,
-            _videoWidth: fileData.file.width,
-            _videoHeigth: fileData.file.height
+            _videoUri: videoPath,
         })
     }
 }

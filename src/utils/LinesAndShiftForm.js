@@ -92,14 +92,15 @@ class LinesAndShift extends Component {
                                     onPress={(index) => this.handlePlantChange(index)}
                                     selectedIndex={this.state.selectedPlantIndex}
                                     buttons={plants}
+                                    selectedButtonStyle={{ backgroundColor: primaryColor }}
                                     containerStyle={{ height: 50 }}
                                 />
                             }
                         </View>
                         <CheckBox
                             title='Not Applicable'
-                            checkedColor="red"
-                            textStyle={{ color: "red" }}
+                            textStyle={{ color: primaryColor }}
+                            checkedColor={primaryColor}
                             containerStyle={{ alignSelf: "center" }}
                             checked={this.state.isPlantNA}
                             onPress={() => { this.setState({ isPlantNA: !this.state.isPlantNA }) }}
@@ -124,6 +125,7 @@ class LinesAndShift extends Component {
                                                     title={"Line " + item.val}
                                                     textStyle={{ fontSize: 12, color: appGreyColor }}
                                                     checked={item.isChecked}
+                                                    checkedColor={primaryColor}
                                                     onPress={() => { this.handleLineChange(item) }}
                                                 />
                                             )
@@ -135,8 +137,8 @@ class LinesAndShift extends Component {
                                 title='Not Applicable'
                                 containerStyle={{ alignSelf: "center" }}
                                 checked={this.state.isLineNA}
-                                textStyle={{ color: "red" }}
-                                checkedColor="red"
+                                textStyle={{ color: primaryColor }}
+                                checkedColor={primaryColor}
                                 onPress={() => { this.setState({ isLineNA: !this.state.isLineNA }) }}
                             />
                         </View>
@@ -149,13 +151,14 @@ class LinesAndShift extends Component {
                                 onPress={(index) => this.setState({ selectedShiftIndex: index })}
                                 selectedIndex={this.state.selectedShiftIndex}
                                 buttons={shifts}
+                                selectedButtonStyle={{ backgroundColor: primaryColor }}
                                 containerStyle={{ height: 50 }}
                             />
                         }
                         <CheckBox
                             title='Not Applicable'
-                            checkedColor="red"
-                            textStyle={{ color: "red" }}
+                            textStyle={{ color: primaryColor }}
+                            checkedColor={primaryColor}
                             containerStyle={{ alignSelf: "center" }}
                             checked={this.state.isShiftNA}
                             onPress={() => { this.handleShiftNACheck(!this.state.isShiftNA) }}

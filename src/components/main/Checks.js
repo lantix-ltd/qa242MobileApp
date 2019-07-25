@@ -184,14 +184,18 @@ class Checks extends Component {
     renderQAManagerHeader() {
         return (
             <View style={{ flexDirection: "row", padding: 10 }}>
-                <View style={[styles.round_pending_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginEnd: 5 }]}>
-                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
-                    <Text style={{ color: "#fff", fontSize: 14 }}>PENDING</Text>
-                </View>
-                <View style={[styles.round_reviewed_checks_bg, { flex: 1, alignItems: "center", justifyContent: "center", padding: 10, marginStart: 5 }]}>
-                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
-                    <Text style={{ color: "#fff", fontSize: 14 }}>APPROVED</Text>
-                </View>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleHeaderItemClick("Open") }}>
+                    <View style={[styles.round_pending_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10, marginEnd: 5 }]}>
+                        <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
+                        <Text style={{ color: "#fff", fontSize: 14 }}>PENDING</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleHeaderItemClick("Completed") }}>
+                    <View style={[styles.round_reviewed_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10, marginStart: 5 }]}>
+                        <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
+                        <Text style={{ color: "#fff", fontSize: 14 }}>APPROVED</Text>
+                    </View>
+                </TouchableOpacity>
             </View>
         )
     }

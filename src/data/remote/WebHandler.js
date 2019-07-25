@@ -899,13 +899,13 @@ export default class WebHandler {
     async uploadCheckMedia(assignId, mediaFile, mediaType, onSuccess, onFailure) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
-
                 var formData = new FormData()
                 formData.append("user_id", userData.id)
                 formData.append("outlet_id", userData.businessId)
                 formData.append("session_token", userData.sessionToken)
                 formData.append("assign_id", assignId)
-                formData.append("answer_media", { uri: mediaFile, name: 'MediaFile', type: 'multipart/form-data' })
+                var ext = (mediaType === "video") ? ".mp4" : ".jpg"
+                formData.append("answer_media", { uri: mediaFile, name: "MediaFile" + ext, type: 'multipart/form-data' })
                 formData.append("media_type", mediaType)
 
                 this.sendMediaPostFormRequest(Urls.UPLOAD_MEDIA_URL, formData, (responseJson) => {
