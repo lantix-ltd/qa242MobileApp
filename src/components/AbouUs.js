@@ -14,7 +14,7 @@ class AboutUs extends Component {
                         style={{ padding: 10, marginBottom: 5, alignSelf: "flex-end", justifyContent: "center", }}
                         onPress={() => this.props.navigation.goBack()}>
                         <Icon name="x" size={28} color={appGreyColor} />
-                        <Text>About us detail will be here</Text>
+                        <Text></Text>
                     </TouchableOpacity>
                 </View>
             </SafeAreaView>
