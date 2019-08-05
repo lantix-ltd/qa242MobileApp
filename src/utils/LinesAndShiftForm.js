@@ -82,7 +82,7 @@ class LinesAndShift extends Component {
         })
         return (
             <ScrollView style={styles.container}>
-                <View >
+                <View>
 
                     <View style={styles.round_white_bg_container}>
                         <Text style={{ fontSize: 16, padding: 5, fontWeight: "bold", color: "#000" }}> * Which plants you're working on? </Text>

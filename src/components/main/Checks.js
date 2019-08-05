@@ -125,7 +125,7 @@ class Checks extends Component {
                     isError: true, errorMsg: "Please define your Lines & Shift"
                 })}
             >
-                <View style={{ flex: 1, flexWrap: "wrap", padding: 5 }}>
+                <View style={{ flex: 1, padding: 5 }}>
                     <LinesAndShift
                         onSavePress={() => {
                             this.setState({ modalVisible: false })

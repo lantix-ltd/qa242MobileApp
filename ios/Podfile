@@ -11,6 +11,8 @@ target 'QAProject' do
   pod 'Firebase/Firestore', '~> 5.15.0'
   pod 'Firebase/Messaging', '~> 5.15.0'
 
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
   target 'QAProjectTests' do
     inherit! :search_paths
     # Pods for testing
