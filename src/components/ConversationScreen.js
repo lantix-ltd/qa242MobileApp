@@ -63,7 +63,7 @@ class ConversationScreen extends Component {
                         var msg = {
                             _id: doc.id,
                             text: msg_data.text,
-                            createdAt: Moment(msg_data.createdAt).toDate(),
+                            createdAt: msg_data.createdAt != null ? msg_data.createdAt.toDate() : new Date(),
                             user: {
                                 _id: msg_data.user_id,
                                 name: msg_data.user_name,
@@ -180,7 +180,7 @@ class ConversationScreen extends Component {
                             var msg = {
                                 _id: doc.id,
                                 text: msg_data.text,
-                                createdAt: Moment(msg_data.createdAt).toDate(),
+                                createdAt: msg_data.createdAt != null ? msg_data.createdAt.toDate() : new Date(),
                                 user: {
                                     _id: msg_data.user_id,
                                     name: msg_data.user_name,

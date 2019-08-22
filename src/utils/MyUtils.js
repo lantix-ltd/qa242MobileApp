@@ -5,7 +5,7 @@ import { Button } from "react-native-elements"
 
 export default {
 
-    APP_NAME: "cQcheck",
+    APP_NAME: "LANTIX eQCheck",
 
     isEmptyString(txt) {
         return (txt == undefined || txt == null || txt.trim() == "" || txt.length == 0)

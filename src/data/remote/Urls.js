@@ -1,4 +1,4 @@
-const SERVER = "https://qa.hwryk.com/"
+const SERVER = "https://lantixapp1.lantix.com/"
 
 export default {
     LOGIN_URL: SERVER + "outlet-admin-login",

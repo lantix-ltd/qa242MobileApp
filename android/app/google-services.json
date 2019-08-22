@@ -30,6 +30,49 @@
             {
               "client_id": "433696591781-qn2sp2on6q5o4g2e5airq6l9lofi1tu6.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "433696591781-df8ff0ebfjspupsr31kl7sbume2rdp42.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.qa242.iosapp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433696591781:android:a677f035fb446441",
+        "android_client_info": {
+          "package_name": "com.qaproject.vff"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "433696591781-qn2sp2on6q5o4g2e5airq6l9lofi1tu6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhCxlNzNPJ1NHjjXzkWSHdvoSHO5WcvR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "433696591781-qn2sp2on6q5o4g2e5airq6l9lofi1tu6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "433696591781-df8ff0ebfjspupsr31kl7sbume2rdp42.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.qa242.iosapp"
+              }
             }
           ]
         }
