@@ -1,11 +1,11 @@
 import React from "react";
 import { ToastAndroid, ActivityIndicator, Text, View, TouchableOpacity, Platform, Alert } from "react-native"
 import { appPinkColor, defButtonContainer, defButtonText } from "./AppStyles";
-import { Button } from "react-native-elements"
 
 export default {
 
-    APP_NAME: "LANTIX eQCheck",
+    //QA eQCheck LANTIX eQCheck VFF eQCheck
+    APP_NAME: "QA eQCheck",
 
     isEmptyString(txt) {
         return (txt == undefined || txt == null || txt.trim() == "" || txt.length == 0)

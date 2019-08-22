@@ -186,6 +186,34 @@ android {
         pickFirst '**/x86/libjsc.so'
         pickFirst '**/armeabi-v7a/libjsc.so'
     }
+
+    flavorDimensions "default"
+    productFlavors {
+        qatest {
+            applicationId 'com.qaproject'
+            minSdkVersion rootProject.ext.minSdkVersion
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            versionCode 1
+            versionName '1.0'
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        }
+        lantix {
+            applicationId 'com.qaproject.lantix'
+            minSdkVersion rootProject.ext.minSdkVersion
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            versionCode 1
+            versionName '1.0'
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        }
+        valleyfine {
+            applicationId 'com.qaproject.vff'
+            minSdkVersion rootProject.ext.minSdkVersion
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            versionCode 1
+            versionName '1.0'
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        }
+    }
 }
 
 dependencies {
