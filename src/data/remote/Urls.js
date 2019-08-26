@@ -1,6 +1,6 @@
-const SERVER = "https://qa.hwryk.com/"
+// const SERVER = "https://qa.hwryk.com/"
 // const SERVER = "https://lantixapp1.lantix.com/"
-// const SERVER = "https://eqcheck.valleyfine.com/"
+const SERVER = "https://eqcheck.valleyfine.com/"
 
 export default {
     LOGIN_URL: SERVER + "outlet-admin-login",

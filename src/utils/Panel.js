@@ -1,5 +1,5 @@
 import React from 'react';
-import { Component, StyleSheet, Text, View, TouchableHighlight, Animated, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, TouchableHighlight, Animated, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
 class Panel extends React.Component {
@@ -13,6 +13,7 @@ class Panel extends React.Component {
 
         if (props.collapse === "false") {
             this.state = {
+                timeStamp: props.timeStamp,
                 title: props.title,
                 titleColor: props.titleColor != undefined ? props.titleColor : "#4D5761",
                 expanded: props.collapse === "true" ? false : true,
@@ -21,6 +22,7 @@ class Panel extends React.Component {
         } else {
             this.state = {
                 title: props.title,
+                timeStamp: props.timeStamp,
                 titleColor: props.titleColor != undefined ? props.titleColor : "#4D5761",
                 expanded: props.collapse === "true" ? false : true
             };
@@ -81,7 +83,14 @@ class Panel extends React.Component {
                             underlayColor="#f1f1f1"
                             onPress={() => { this.handleItemClick() }}
                         >
-                            <Text style={[styles.title, { color: this.state.titleColor }]}>{this.state.title}</Text>
+                            <View style={{ paddingVertical: 5 }}>
+                                {this.state.timeStamp &&
+                                    < Text style={{ fontSize: 13, paddingHorizontal: 10, color: "#4D5761", marginBottom: 5 }}>
+                                        {this.state.timeStamp}
+                                    </Text>
+                                }
+                                <Text style={[styles.title, { color: this.state.titleColor }]}>{this.state.title}</Text>
+                            </View>
                         </TouchableHighlight>
 
                         <TouchableHighlight
@@ -97,7 +106,7 @@ class Panel extends React.Component {
                     </View>
 
                 </Animated.View>
-            </SafeAreaView>
+            </SafeAreaView >
         );
     }
 
@@ -120,7 +129,7 @@ var styles = StyleSheet.create({
     },
     title: {
         flex: 1,
-        padding: 10,
+        paddingHorizontal: 10,
         fontWeight: 'bold'
     },
     body: {

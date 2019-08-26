@@ -207,6 +207,7 @@ class Checks extends Component {
         // }
         return (
             <Panel key={index}
+                timeStamp={item.timestamp}
                 title={item.checkname} collapse="true"
                 titleColor={title_color}
                 onItemClick={() => { this.handleOnItemClick(item) }}

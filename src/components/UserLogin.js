@@ -26,13 +26,13 @@ class UserLogin extends Component {
     }
 
     componentDidMount() {
-        prefManager.isUserLoggedIn(result => {
-            if (result) {
-                prefManager.getLoginCredential((userName, userPass) => {
-                    this.setState({ email: userName, password: userPass })
-                })
-            }
-        })
+        // prefManager.isUserLoggedIn(result => {
+        //     if (result) {
+        //         prefManager.getLoginCredential((userName, userPass) => {
+        //             this.setState({ email: userName, password: userPass })
+        //         })
+        //     }
+        // })
     }
 
     render() {
@@ -93,7 +93,7 @@ class UserLogin extends Component {
 
                         </View>
 
-                        <View style={{ flex: 1, flexDirection: "row", marginHorizontal: 15, }}>
+                        {/* <View style={{ flex: 1, flexDirection: "row", marginHorizontal: 15, }}>
                             <TouchableOpacity activeOpacity={0.9} style={{}}
                                 onPress={() => { this.handleForgotPwd() }}>
                                 <Text style={{ fontSize: 15, color: "#AAAAAA", textDecorationLine: "underline" }} >Lost Password?</Text>
@@ -103,7 +103,7 @@ class UserLogin extends Component {
                                 onPress={() => { this.handleForgotPwd() }}>
                                 <Text style={{ fontSize: 15, color: "#AAAAAA", textDecorationLine: "underline" }} >New Member</Text>
                             </TouchableOpacity>
-                        </View>
+                        </View> */}
 
 
                         <View style={{ flex: 1 }} />

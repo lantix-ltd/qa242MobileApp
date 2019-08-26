@@ -45,7 +45,7 @@ export default class PrefManager {
         try {
             await AsyncStorage.setItem(USER_ID_KEY, userData.userId.toString());
             await AsyncStorage.setItem(USER_NAME_KEY, userData.userName.toString());
-            await AsyncStorage.setItem(USER_PASSWORD_KEY, userData.userPassword.toString());
+            // await AsyncStorage.setItem(USER_PASSWORD_KEY, userData.userPassword.toString());
             await AsyncStorage.setItem(USER_EMAIL_KEY, userData.email.toString());
             await AsyncStorage.setItem(USER_PIC_KEY, userData.picPath.toString());
 
@@ -71,7 +71,7 @@ export default class PrefManager {
         try {
             const id = await AsyncStorage.getItem(USER_ID_KEY);
             const un = await AsyncStorage.getItem(USER_NAME_KEY);
-            const up = await AsyncStorage.getItem(USER_PASSWORD_KEY);
+            // const up = await AsyncStorage.getItem(USER_PASSWORD_KEY);
             const em = await AsyncStorage.getItem(USER_EMAIL_KEY);
 
             const p_gid = await AsyncStorage.getItem(USER_PRIMARY_GID_KEY);
@@ -85,7 +85,7 @@ export default class PrefManager {
             let data = {
                 id: id,
                 username: un,
-                userPassword: up,
+                userPassword: "up",
                 email: em,
                 userPrimaryGId: p_gid,
                 userPrimaryType: p_type,
