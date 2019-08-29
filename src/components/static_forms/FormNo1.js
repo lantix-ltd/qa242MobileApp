@@ -5,12 +5,13 @@ import { CheckBox, ButtonGroup, Button } from 'react-native-elements'
 import WebHandler from "../../data/remote/WebHandler"
 import Modal from "react-native-modal";
 import MyUtils from "../../utils/MyUtils";
-import { appPinkColor } from "../../utils/AppStyles";
+import { appPinkColor, appGreyColor } from "../../utils/AppStyles";
 import DateTimePicker from "react-native-modal-datetime-picker";
+import SelectMultiOptionModal from "../../utils/SelectMultiOptionModal"
+import Icon from 'react-native-vector-icons/Feather';
+import { Chip } from "react-native-paper"
 
 const yesNo = ["Yes", "No"]
-const productTempTypes = ["Nose", "Mid", "Tail"]
-const allergenContent = ["W", "E", "D", "TN", "SH", "GF", "None"]
 const acceptOrNot = ["Acceptable", "Not Acceptable"]
 const acceptHoldReject = ["Accept", "Hold", "Reject"]
 const webHandler = new WebHandler()
@@ -41,9 +42,12 @@ class FormNo1 extends Component {
             materialsFreeIndex: 0,
             truckInsideIndx: 0,
             productCondtionIndx: 0,
-            productTempIndx: 0,
+            noseProductTemp: "",
+            midProductTemp: "",
+            tailProductTemp: "",
             vvOfProductIndx: 0,
-            allergenContentIndx: 0,
+
+            allergenContent: [],
             allergentaqggedIndx: 0,
             markedWithExpDateIndx: 0,
             inspectionSummaryIndx: 0,
@@ -52,6 +56,20 @@ class FormNo1 extends Component {
             isFormSubmitting: false,
             isDateTimePickerVisible: false
         }
+    }
+
+    componentDidMount() {
+        var allergenContent = [
+            { id: 0, key: "N/A", isSelecetd: false },
+            { id: 1, key: "W", isSelecetd: false },
+            { id: 2, key: "E", isSelecetd: false },
+            { id: 3, key: "D", isSelecetd: false },
+            { id: 4, key: "TN", isSelecetd: false },
+            { id: 5, key: "SH", isSelecetd: false },
+            { id: 6, key: "GF", isSelecetd: false },
+            { id: 7, key: "None", isSelecetd: false },
+        ]
+        this.setState({ allergenContent })
     }
 
     renderLoadingDialog() {
@@ -81,6 +99,11 @@ class FormNo1 extends Component {
             <SafeAreaView style={{ flex: 1 }}>
 
                 <ScrollView style={styles.container}>
+
+                    <SelectMultiOptionModal
+                        ref="_selectMultiOptionModal"
+                        onDonePress={(types) => this.setState({ allergenContent: types })}
+                    />
 
                     <DateTimePicker
                         isVisible={this.state.isDateTimePickerVisible}
@@ -283,13 +306,42 @@ class FormNo1 extends Component {
                     </View>
 
                     <View style={[styles.round_white_bg_container]}>
-                        <Text>{"Product Temperature (Check one random case per pallet at nose, mid and tail of load) Record all 3 temps. (FROZEN <10° F, REF. 32-40 deg°F); Cheese 45°F Max. Record 'Ambient' if Shelf Stable Materials. "}</Text>
-                        <ButtonGroup
-                            selectedIndex={this.state.productTempIndx}
-                            onPress={(index) => this.setState({ productTempIndx: index })}
-                            buttons={productTempTypes}
-                            containerStyle={{ height: 50 }}
-                        />
+                        <Text>{"Product Temperature (Check one random case per pallet at nose, mid and tail of load) Record all 3 temps. (FROZEN <10° F, REF. 32-40 deg°F); Cheese 45°F Max. Record 'Ambient' if Shelf Stable Materials."}</Text>
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='number-pad'
+                            returnKeyType="done"
+                            value={this.state.noseProductTemp}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Nose'
+                            onChangeText={(text) => this.setState({ noseProductTemp: text })}
+                            placeholderTextColor={hintColor} />
+
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='number-pad'
+                            returnKeyType="done"
+                            value={this.state.midProductTemp}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Mid'
+                            onChangeText={(text) => this.setState({ midProductTemp: text })}
+                            placeholderTextColor={hintColor} />
+
+                        <TextInput style={{ backgroundColor: "#FFF", textAlignVertical: "top" }}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            keyboardType='number-pad'
+                            returnKeyType="done"
+                            value={this.state.tailProductTemp}
+                            numberOfLines={1}
+                            multiline={false}
+                            placeholder='* Tail'
+                            onChangeText={(text) => this.setState({ tailProductTemp: text })}
+                            placeholderTextColor={hintColor} />
                     </View>
 
                     <View style={[styles.round_white_bg_container]}>
@@ -304,12 +356,26 @@ class FormNo1 extends Component {
 
                     <View style={[styles.round_white_bg_container]}>
                         <Text>{"Allergen Verification: Note Allergen Content of items Received.  (Circle Appropriate and note specific allergen type when Tree Nuts (TN) and/or Shellfish (SH) is received) Note: Gluten Free is treated as an allergen:"} </Text>
-                        <ButtonGroup
-                            selectedIndex={this.state.allergenContentIndx}
-                            onPress={(index) => this.setState({ selectedShiftIndex: index })}
-                            buttons={allergenContent}
-                            containerStyle={{ height: 50 }}
-                        />
+                        <TouchableOpacity
+                            onPress={() => { this.refs._selectMultiOptionModal.showProgramsTypes(this.state.allergenContent) }}
+                        >
+                            <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 10 }}>
+                                <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appGreyColor }}>Select allergen Content</Text>
+                                <View style={{ flex: 1 }} />
+                                <Icon name="edit" color={appGreyColor} size={24} />
+                            </View>
+                        </TouchableOpacity>
+                        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                            {
+                                this.state.allergenContent.map((item, index) => {
+                                    if (item.isSelecetd) {
+                                        return (
+                                            <Chip key={index} style={{ margin: 5 }}>{item.key}</Chip>
+                                        )
+                                    }
+                                })
+                            }
+                        </View>
                     </View>
 
                     <View style={[styles.round_white_bg_container]}>
@@ -392,6 +458,16 @@ class FormNo1 extends Component {
         );
     }
 
+    getSelectedAllergenContent() {
+        var values = ""
+        this.state.allergenContent.map(item => {
+            if (item.isSelecetd) {
+                values = values + item.key + ","
+            }
+        })
+        return values;
+    }
+
     submitForm() {
         let v1 = this.state.monitorName
         let v2 = this.state.time
@@ -411,9 +487,11 @@ class FormNo1 extends Component {
         let v12 = yesNo[this.state.materialsFreeIndex]
         let v13 = yesNo[this.state.truckInsideIndx]
         let v14 = yesNo[this.state.productCondtionIndx]
-        let v15 = productTempTypes[this.state.productTempIndx]
+
         let v16 = yesNo[this.state.vvOfProductIndx]
-        let v17 = allergenContent[this.state.allergenContentIndx]
+
+        let v17 = this.getSelectedAllergenContent()
+
         let v18 = yesNo[this.state.allergentaqggedIndx]
         let v19 = acceptOrNot[this.state.markedWithExpDateIndx]
         let v20 = acceptHoldReject[this.state.inspectionSummaryIndx]
@@ -421,9 +499,14 @@ class FormNo1 extends Component {
         let v21 = this.state.followUpAction
         let v22 = this.state.correctiveActionDetail
 
+        let v23 = this.state.noseProductTemp
+        let v24 = this.state.midProductTemp
+        let v25 = this.state.tailProductTemp
+
         if (MyUtils.isEmptyString(v1) || MyUtils.isEmptyString(v2) || MyUtils.isEmptyString(v3) || MyUtils.isEmptyString(v4) ||
             MyUtils.isEmptyString(v5) || MyUtils.isEmptyString(v7) || MyUtils.isEmptyString(v8) || MyUtils.isEmptyString(v08) ||
-            MyUtils.isEmptyString(v9) || MyUtils.isEmptyString(v21) || MyUtils.isEmptyString(v22)) {
+            MyUtils.isEmptyString(v9) || MyUtils.isEmptyString(v17) || MyUtils.isEmptyString(v21) || MyUtils.isEmptyString(v22) ||
+            MyUtils.isEmptyString(v23) || MyUtils.isEmptyString(v24) || MyUtils.isEmptyString(v25)) {
             MyUtils.showSnackbar("Please fill all required (*) fields", "")
             return;
         }
@@ -444,7 +527,6 @@ class FormNo1 extends Component {
             materialsFreeIndex: v12,
             truckInsideIndx: v13,
             productCondtionIndx: v14,
-            productTempIndx: v15,
             vvOfProductIndx: v16,
             allergenContentIndx: v17,
             allergentaqggedIndx: v18,
@@ -452,7 +534,11 @@ class FormNo1 extends Component {
             inspectionSummaryIndx: v20,
 
             followUpAction: v21,
-            correctiveActionDetail: v22
+            correctiveActionDetail: v22,
+
+            noseProductTemp: v23,
+            midProductTemp: v24,
+            tailProductTemp: v25
         }
 
         this.setState({ isFormSubmitting: true })

@@ -4,8 +4,8 @@ import { appPinkColor, defButtonContainer, defButtonText } from "./AppStyles";
 
 export default {
 
-    //QA eQCheck LANTIX eQCheck VFF eQCheck
-    APP_NAME: "VFF eQCheck",
+    //QA eQCheck LANTIX eQCheck VFF eQSmart
+    APP_NAME: "VFF eQSmart",
 
     isEmptyString(txt) {
         return (txt == undefined || txt == null || txt.trim() == "" || txt.length == 0)

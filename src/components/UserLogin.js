@@ -4,7 +4,6 @@ import {
     ActivityIndicator, ImageBackground, KeyboardAvoidingView
 } from "react-native";
 import Icon from 'react-native-vector-icons/Feather';
-import { defTextInputStyle, defButtonContainer, defButtonText } from '../utils/AppStyles'
 import MyUtils from "../utils/MyUtils";
 import { StackActions, NavigationActions } from 'react-navigation';
 import PrefManager from "../data/local/PrefManager"
@@ -136,7 +135,6 @@ class UserLogin extends Component {
             }
             webHandler.loginUser(email, password, myFcmToken,
                 (responseJson) => {
-                    prefManager.setDummyLinesAndShiftsData(responseJson.data.shifts, responseJson.data.plants)
                     setTimeout(() => {
                         this.navigateToHome()
                     }, 2000)

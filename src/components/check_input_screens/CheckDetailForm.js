@@ -56,6 +56,7 @@ class CheckDetailForm extends Component {
     componentDidMount() {
         this.setState({ isLoading: true })
         var programType = [
+            { id: 0, key: "N/A", isSelecetd: false },
             { id: 1, key: "Seafood", isSelecetd: false },
             { id: 2, key: "USDA", isSelecetd: false },
             { id: 3, key: "FDA", isSelecetd: false },
@@ -557,7 +558,6 @@ class CheckDetailForm extends Component {
                         }
                     });
                 }, 100);
-
             }, 100);
         }
     }

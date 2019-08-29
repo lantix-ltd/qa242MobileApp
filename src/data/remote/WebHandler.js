@@ -50,6 +50,8 @@ export default class WebHandler {
                         businessId: data.outlet_id,
                     }
                     prefManager.createNewUserSession(userData, data.token)
+                    prefManager.setDummyLinesAndShiftsData(responseJson.data.shifts, responseJson.data.plants)
+                    prefManager.setFirebaseDBRoot(responseJson.document_name)
                     onSuccess(responseJson)
                 } else {
                     onFailure(responseJson.message)
@@ -515,14 +517,17 @@ export default class WebHandler {
                             "&materialsFreeIndex=" + inspectionData.materialsFreeIndex +
                             "&truckInsideIndx=" + inspectionData.truckInsideIndx +
                             "&productCondtionIndx=" + inspectionData.productCondtionIndx +
-                            "&productTempIndx=" + inspectionData.productTempIndx +
                             "&vvOfProductIndx=" + inspectionData.vvOfProductIndx +
                             "&allergenContentIndx=" + inspectionData.allergenContentIndx +
                             "&allergentaqggedIndx=" + inspectionData.allergentaqggedIndx +
                             "&markedWithExpDateIndx=" + inspectionData.markedWithExpDateIndx +
                             "&inspectionSummaryIndx=" + inspectionData.inspectionSummaryIndx +
                             "&followUpAction=" + inspectionData.followUpAction +
-                            "&correctiveActionDetail=" + inspectionData.correctiveActionDetail
+                            "&correctiveActionDetail=" + inspectionData.correctiveActionDetail +
+
+                            "&noseProductTemp=" + inspectionData.noseProductTemp +
+                            "&midProductTemp=" + inspectionData.midProductTemp +
+                            "&tailProductTemp=" + inspectionData.tailProductTemp
 
                         this.sendSimplePostFormRequest(Urls.TRUCK_INSPECT_FORM_URL, body, (responseJson) => {
                             if (responseJson.status) {

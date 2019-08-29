@@ -13,7 +13,7 @@ class ConversationScreen extends Component {
 
     constructor(props) {
         super(props)
-        this.ref = firebase.firestore().collection('qaproject').doc("users_chats");
+        this.ref = null;
         this.unsubscribe = null;
         this.state = {
             myUserId: "",
@@ -35,9 +35,16 @@ class ConversationScreen extends Component {
     };
 
     componentDidMount() {
-        prefManager.getUserSessionData(data => {
-            this.setState({ myUserId: data.id })
-            this.loadData(data.id)
+        prefManager.getFirebaseDBRoot(dbRoot => {
+            if (!MyUtils.isEmptyString(dbRoot)) {
+                this.ref = firebase.firestore().collection('qaproject').doc(dbRoot);
+                prefManager.getUserSessionData(data => {
+                    this.setState({ myUserId: data.id })
+                    this.loadData(data.id)
+                })
+            } else {
+                MyUtils.showCustomAlert("Unknown Root", "Something went wrong please contact to the administrator.")
+            }
         })
     }
 

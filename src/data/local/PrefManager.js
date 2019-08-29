@@ -37,6 +37,8 @@ const DUMMY_LINES_DATA = "@General:DummyLinesD"
 const DUMMY_SHIFTS_DATA = "@General:DummyShiftsD"
 const DUMMY_PLANTS_DATA = "@General:DummyPlantsD"
 
+const Firebase_DB_ROOT = "@General:FirebaseDBRoot"
+
 export default class PrefManager {
 
     AGENT = "agent"; EDITOR = "editor"; ADMIN = "admin"; OWNER = "owner";
@@ -343,6 +345,24 @@ export default class PrefManager {
                 DUMMY_PLANTS_DATA
             ])
         } catch (ex) {
+            console.warn(ex.message)
+        }
+    }
+
+    async setFirebaseDBRoot(rootName) {
+        try {
+            await AsyncStorage.setItem(Firebase_DB_ROOT, rootName);
+        } catch (ex) {
+            console.warn(ex.message)
+        }
+    }
+
+    async getFirebaseDBRoot(onResult) {
+        try {
+            const RT = await AsyncStorage.getItem(Firebase_DB_ROOT);
+            onResult(RT)
+        } catch (ex) {
+            onResult(null)
             console.warn(ex.message)
         }
     }
