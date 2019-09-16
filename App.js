@@ -32,6 +32,8 @@ import FormNo5 from "./src/components/static_forms/FormNo5"
 import FormNo6 from "./src/components/static_forms/FormNo6"
 import FormNo7 from "./src/components/static_forms/FormNo7"
 
+import FormDetail from "./src/components/static_forms/FormDetail"
+
 import { primaryColor, appGreyColor, appPinkColor } from './src/utils/AppStyles';
 import { Dimensions, StyleSheet, View } from "react-native"
 
@@ -128,15 +130,15 @@ const DrawerNavigator = createDrawerNavigator({
         }
     }
 }, {
-        initialRouteName: 'Home',
-        drawerWidth: width,
-        contentComponent: MainDrawerHeader,
-        contentOptions: {
-            activeBackgroundColor: appPinkColor,
-            activeTintColor: "#fff",
-            inactiveTintColor: appGreyColor,
-        }
+    initialRouteName: 'Home',
+    drawerWidth: width,
+    contentComponent: MainDrawerHeader,
+    contentOptions: {
+        activeBackgroundColor: appPinkColor,
+        activeTintColor: "#fff",
+        inactiveTintColor: appGreyColor,
     }
+}
 );
 
 const RootStack = createStackNavigator({
@@ -169,6 +171,9 @@ const RootStack = createStackNavigator({
     },
     MyVideoPlayer: {
         screen: MyVideoPlayer,
+    },
+    FormDetail: {
+        screen: FormDetail,
     },
     FormNo1: {
         screen: FormNo1,

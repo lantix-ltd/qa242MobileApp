@@ -87,14 +87,6 @@ export default class WebHandler {
                                 onFailure(responseJson.message)
                             }
                         }, (error) => {
-                            // localDB.getAllChecks(
-                            //     checksData => {
-                            //         onOffLineData(checksData)
-                            //     },
-                            //     dbError => {
-                            //         onFailure(error)
-                            //     }
-                            // )
                             onFailure(error)
                         })
                     }
@@ -923,6 +915,91 @@ export default class WebHandler {
                     onFailure(error)
                 })
 
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    getFixedChecksList(onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    "&group_id=" + userData.userPrimaryGId
+
+                this.sendSimplePostFormRequest(Urls.FIXED_CHECKS_LIST_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    getFixedCheckData(checkId, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    "&check_id=" + checkId
+
+                this.sendSimplePostFormRequest(Urls.FIXED_CHECK_DATA_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    submitFormData(formId, response, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                this.getSelectedLinesAndShift((plant, line, shift) => {
+                    if (line === "" || shift === "") {
+                        onFailure("Please define your Lines & Shift")
+                    } else {
+                        var body =
+                            "user_id=" + userData.id +
+                            "&outlet_id=" + userData.businessId +
+                            "&session_token=" + userData.sessionToken +
+                            "&line_no=" + line.substring(0, line.lastIndexOf(",")) +
+                            "&shift_no=" + shift +
+                            "&plant_name=" + plant +
+                            "&response=" + response +
+                            "&check_id=" + formId
+                        this.sendSimplePostFormRequest(Urls.SUBMIT_FIXED_FORM_DATA_URL, body, (responseJson) => {
+                            if (responseJson.status) {
+                                onSuccess(responseJson)
+                            } else {
+                                onFailure(responseJson.message)
+                            }
+                        }, (error) => {
+                            onFailure(error)
+                        })
+                    }
+                }, error => {
+                    onFailure(error)
+                })
             } else {
                 onFailure("User session not exist!")
             }

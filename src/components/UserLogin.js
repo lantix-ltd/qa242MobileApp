@@ -12,6 +12,7 @@ import firebase from "react-native-firebase"
 
 const webHandler = new WebHandler()
 const prefManager = new PrefManager()
+
 class UserLogin extends Component {
 
     constructor(props) {

@@ -1,6 +1,7 @@
 // const SERVER = "https://qa.hwryk.com/"
-// const SERVER = "https://lantixapp1.lantix.com/"
-const SERVER = "https://eqcheck.valleyfine.com/"
+const SERVER = "https://lantixapp1.lantix.com/"
+// const SERVER = "https://eqcheck.valleyfine.com/"
+// const SERVER = "https://eqsmart.alchemy20.com/"
 
 export default {
     LOGIN_URL: SERVER + "outlet-admin-login",
@@ -26,4 +27,7 @@ export default {
     REPACK_INSPECT_URL: SERVER + "submit-recode-inspection",
     UPLOAD_MEDIA_URL: SERVER + "submit-media-file",
     DELETE_MEDIA_URL: SERVER + "delete-media-file",
+    FIXED_CHECKS_LIST_URL: SERVER + "get-fixed-forms",
+    FIXED_CHECK_DATA_URL: SERVER + "get-fixed-forms-detail",
+    SUBMIT_FIXED_FORM_DATA_URL: SERVER + "fixed-form-response"
 }
