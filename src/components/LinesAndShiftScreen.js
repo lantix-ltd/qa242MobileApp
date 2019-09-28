@@ -25,6 +25,7 @@ class LinesAndShiftScreen extends Component {
                     <View style={{ flex: 1, }}>
                         <LinesAndShiftForm
                             ref="_linesAndShiftForm"
+                            isSettingsView={true}
                             onSavePress={() => this.props.navigation.goBack()}
                         />
                     </View>

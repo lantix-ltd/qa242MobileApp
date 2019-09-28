@@ -17,10 +17,6 @@ const BUSINESS_ID_KEY = "@Session:BusinessId"
 const IS_LOGIN_KEY = "@Session:IsUserLogin"
 const USER_SESSION_TOKEN_KEY = "@Session:UserToken"
 
-const IS_LINE_CHECK_EXIST = "@General:IsLineCheckExist"
-const IS_LINE_CHECK_NA = "@General:IsLineCheckNA"
-const LINES_DATA = "@General:linesData"
-
 const IS_SHIFT_CHECK_EXIST = "@General:IsShiftCheckExist"
 const IS_SHIFT_CHECK_NA = "@General:IsShiftCheckNA"
 const SELECTED_SHIFT_INDEX = "@General:SelectedShiftIndex"
@@ -31,13 +27,29 @@ const IS_PLANT_CHECK_NA = "@General:IsPlantCheckNA"
 const SELECTED_PLANT_INDEX = "@General:SelectedPlantIndex"
 const SELECTED_PLANT_VAL = "@General:SelectedPlantVal"
 
-const LAST_OPENED_CHECK_FORM = "@Checks:LastOpenedForm"
+// const LINES_DATA = "@General:linesData"
+const IS_LINE_CHECK_EXIST = "@General:IsLineCheckExist"
+const IS_LINE_CHECK_NA = "@General:IsLineCheckNA"
+const SELECTED_LINE_INDEX = "@General:SelectedLineIndex"
+const SELECTED_LINE_VAL = "@General:SelectedLineVal"
+
+const IS_LINE_STATUS_EXIST = "@General:IsLineStatusExist"
+const IS_LINE_STATUS_NA = "@General:IsLineStatusNA"
+const SELECTED_LINE_STATUS_INDEX = "@General:SelectedLineStatusIndex"
+const SELECTED_LINE_STATUS_VAL = "@General:SelectedLineStatusVal"
+
+const IS_LINE_PRODUCT_EXIST = "@General:IsLineProductExist"
+const IS_LINE_PRODUCT_NA = "@General:IsLineProductNA"
+const SELECTED_LINE_PRODUCT_INDEX = "@General:SelectedLineProductIndex"
+const SELECTED_LINE_PRODUCT_VAL = "@General:SelectedLineProductVal"
 
 const DUMMY_LINES_DATA = "@General:DummyLinesD"
 const DUMMY_SHIFTS_DATA = "@General:DummyShiftsD"
 const DUMMY_PLANTS_DATA = "@General:DummyPlantsD"
+const DUMMY_LINE_PRODUCTS_DATA = "@General:DummyLineProductsD"
 
 const Firebase_DB_ROOT = "@General:FirebaseDBRoot"
+const RELOAD_REQ_ROOT = "@General:ReloadRequired"
 
 export default class PrefManager {
 
@@ -176,12 +188,14 @@ export default class PrefManager {
                 USER_PRIMARY_GID_KEY, USER_SECONDARY_GID_KEY,
                 BUSINESS_ID_KEY, USER_SESSION_TOKEN_KEY,
 
-                DUMMY_LINES_DATA, DUMMY_SHIFTS_DATA, DUMMY_PLANTS_DATA,
+                DUMMY_LINES_DATA, DUMMY_SHIFTS_DATA, DUMMY_PLANTS_DATA, DUMMY_LINE_PRODUCTS_DATA,
 
-                IS_LINE_CHECK_NA, LINES_DATA,
-                IS_SHIFT_CHECK_NA, SELECTED_SHIFT_VAL, SELECTED_SHIFT_INDEX,
-                IS_LINE_CHECK_EXIST, IS_SHIFT_CHECK_EXIST,
-                IS_PLANT_CHECK_EXIST, IS_PLANT_CHECK_NA, SELECTED_PLANT_INDEX, SELECTED_PLANT_VAL
+                //LINES_DATA,
+                IS_SHIFT_CHECK_EXIST, IS_SHIFT_CHECK_NA, SELECTED_SHIFT_VAL, SELECTED_SHIFT_INDEX,
+                IS_PLANT_CHECK_EXIST, IS_PLANT_CHECK_NA, SELECTED_PLANT_INDEX, SELECTED_PLANT_VAL,
+                IS_LINE_CHECK_EXIST, IS_LINE_CHECK_NA, SELECTED_LINE_INDEX, SELECTED_LINE_VAL,
+                IS_LINE_STATUS_EXIST, IS_LINE_STATUS_NA, SELECTED_LINE_STATUS_VAL, SELECTED_LINE_STATUS_INDEX,
+                IS_LINE_PRODUCT_EXIST, IS_LINE_PRODUCT_NA, SELECTED_LINE_PRODUCT_INDEX, SELECTED_LINE_PRODUCT_VAL
             ])
         } catch (ex) {
             console.warn(ex.message)
@@ -216,10 +230,35 @@ export default class PrefManager {
         }
     }
 
-    async setLineCheckData(isLineNA, linesData) {
+    // async setLineCheckData(isLineNA, linesData) {
+    //     try {
+    //         await AsyncStorage.setItem(IS_LINE_CHECK_NA, String(isLineNA));
+    //         await AsyncStorage.setItem(LINES_DATA, linesData);
+    //         await AsyncStorage.setItem(IS_LINE_CHECK_EXIST, "true");
+    //     } catch (ex) {
+    //         console.warn(ex.message)
+    //     }
+    // }
+
+    // async getLineCheckData(onResult) {
+    //     try {
+    //         const v1 = await AsyncStorage.getItem(IS_LINE_CHECK_NA);
+    //         const LD = await AsyncStorage.getItem(LINES_DATA);
+    //         onResult(
+    //             (v1 != undefined && v1 == 'true'),
+    //             JSON.parse(LD)
+    //         )
+    //     } catch (ex) {
+    //         onResult(false, null)
+    //         console.warn(ex.message)
+    //     }
+    // }
+
+    async setLineCheckData(isLineNA, selectedIndx, selecetedVal) {
         try {
             await AsyncStorage.setItem(IS_LINE_CHECK_NA, String(isLineNA));
-            await AsyncStorage.setItem(LINES_DATA, linesData);
+            await AsyncStorage.setItem(SELECTED_LINE_INDEX, String(selectedIndx));
+            await AsyncStorage.setItem(SELECTED_LINE_VAL, String(selecetedVal));
             await AsyncStorage.setItem(IS_LINE_CHECK_EXIST, "true");
         } catch (ex) {
             console.warn(ex.message)
@@ -229,10 +268,12 @@ export default class PrefManager {
     async getLineCheckData(onResult) {
         try {
             const v1 = await AsyncStorage.getItem(IS_LINE_CHECK_NA);
-            const LD = await AsyncStorage.getItem(LINES_DATA);
+            const v2 = await AsyncStorage.getItem(SELECTED_LINE_INDEX);
+            const v3 = await AsyncStorage.getItem(SELECTED_LINE_VAL);
             onResult(
                 (v1 != undefined && v1 == 'true'),
-                JSON.parse(LD)
+                (v2 != undefined ? parseInt(v2) : -1),
+                v3
             )
         } catch (ex) {
             onResult(false, null)
@@ -289,29 +330,61 @@ export default class PrefManager {
                 V3
             )
         } catch (ex) {
-            onResult(false, null)
+            onResult(false, null, null)
             console.warn(ex.message)
         }
     }
 
-    async updateLastOpenedForm(data) {
+    async setLineStausData(isLineStatusNA, selectedIndx, selecetedVal) {
         try {
-            await AsyncStorage.setItem(LAST_OPENED_CHECK_FORM, JSON.stringify(data));
+            await AsyncStorage.setItem(IS_LINE_STATUS_NA, String(isLineStatusNA));
+            await AsyncStorage.setItem(SELECTED_LINE_STATUS_INDEX, String(selectedIndx));
+            await AsyncStorage.setItem(SELECTED_LINE_STATUS_VAL, String(selecetedVal));
+            await AsyncStorage.setItem(IS_LINE_STATUS_EXIST, "true");
         } catch (ex) {
             console.warn(ex.message)
         }
     }
 
-    async getLastOpenedForm(onResult) {
+    async getLineStatusData(onResult) {
         try {
-            const data = await AsyncStorage.getItem(LAST_OPENED_CHECK_FORM);
-            if (data != undefined) {
-                onResult(JSON.parse(data))
-            } else {
-                onResult(null)
-            }
+            const v1 = await AsyncStorage.getItem(IS_LINE_STATUS_NA);
+            const V2 = await AsyncStorage.getItem(SELECTED_LINE_STATUS_INDEX);
+            const V3 = await AsyncStorage.getItem(SELECTED_LINE_STATUS_VAL);
+            onResult(
+                (v1 != undefined && v1 == 'true'),
+                (V2 != undefined ? parseInt(V2) : -1),
+                V3
+            )
         } catch (ex) {
-            onResult(null)
+            onResult(false, null, null)
+            console.warn(ex.message)
+        }
+    }
+
+    async setLineProductData(isLineProductNA, selectedIndx, selecetedVal) {
+        try {
+            await AsyncStorage.setItem(IS_LINE_PRODUCT_NA, String(isLineProductNA));
+            await AsyncStorage.setItem(SELECTED_LINE_PRODUCT_INDEX, String(selectedIndx));
+            await AsyncStorage.setItem(SELECTED_LINE_PRODUCT_VAL, String(selecetedVal));
+            await AsyncStorage.setItem(IS_LINE_PRODUCT_EXIST, "true");
+        } catch (ex) {
+            console.warn(ex.message)
+        }
+    }
+
+    async getLineProductData(onResult) {
+        try {
+            const v1 = await AsyncStorage.getItem(IS_LINE_PRODUCT_NA);
+            const V2 = await AsyncStorage.getItem(SELECTED_LINE_PRODUCT_INDEX);
+            const V3 = await AsyncStorage.getItem(SELECTED_LINE_PRODUCT_VAL);
+            onResult(
+                (v1 != undefined && v1 == 'true'),
+                (V2 != undefined ? parseInt(V2) : -1),
+                ((V3 != undefined && V3 != -1) ? V3 : "")
+            )
+        } catch (ex) {
+            onResult(false, null, null)
             console.warn(ex.message)
         }
     }
@@ -334,6 +407,24 @@ export default class PrefManager {
             onResult(JSON.parse(SD), JSON.parse(PD))
         } catch (ex) {
             onResult(null, null, null)
+            console.warn(ex.message)
+        }
+    }
+
+    async setDummyLineProductsData(data) {
+        try {
+            await AsyncStorage.setItem(DUMMY_LINE_PRODUCTS_DATA, JSON.stringify(data));
+        } catch (ex) {
+            console.warn(ex.message)
+        }
+    }
+
+    async getDummyLineProductsData(onResult) {
+        try {
+            const PD = await AsyncStorage.getItem(DUMMY_LINE_PRODUCTS_DATA);
+            onResult(JSON.parse(PD))
+        } catch (ex) {
+            onResult(null)
             console.warn(ex.message)
         }
     }
@@ -363,6 +454,24 @@ export default class PrefManager {
             onResult(RT)
         } catch (ex) {
             onResult(null)
+            console.warn(ex.message)
+        }
+    }
+
+    async setReloadReq(val) {
+        try {
+            await AsyncStorage.setItem(RELOAD_REQ_ROOT, String(val));
+        } catch (ex) {
+            console.warn(ex.message)
+        }
+    }
+
+    async getReloadReq(onResult) {
+        try {
+            const RQ = await AsyncStorage.getItem(RELOAD_REQ_ROOT);
+            onResult((RQ != undefined && RQ == 'true'))
+        } catch (ex) {
+            onResult(false)
             console.warn(ex.message)
         }
     }

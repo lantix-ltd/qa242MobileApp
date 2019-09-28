@@ -35,7 +35,8 @@ class SplashScreen extends Component {
                             iterationCount="infinite"
                         >
                             <Image
-                                source={require("../assets/images/qa242_new_logo.png")}
+                                source={require("../assets/images/eqsmart_logo.png")}
+                                resizeMode="center"
                                 style={{ width: 250, height: 250 }}
                             />
                         </Animatable.View>

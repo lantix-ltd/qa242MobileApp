@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 
 const primaryColor = "#7BABED"
+// const primaryColor = "#ED3237"
 const appPinkColor = "#ff6b81"
 const appYellowColor = "#fad390"
 const appGreyColor = "grey"

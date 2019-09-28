@@ -9,7 +9,7 @@ export default {
     // VFF eQSmart
     // eQSmart
     
-    APP_NAME: "LANTIX eQCheck",
+    APP_NAME: "QA eQCheck",
 
     isEmptyString(txt) {
         return (txt == undefined || txt == null || txt.trim() == "" || txt.length == 0)

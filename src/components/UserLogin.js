@@ -48,7 +48,7 @@ class UserLogin extends Component {
 
                         <View style={{ flex: 1 }} />
 
-                        <Image style={{ width: 200, height: 200 }} source={require("../assets/images/qa242_new_logo.png")} />
+                        <Image style={{ width: 200, height: 200 }} resizeMode="center" source={require("../assets/images/eqsmart_logo.png")} />
 
                         <View
                             style={[styles.round_white_bg, { flexDirection: "row", padding: 0, marginHorizontal: 15, marginBottom: 10 }]}>

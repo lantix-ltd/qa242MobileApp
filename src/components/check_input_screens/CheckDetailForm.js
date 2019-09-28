@@ -9,8 +9,7 @@ import Modal from "react-native-modal";
 import ImagePicker from 'react-native-image-crop-picker';
 import Sound from 'react-native-sound';
 import Icon from 'react-native-vector-icons/Feather';
-
-import { appPinkColor, appYellowColor, appGreyColor } from "../../utils/AppStyles";
+import { appPinkColor, appYellowColor, appGreyColor, primaryColor } from "../../utils/AppStyles";
 import MyUtils from "../../utils/MyUtils";
 import WebHandler from "../../data/remote/WebHandler"
 import QuesDetailForm from "./QuesDetailForm"
@@ -18,16 +17,25 @@ import SelectOptionModal from "../../utils/SelectOptionModal"
 import SelectMultiOptionModal from "../../utils/SelectMultiOptionModal"
 import MyAudioRecorder from "../../utils/MyAudioRecorder"
 import FullImageView from "../../utils/FullImageView"
+import { ButtonGroup } from 'react-native-elements'
 
+const LINE_DOWN_DEF_VAL = "LINE DOWN"
 const GEN_QA_CHECK = "general qa check"
 const webHandler = new WebHandler()
 var count = 0
+
+const photoOptions = [
+    { id: 1, key: "Take a photo", icon: "camera", type: "photo" },
+    { id: 2, key: "Open Gallery", icon: "image", type: "file" },
+    // { id: 3, key: "Record Audio", icon: "mic", type: "audio" },
+    { id: 4, key: "Record Video", icon: "video", type: "video" },
+]
+const lineStatusOpts = ['Active', 'Down']
 
 class CheckDetailForm extends Component {
 
     constructor(props) {
         super(props)
-
         this.state = {
             isLoading: false,
             refreshing: false,
@@ -43,7 +51,9 @@ class CheckDetailForm extends Component {
             checkQuesRefs: [],
             isFormSubmitting: false,
             selectedProgramtypes: [],
-            isMediaReUploading: false
+            isMediaReUploading: false,
+
+            lineStatusIndex: 0
         }
     }
 
@@ -71,6 +81,21 @@ class CheckDetailForm extends Component {
         this.loadData()
     }
 
+    renderLoadingDialog() {
+        return (
+            <Modal
+                isVisible={this.state.isFormSubmitting}
+                // onBackdropPress={() => this.setState({ modalVisible: false })}
+                onBackButtonPress={() => this.setState({ isFormSubmitting: false })}
+            >
+                <View style={{ backgroundColor: "#fff", height: 100, justifyContent: "center", alignItems: "center" }}>
+                    <ActivityIndicator size="large" color={appPinkColor} />
+                    <Text>Please Wait...</Text>
+                </View>
+            </Modal>
+        )
+    }
+
     loadData() {
         webHandler.getCheckListDetail(this.state.checkId,
             (responseJson) => {
@@ -88,125 +113,130 @@ class CheckDetailForm extends Component {
 
     renderItem(item, index) {
         return (
-            <View style={{ marginHorizontal: 10 }}>
-                <Text style={{
-                    fontSize: 16, textAlign: "center",
-                    fontWeight: "bold", marginVertical: 10
-                }}>{item.productname}</Text>
+            <View style={{ flex: 1 }}>
 
-                <Text style={{
-                    fontSize: 15, color: appPinkColor, marginVertical: 5
-                }}>{"* Please provide the following input:"}
-                </Text>
+                <View style={{ marginHorizontal: 10 }} pointerEvents={this.state.lineStatusIndex == 1 ? 'none' : 'auto'}>
+                    <Text style={{
+                        fontSize: 16, textAlign: "center",
+                        fontWeight: "bold", marginVertical: 10
+                    }}>{item.productname}</Text>
 
-                {item.questions.map((quest, q_index) => {
-                    return (
-                        <View key={q_index}>
-                            {(quest.question_type === "Dropdown" || quest.question_type === "Fixed" || quest.question_type === "Choice") &&
-                                <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
-                                    <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
-                                        {(q_index + 1) + ". "}
-                                    </Text>
-                                    <View style={{ flex: 1, flexDirection: "row" }}>
-                                        <Text style={{ fontSize: 16, color: appPinkColor }}>
-                                            {quest.question_title}
+                    <Text style={{
+                        fontSize: 15, color: appPinkColor, marginVertical: 5
+                    }}>{"* Please provide the following input:"}
+                    </Text>
+
+                    {item.questions.map((quest, q_index) => {
+                        return (
+                            <View key={q_index}>
+                                {(quest.question_type === "Dropdown" || quest.question_type === "Fixed" || quest.question_type === "Choice") &&
+                                    <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
+                                        <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
+                                            {(q_index + 1) + ". "}
                                         </Text>
+                                        <View style={{ flex: 1, flexDirection: "row" }}>
+                                            <Text style={{ fontSize: 16, color: appPinkColor }}>
+                                                {quest.question_title}
+                                            </Text>
+                                        </View>
                                     </View>
-                                </View>
-                            }
+                                }
 
-                            {quest.question_type === "Range" &&
-                                <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
-                                    <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
-                                        {(q_index + 1) + ". "}
-                                    </Text>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={{ fontSize: 16, color: appPinkColor }}>
-                                            {quest.question_title}
+                                {quest.question_type === "Range" &&
+                                    <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
+                                        <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
+                                            {(q_index + 1) + ". "}
                                         </Text>
-                                        <Text style={{ fontSize: 14 }}>
-                                            {"(Acceptable range: "
-                                                + quest.answers[0].min + " - "
-                                                + quest.answers[0].max + ")"
-                                            }
-                                        </Text>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={{ fontSize: 16, color: appPinkColor }}>
+                                                {quest.question_title}
+                                            </Text>
+                                            <Text style={{ fontSize: 14 }}>
+                                                {"(Acceptable range: "
+                                                    + quest.answers[0].min + " - "
+                                                    + quest.answers[0].max + ")"
+                                                }
+                                            </Text>
+                                        </View>
                                     </View>
-                                </View>
-                            }
+                                }
 
-                            <View style={{ width: "100%" }}>
-                                <QuesDetailForm _quesData={quest}
-                                    onResponse={(resp) => {
-                                        this.updateCheckResp(item.productid, resp)
-                                    }}
-                                />
+                                <View style={{ width: "100%" }}>
+                                    <QuesDetailForm _quesData={quest}
+                                        onResponse={(resp) => {
+                                            this.updateCheckResp(item.productid, resp)
+                                        }}
+                                    />
+                                </View>
+                                <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
                             </View>
-                            <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
-                        </View>
-                    )
-                })}
+                        )
+                    })}
 
-                <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
-                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                        <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Media Files:</Text>
-                        <TouchableOpacity
-                            onPress={() => { this.refs._selectOptionModal.setModalVisible(true) }}
-                        >
-                            <Icon name="plus-circle" color={appGreyColor} size={24} />
-                        </TouchableOpacity>
-                    </View>
-                    {
-                        this.state.mediaFiles.map((item, index) => {
-                            if (item.type == "image") {
-                                return this.renderImageFileView(item, index)
-                            } else if (item.type == "audio") {
-                                return this.renderAudioFileView(item, index)
-                            } else if (item.type == "video") {
-                                return this.renderVideoFileView(item, index)
-                            }
-                        })
-                    }
-                </View>
-
-                {this.state.checkType == GEN_QA_CHECK &&
                     <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                            <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Program Types:</Text>
+                            <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Media Files:</Text>
                             <TouchableOpacity
-                                onPress={() => { this.refs._selectMultiOptionModal.showProgramsTypes(this.state.selectedProgramtypes) }}
+                                onPress={() => { this.refs._selectPhotoOptModal.setModalVisible(photoOptions) }}
                             >
-                                <Icon name="edit" color={appGreyColor} size={24} />
+                                <Icon name="plus-circle" color={appGreyColor} size={24} />
                             </TouchableOpacity>
                         </View>
-                        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                            {
-                                this.state.selectedProgramtypes.map((item, index) => {
-                                    if (item.isSelecetd) {
-                                        return (
-                                            <Chip key={index} style={{ margin: 5 }}>{item.key}</Chip>
-                                        )
-                                    }
-                                })
-                            }
-                        </View>
+                        {
+                            this.state.mediaFiles.map((item, index) => {
+                                if (item.type == "image") {
+                                    return this.renderImageFileView(item, index)
+                                } else if (item.type == "audio") {
+                                    return this.renderAudioFileView(item, index)
+                                } else if (item.type == "video") {
+                                    return this.renderVideoFileView(item, index)
+                                }
+                            })
+                        }
                     </View>
-                }
+
+                    {this.state.checkType == GEN_QA_CHECK &&
+                        <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
+                            <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                                <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Program Types:</Text>
+                                <TouchableOpacity
+                                    onPress={() => { this.refs._selectMultiOptionModal.showProgramsTypes(this.state.selectedProgramtypes) }}
+                                >
+                                    <Icon name="edit" color={appGreyColor} size={24} />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                                {
+                                    this.state.selectedProgramtypes.map((item, index) => {
+                                        if (item.isSelecetd) {
+                                            return (
+                                                <Chip key={index} style={{ margin: 5 }}>{item.key}</Chip>
+                                            )
+                                        }
+                                    })
+                                }
+                            </View>
+                        </View>
+                    }
+                </View>
+                {this.state.lineStatusIndex == 1 && <View style={[styles.overlay, { height: '100%' }]} />}
+
             </View>
         )
     }
 
-    renderLoadingDialog() {
+    renderLineStatusView() {
         return (
-            <Modal
-                isVisible={this.state.isFormSubmitting}
-                // onBackdropPress={() => this.setState({ modalVisible: false })}
-                onBackButtonPress={() => this.setState({ isFormSubmitting: false })}
-            >
-                <View style={{ backgroundColor: "#fff", height: 100, justifyContent: "center", alignItems: "center" }}>
-                    <ActivityIndicator size="large" color={appPinkColor} />
-                    <Text>Please Wait...</Text>
-                </View>
-            </Modal>
+            <View style={styles.round_white_bg_container}>
+                <Text style={{ fontSize: 16, padding: 5, fontWeight: "bold", color: "#000" }}> * What is the line status? </Text>
+                <ButtonGroup
+                    onPress={(index) => this.setState({ lineStatusIndex: index })}
+                    selectedIndex={this.state.lineStatusIndex}
+                    buttons={lineStatusOpts}
+                    selectedButtonStyle={{ backgroundColor: primaryColor }}
+                    containerStyle={{ height: 40 }}
+                />
+            </View>
         )
     }
 
@@ -229,6 +259,8 @@ class CheckDetailForm extends Component {
                                 <View style={{ flex: 1 }}>
 
                                     <ScrollView style={{ flex: 1 }}>
+                                        {!MyUtils.isEmptyString(this.state.checkDetail[0].productid) &&
+                                            this.state.checkDetail[0].productid != "0" && this.renderLineStatusView()}
                                         {this.renderItem(this.state.checkDetail[0], 0)}
                                     </ScrollView>
 
@@ -252,7 +284,7 @@ class CheckDetailForm extends Component {
                                     </View>
 
                                     <SelectOptionModal
-                                        ref="_selectOptionModal"
+                                        ref="_selectPhotoOptModal"
                                         onItemPress={(type) => this.handleMediaFileAction(type)}
                                     />
                                     <SelectMultiOptionModal
@@ -319,6 +351,11 @@ class CheckDetailForm extends Component {
         var topicResp = []
         var pTypes = ""
 
+        if (this.state.lineStatusIndex == 1) {
+            this.handleForLineDown()
+            return
+        }
+
         allResp.map((item, index) => {
             if (item.topicId == topicId) {
                 topicResp.push(item)
@@ -350,6 +387,26 @@ class CheckDetailForm extends Component {
 
         if (isAllOK) {
             this.submitData(JSON.stringify(topicResp), pTypes)
+        }
+    }
+
+    handleForLineDown() {
+        let checkQues = this.state.checkDetail[0].questions
+        if (!MyUtils.isEmptyArray(checkQues)) {
+            let ans = []
+            checkQues.map((item) => {
+                let resp = {
+                    quesType: item.question_type,
+                    quesId: item.question_id,
+                    selecetedAnsId: "",
+                    givenAns: "",
+                    givenRange: "",
+                    comment: LINE_DOWN_DEF_VAL,
+                    isAcceptableAnswer: false
+                }
+                ans.push({ resp: resp })
+            })
+            this.submitData(JSON.stringify(ans), "")
         }
     }
 
@@ -585,6 +642,15 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         borderRadius: 5
     },
+    overlay: {
+        flex: 1,
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        opacity: 0.5,
+        backgroundColor: '#fff',
+        width: '100%'
+    }
 });
 
 export default CheckDetailForm;

@@ -3,6 +3,7 @@ import Urls from "./Urls"
 import LocalDBManager from "../local/LocalDBManager"
 
 import CryptoJS from "crypto-js"
+import MyUtils from '../../utils/MyUtils';
 
 const API_KEY = "3ec00dddc00e1dec3115457b0e317c9fb1c34db2";
 const prefManager = new PrefManager();
@@ -68,26 +69,39 @@ export default class WebHandler {
                     if (line === "" || shift === "") {
                         onFailure("Please define your Lines & Shift")
                     } else {
-                        var body =
-                            "user_id=" + userData.id +
-                            "&outlet_id=" + userData.businessId +
-                            "&role=" + userData.userPrimaryType +
-                            "&group_id=" + userData.userPrimaryGId +
-                            "&session_token=" + userData.sessionToken +
-                            "&line_timing=" + line.substring(0, line.lastIndexOf(",")) +
-                            "&shift_timing=" + shift +
-                            "&plant_name=" + plant +
-                            "&calling_status=" + checkTypes +
-                            "&page_number=" + pageNo
-                        this.sendSimplePostFormRequest(Urls.CHECKS_LIST_URL, body, (responseJson) => {
-                            if (responseJson.status) {
-                                localDB.addNewChecks(responseJson.data)
-                                onSuccess(responseJson)
-                            } else {
-                                onFailure(responseJson.message)
+                        prefManager.getLineProductData((isLineProductNA, selectedLPIndx, selecetedLPId) => {
+
+                            if (userData.userPrimaryType != prefManager.EDITOR && userData.userPrimaryType != prefManager.ADMIN &&
+                                MyUtils.isEmptyString(selecetedLPId)) {
+                                onFailure("Please define line product")
+                                return
                             }
-                        }, (error) => {
-                            onFailure(error)
+
+                            var body =
+                                "user_id=" + userData.id +
+                                "&outlet_id=" + userData.businessId +
+                                "&role=" + userData.userPrimaryType +
+                                "&group_id=" + userData.userPrimaryGId +
+                                "&session_token=" + userData.sessionToken +
+                                // "&line_timing=" + line.substring(0, line.lastIndexOf(",")) +
+                                "&line_timing=" + line +
+                                "&shift_timing=" + shift +
+                                "&plant_name=" + plant +
+                                "&calling_status=" + checkTypes +
+                                "&product_id=" + selecetedLPId +
+                                "&page_number=" + pageNo
+
+                            this.sendSimplePostFormRequest(Urls.CHECKS_LIST_URL, body, (responseJson) => {
+                                if (responseJson.status) {
+                                    localDB.addNewChecks(responseJson.data)
+                                    onSuccess(responseJson)
+                                } else {
+                                    onFailure(responseJson.message)
+                                }
+                            }, (error) => {
+                                onFailure(error)
+                            })
+
                         })
                     }
                 }, error => {
@@ -216,15 +230,16 @@ export default class WebHandler {
                     } else {
                         plant = selecetedVal
                     }
-                    prefManager.getLineCheckData((isLineNA, linesData) => {
+                    prefManager.getLineCheckData((isLineNA, selectedIndx, selecetedVal) => {
                         if (isLineNA) {
                             line = "N/A"
                         } else {
-                            linesData.map((item, index) => {
-                                if (item.isChecked) {
-                                    line = line + item.val + ","
-                                }
-                            })
+                            // linesData.map((item, index) => {
+                            //     if (item.isChecked) {
+                            //         line = line + item.val + ","
+                            //     }
+                            // })
+                            line = selecetedVal
                         }
                         prefManager.getShiftCheckData((isShiftNA, selectedIndx, selecetedVal) => {
                             if (isShiftNA) {
@@ -998,6 +1013,29 @@ export default class WebHandler {
                         })
                     }
                 }, error => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+
+    getLineProducts(lineId, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body = "line=" + lineId +
+                    "&user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken
+                this.sendSimplePostFormRequest(Urls.GET_LINE_PRODUCTS_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
                     onFailure(error)
                 })
             } else {

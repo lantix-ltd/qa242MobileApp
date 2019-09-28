@@ -46,6 +46,15 @@ class Checks extends Component {
             }
         })
         this.setUpForMessaging()
+        this.props.navigation.addListener('willFocus', (playload) => {
+            prefManager.getReloadReq(isReq => {
+                if (isReq) {
+                    this.setState({ isLoading: true })
+                    this.loadDataFromServer(this.state.openedCheck)
+                    prefManager.setReloadReq(false)
+                }
+            })
+        })
     }
 
     componentWillUnmount() {
@@ -60,7 +69,7 @@ class Checks extends Component {
             this.messageListener = firebase.messaging().onMessage((message) => {
                 // Process your message when app is visible to user
                 var data = JSON.parse(message.data.data);
-                this.showMessage(data.title, data.message)
+                //this.showMessage(data.title, data.message)
                 //alert(message.data.data)
                 this.props.updateCounter(1)
             });
@@ -276,7 +285,7 @@ class Checks extends Component {
                             }
                         </View>
                     }
-                    {this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
+                    {!this.state.isLoading && this.state.isError && MyUtils.renderErrorView(this.state.errorMsg, () => {
                         this.setState({ isLoading: true, isError: false })
                         this.loadDataFromServer(this.state.openedCheck)
                     })}
@@ -291,7 +300,6 @@ class Checks extends Component {
     }
 
     handleOnItemClick(item) {
-        prefManager.updateLastOpenedForm(item)
         if (this.state.userRole == prefManager.EDITOR || this.state.userRole == prefManager.ADMIN) {
             this.props.navigation.navigate("CheckDetailView", {
                 _id: item.assign_id,
