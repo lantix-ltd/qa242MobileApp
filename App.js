@@ -24,14 +24,6 @@ import CheckDetailView from './src/components/check_view_screens/CheckDetailView
 import LinesAndShiftScreen from "./src/components/LinesAndShiftScreen"
 import MyVideoPlayer from "./src/utils/MyVideoPlayer"
 
-import FormNo1 from "./src/components/static_forms/FormNo1"
-import FormNo2 from "./src/components/static_forms/FormNo2"
-import FormNo3 from "./src/components/static_forms/FormNo3"
-import FormNo4 from "./src/components/static_forms/FormNo4"
-import FormNo5 from "./src/components/static_forms/FormNo5"
-import FormNo6 from "./src/components/static_forms/FormNo6"
-import FormNo7 from "./src/components/static_forms/FormNo7"
-
 import FormDetail from "./src/components/static_forms/FormDetail"
 
 import { primaryColor, appGreyColor, appPinkColor } from './src/utils/AppStyles';
@@ -174,27 +166,6 @@ const RootStack = createStackNavigator({
     },
     FormDetail: {
         screen: FormDetail,
-    },
-    FormNo1: {
-        screen: FormNo1,
-    },
-    FormNo2: {
-        screen: FormNo2,
-    },
-    FormNo3: {
-        screen: FormNo3,
-    },
-    FormNo4: {
-        screen: FormNo4,
-    },
-    FormNo5: {
-        screen: FormNo5,
-    },
-    FormNo6: {
-        screen: FormNo6,
-    },
-    FormNo7: {
-        screen: FormNo7,
     }
 })
 const AppContainer = createAppContainer(RootStack);

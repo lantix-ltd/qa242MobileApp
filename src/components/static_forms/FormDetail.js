@@ -136,7 +136,7 @@ export default class FormDetail extends Component {
 
     submitData(respData) {
         this.setState({ isSubmitting: true })
-        webHandler.submitFormData(this.state.formId, respData, (responseJson) => {
+        webHandler.submitFixedFormData(this.state.formId, respData, (responseJson) => {
             MyUtils.showSnackbar("form submitted successfully", "")
             this.props.navigation.goBack()
         }, (error) => {

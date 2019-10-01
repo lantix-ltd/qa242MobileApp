@@ -9,8 +9,6 @@ import PrefManager from "../../data/local/PrefManager"
 import WebHandler from '../../data/remote/WebHandler'
 
 const webHandler = new WebHandler()
-const prefManager = new PrefManager()
-const WAREHOUSE = "warehouse", PRODUCTION = "production", PACKING_TECH = "packingtech"
 
 class InputForms extends Component {
 
@@ -27,40 +25,6 @@ class InputForms extends Component {
     }
 
     componentDidMount() {
-        // var forms = [
-        //     { id: 1, title: "Receiving Inspection Log", value: "FormNo1", responsible: WAREHOUSE },
-        //     { id: 2, title: "PPC-7 Shipping Inspection", value: "FormNo2", responsible: WAREHOUSE },
-        //     { id: 3, title: "Palletizing Record", value: "FormNo3", responsible: PRODUCTION },
-        //     { id: 4, title: "PPC-2 Cleaning Inspection", value: "FormNo4", responsible: PACKING_TECH },
-        //     { id: 5, title: "Bulk Pasta Temp Log (Every Tub)", value: "FormNo5", responsible: PRODUCTION },
-        //     { id: 6, title: "Repack/ Recode Form", value: "FormNo6", responsible: PACKING_TECH },
-        //     { id: 7, title: "Bulk Pasta Temp Log (Every Bulk Form)", value: "FormNo7", responsible: PRODUCTION },
-        // ]
-        // this.setState({ isLoading: true })
-        // prefManager.getUserSessionData(data => {
-        //     if (data != null) {
-        //         let pr = data.userPrimaryType
-        //         let sr = data.userSecondaryType
-        //         let resp = ""
-        //         if (pr == WAREHOUSE || sr == WAREHOUSE) {
-        //             resp = WAREHOUSE
-        //         } else if (pr == PRODUCTION || sr == PRODUCTION) {
-        //             resp = PRODUCTION
-        //         } else if (pr == PACKING_TECH || sr == PACKING_TECH) {
-        //             resp = PACKING_TECH
-        //         }
-        //         let respForms = []
-        //         forms.map((item, index) => {
-        //             if (item.responsible == resp) {
-        //                 respForms.push(item)
-        //             }
-        //         })
-        //         this.setState({ inputForms: respForms, isLoading: false })
-        //     } else {
-        //         this.setState({ inputForms: null, isLoading: false })
-        //     }
-        // })
-
         this.setState({ isLoading: true })
         webHandler.getFixedChecksList((responseJson) => {
             this.setState({ inputForms: responseJson.static_form, isLoading: false })
