@@ -12,6 +12,7 @@ class SelectMultiOptionModal extends Component {
         this.state = {
             modalVisible: false,
             selectedProgramtypes: null,
+            isNA: false
         }
     }
 
@@ -24,24 +25,28 @@ class SelectMultiOptionModal extends Component {
             >
                 <View style={styles.container}>
                     {this.state.selectedProgramtypes != null &&
-                        this.state.selectedProgramtypes.map((item, index) => {
-                            return (
-                                <View style={styles.round_white_bg_container} key={index}>
-                                    <CheckBox
-                                        containerStyle={{ flex: 1, padding: 15 }}
-                                        title={item.key}
-                                        textStyle={{ fontSize: 18, color: appGreyColor }}
-                                        checked={item.isSelecetd}
-                                        onPress={() => { this.handleOptionClick(item) }}
-                                    />
-                                </View>
-                            )
-                        })
+                        <View>
+                            {this.state.selectedProgramtypes.map((item, index) => {
+                                return (
+                                    <View
+                                        pointerEvents={(this.state.isNA && item.isAcceptable) ? 'none' : 'auto'}
+                                        style={styles.round_white_bg_container} key={index}>
+                                        <CheckBox
+                                            containerStyle={{ flex: 1, padding: 15 }}
+                                            title={item.key}
+                                            textStyle={{ fontSize: 18, color: appGreyColor }}
+                                            checked={item.isSelecetd}
+                                            onPress={() => { this.handleOptionClick(item) }}
+                                        />
+                                        {this.state.isNA && item.isAcceptable && <View style={[styles.overlay, { height: '100%' }]} />}
+                                    </View>
+                                )
+                            })}
+                        </View>
                     }
                     <View style={{ flexDirection: "row", padding: 10 }}>
                         <TouchableOpacity style={[styles.round_pink_btn_bg, { flex: 1, height: 40, justifyContent: "center" }]} onPress={() => {
-                            this.onCancel()
-                            this.props.onDonePress(this.state.selectedProgramtypes)
+                            this.handleDonePress()
                         }}>
                             <Text style={{ textAlign: "center", fontSize: 17, fontWeight: "bold", color: "#fff" }}>Save</Text>
                         </TouchableOpacity>
@@ -58,8 +63,23 @@ class SelectMultiOptionModal extends Component {
             var opt = options[indx]
             opt.isSelecetd = !opt.isSelecetd
             options[indx] = opt
+            if (!opt.isAcceptable) {
+                this.setState({ isNA: !this.state.isNA })
+                options.map((item, indx2) => {
+                    if (indx2 != indx) {
+                        let opt2 = item
+                        opt2.isSelecetd = false
+                        options[indx2] = opt2
+                    }
+                })
+            }
         }
         this.setState({ selectedProgramtypes: options })
+    }
+
+    handleDonePress() {
+        this.onCancel()
+        this.props.onDonePress(this.state.selectedProgramtypes)
     }
 
     showProgramsTypes(_selectedProgramtypes) {
@@ -74,7 +94,6 @@ class SelectMultiOptionModal extends Component {
     onCancel() {
         this.setModalVisible(false)
     }
-
 }
 
 const styles = StyleSheet.create({
@@ -90,6 +109,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#F75473',
         overflow: 'hidden',
         borderRadius: 5
+    },
+    overlay: {
+        flex: 1,
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        opacity: 0.5,
+        backgroundColor: '#fff',
+        width: '100%'
     }
 });
 

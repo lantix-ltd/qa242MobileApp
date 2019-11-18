@@ -30,7 +30,7 @@ const NotificationIcon = (props) => {
 
 const mapStateToProps = (state) => {
     return {
-        counter: state.counter
+        counter: state.reducer.counter
     }
 }
 

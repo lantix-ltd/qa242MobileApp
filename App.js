@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { createStackNavigator, createBottomTabNavigator, createDrawerNavigator, createAppContainer } from 'react-navigation'
-import { createStore } from "redux"
+import { createStore, combineReducers } from "redux"
 import { Provider } from "react-redux"
 
 import Icon from 'react-native-vector-icons/Feather';
@@ -24,6 +24,8 @@ import CheckDetailView from './src/components/check_view_screens/CheckDetailView
 import LinesAndShiftScreen from "./src/components/LinesAndShiftScreen"
 import MyVideoPlayer from "./src/utils/MyVideoPlayer"
 
+import ChatNotificationIcon from './src/utils/ChatNotificationIcon'
+
 import FormDetail from "./src/components/static_forms/FormDetail"
 
 import { primaryColor, appGreyColor, appPinkColor } from './src/utils/AppStyles';
@@ -31,7 +33,6 @@ import { Dimensions, StyleSheet, View } from "react-native"
 
 import PrefManager from "./src/data/local/PrefManager"
 import WebHandler from "./src/data/remote/WebHandler"
-
 
 const win = Dimensions.get('window');
 const width = win.width * 70 / 100
@@ -48,7 +49,8 @@ const BottomNavigation = createBottomTabNavigator({
     Chats: {
         screen: Chats, navigationOptions: {
             tabBarLabel: 'Chats',
-            tabBarIcon: ({ tintColor }) => <Icon size={22} style={{ marginVertical: 2 }} name="message-circle" color={tintColor} />
+            // tabBarIcon: ({ tintColor }) => <Icon size={22} style={{ marginVertical: 2 }} name="message-circle" color={tintColor} />
+            tabBarIcon: ({ tintColor }) => <ChatNotificationIcon tintColor={tintColor} />
         }
     },
     Contact: {
@@ -130,8 +132,7 @@ const DrawerNavigator = createDrawerNavigator({
         activeTintColor: "#fff",
         inactiveTintColor: appGreyColor,
     }
-}
-);
+});
 
 const RootStack = createStackNavigator({
     Splash: {
@@ -194,7 +195,7 @@ export default class App extends React.Component {
 }
 
 const initialState = {
-    counter: 0
+    counter: 0,
 }
 
 const reducer = (state = initialState, action) => {
@@ -207,4 +208,19 @@ const reducer = (state = initialState, action) => {
     return state
 }
 
-const store = createStore(reducer)
+const initialState2 = {
+    chat_counter: 0
+}
+
+const reducer2 = (state = initialState2, action) => {
+    switch (action.type) {
+        case "UPDATE_CHAT_MSG_COUNTER":
+            return { chat_counter: action.chat_counter }
+        case "RESET_CHAT_MSG_COUNTER":
+            return { chat_counter: 0 }
+    }
+    return state
+}
+
+const reducers = combineReducers({reducer, reducer2})
+const store = createStore(reducers)

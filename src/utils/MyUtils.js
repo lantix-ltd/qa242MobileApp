@@ -8,8 +8,8 @@ export default {
     // LANTIX eQCheck
     // VFF eQSmart
     // eQSmart
-    
-    APP_NAME: "QA eQCheck",
+
+    APP_NAME: "LANTIX eQCheck",
 
     isEmptyString(txt) {
         return (txt == undefined || txt == null || txt.trim() == "" || txt.length == 0)
@@ -23,7 +23,7 @@ export default {
         }
     },
 
-     getWith0Digit(num) {
+    getWith0Digit(num) {
         let n = parseInt(num)
         let pad = (n < 10) ? '0' : '';
         return pad + num;

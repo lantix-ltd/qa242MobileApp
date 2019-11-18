@@ -6,6 +6,7 @@ import MyUtils from '../../utils/MyUtils'
 import Icon from 'react-native-vector-icons/Feather'
 import SelectMultiOptionModal from "../../utils/SelectMultiOptionModal"
 import DateTimePicker from "react-native-modal-datetime-picker";
+import moment from 'moment'
 
 const CHOICE_TYPE = "choice", RANGE_TYPE = "range", TEXT_TYPE = "text"
 const DATE_TYPE = "date", TIME_TYPE = "time", DATETIME_TYPE = "datetime"
@@ -20,27 +21,66 @@ export default class FormQuestion extends Component {
             quesNo: props.quesNo,
             quesData: props.quesData,
             selectedAnsId: 0,
+            selectedAnsVal: "",
             isAcceptableAnswer: true,
             quesComment: "",
             multiOptions: [],
             textTypeAns: "",
             selectedRangeTypeIndex: 0,
-            rangeTypeInputAns: "",
             timeVal: TIME_FORMAT,
             dateVal: DATE_FORMAT,
             dateTimeVal: DATETIME_FORMAT,
-            isDateTimePickerVisible: false
+            isDateTimePickerVisible: false,
+            givenAnswer: props.givenAnswer,
         }
     }
 
     componentDidMount() {
         let opts = []
-        if (this.state.quesData.selection == MULTI_SELECT) {
+        if (this.state.givenAnswer && this.state.givenAnswer != null) {
+            let ga = this.state.givenAnswer
+            this.setState({ quesComment: ga.comment })
+            setTimeout(() => {
+                if (ga.da_answer_type == CHOICE_TYPE && this.state.quesData.selection == SINGLE_SELECT) {
+                    this.handleSingleChoiceChange(ga.answer_id)
+                } else if (ga.da_answer_type == CHOICE_TYPE && this.state.quesData.selection == MULTI_SELECT) {
+                    this.state.quesData.possible_answer.map((item, index) => {
+                        opts.push({
+                            id: item.answer_id, key: item.answer,
+                            isSelecetd: this.isOptSelected(ga.answer, item.answer), isAcceptable: (item.acceptance == "acceptable")
+                        })
+                    })
+                    this.setState({ multiOptions: opts })
+                } else if (ga.da_answer_type == RANGE_TYPE) {
+                    this.handleRangeInputChange(ga.answer)
+                } else if (ga.da_answer_type == TEXT_TYPE) {
+                    this.handleTextAnsChange(ga.answer)
+                } else if (ga.da_answer_type == DATE_TYPE || ga.da_answer_type == TIME_TYPE || ga.da_answer_type == DATETIME_TYPE) {
+                    this.handleDateTimePickerChange(ga.answer, this.state.quesData.question_type)
+                }
+            }, 500)
+        } else if (this.state.quesData.selection == MULTI_SELECT) {
             this.state.quesData.possible_answer.map((item, index) => {
-                opts.push({ id: item.answer_id, key: item.answer, isSelecetd: false })
+                opts.push({
+                    id: item.answer_id, key: item.answer,
+                    isSelecetd: false, isAcceptable: (item.acceptance == "acceptable")
+                })
             })
             this.setState({ multiOptions: opts })
         }
+    }
+
+    isOptSelected(selectedOpts, opt) {
+        let val = false
+        if (!MyUtils.isEmptyString(selectedOpts) && !MyUtils.isEmptyString(opt)) {
+            let sOpts = []
+            sOpts = selectedOpts.split(",")
+            if (!MyUtils.isEmptyArray(sOpts)) {
+                let indx = sOpts.findIndex(item => item == opt)
+                val = (indx != undefined && indx > -1)
+            }
+        }
+        return val
     }
 
     render() {
@@ -55,6 +95,7 @@ export default class FormQuestion extends Component {
                         ref="_selectMultiOptionModal"
                         onDonePress={(opts) => this.handleMultiChoiceChange(opts)}
                     />
+
                     <View style={styles.round_white_bg_container}>
                         {this.renderQuestionHeading(data.question)}
                         {data.question_type == CHOICE_TYPE &&
@@ -114,7 +155,7 @@ export default class FormQuestion extends Component {
                                 <RadioButton.Group
                                     onValueChange={value => this.setState({
                                         selectedRangeTypeIndex: value,
-                                        rangeTypeInputAns: "",
+                                        selectedAnsVal: "",
                                         isAcceptableAnswer: true
                                     })}
                                     value={this.state.selectedRangeTypeIndex}
@@ -135,7 +176,7 @@ export default class FormQuestion extends Component {
                                         autoCorrect={false}
                                         keyboardType='number-pad'
                                         returnKeyType="done"
-                                        value={this.state.rangeTypeInputAns}
+                                        value={this.state.selectedAnsVal}
                                         multiline={true}
                                         onChangeText={(text) => this.handleRangeInputChange(text)}
                                         placeholder='* Type here'
@@ -168,7 +209,6 @@ export default class FormQuestion extends Component {
                                     onConfirm={(date) => this.handleDateTimePickerChange(date, data.question_type)}
                                     onCancel={() => this.setState({ isDateTimePickerVisible: false })}
                                 />
-
                                 <TouchableOpacity
                                     onPress={() => { this.setState({ isDateTimePickerVisible: true }) }}
                                 >
@@ -229,21 +269,20 @@ export default class FormQuestion extends Component {
                 is_in_range = (givenVal >= min && givenVal <= max)
             }
         }
-        this.setState({ rangeTypeInputAns: val, isAcceptableAnswer: is_in_range })
+        this.setState({ selectedAnsVal: val, isAcceptableAnswer: is_in_range })
         this.updateMyResponse("", val, this.state.quesComment, is_in_range)
     }
 
     handleDateTimePickerChange(dateTime, type) {
         var dtOutput = ""
-        var d = new Date(dateTime)
         if (type == DATE_TYPE) {
-            dtOutput = MyUtils.getWith0Digit((d.getMonth() + 1)) + "-" + MyUtils.getWith0Digit(d.getDate()) + "-" + d.getFullYear()
+            dtOutput = moment(dateTime).format("MM-DD-YYYY")
             this.setState({ dateVal: dtOutput })
         } else if (type == TIME_TYPE) {
-            dtOutput = d.toLocaleTimeString()
+            dtOutput = moment(dateTime).format("HH:mm:ss")
             this.setState({ timeVal: dtOutput })
         } else if (type == DATETIME_TYPE) {
-            dtOutput = MyUtils.getWith0Digit((d.getMonth() + 1)) + "-" + MyUtils.getWith0Digit(d.getDate()) + "-" + d.getFullYear() + " " + d.toLocaleTimeString()
+            dtOutput = moment(dateTime).format("MM-DD-YYYY HH:mm:ss")
             this.setState({ dateTimeVal: dtOutput })
         }
         this.setState({ isDateTimePickerVisible: false })
@@ -289,7 +328,7 @@ export default class FormQuestion extends Component {
         this.setState({ quesComment: txt })
         this.updateMyResponse(
             this.state.selectedAnsId,
-            this.state.fixedValInput,
+            this.state.selectedAnsVal,
             txt,
             this.state.isAcceptableAnswer
         )
@@ -302,7 +341,7 @@ export default class FormQuestion extends Component {
             selection: this.state.quesData.selection,
             selecetedAnsId: selectedAnsId,
             givenAns: givenAns,
-            comment: comment,
+            comment: isAcceptable ? "" : comment,
             isAcceptableAnswer: isAcceptable
         }
         this.props.onResponse(resp)

@@ -24,7 +24,8 @@ class QuesDetailForm extends Component {
             checkQuesData: props._quesData,
             isAcceptableAnswer: true,
             rangeInput: "",
-            fixedValInput: props._quesData.answers[0].possible_answer
+            // fixedValInput: props._quesData.answers[0].possible_answer
+            fixedValInput: ""
         }
     }
 
@@ -35,7 +36,7 @@ class QuesDetailForm extends Component {
         let shapeData = shapeOptions[indx]
         this.setState({ selectedShapeOptId: shapeData.id })
         setTimeout(() => {
-            if (qDtata.question_type === "Dropdown" || qDtata.question_type === "Fixed") {
+            if (qDtata.question_type === "Dropdown") {
                 this.updateMyResponse(
                     qDtata.answers[0].answer_id,
                     qDtata.answers[0].possible_answer,
@@ -54,7 +55,7 @@ class QuesDetailForm extends Component {
             selecetedAnsId: selecetdAnsId,
             givenAns: givenAns,
             givenRange: givenRange,
-            comment: comment,
+            comment: isAcceptable ? "" : comment,
             isAcceptableAnswer: isAcceptable
         }
         this.props.onResponse(resp)
@@ -65,7 +66,7 @@ class QuesDetailForm extends Component {
         var indx = answers.findIndex(item => item.answer_id == selecetdAnsId)
         var my_ans = answers[indx]
         var val = my_ans.is_acceptable == "1"
-        this.setState({ isAcceptableAnswer: val, selectedAnsValue: selecetdAnsId })
+        this.setState({ isAcceptableAnswer: val, fixedValInput: my_ans.possible_answer, selectedAnsValue: selecetdAnsId })
         this.updateMyResponse(selecetdAnsId, my_ans.possible_answer, this.state.rangeInput, this.state.quesComment, val)
     }
 

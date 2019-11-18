@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import {
     View, Text, Image, StyleSheet, SafeAreaView, ScrollView,
-    TouchableOpacity, ActivityIndicator,
+    TouchableOpacity, ActivityIndicator
 } from "react-native";
 import { Chip } from "react-native-paper"
 import { Button } from 'react-native-elements'
@@ -17,9 +17,10 @@ import SelectOptionModal from "../../utils/SelectOptionModal"
 import SelectMultiOptionModal from "../../utils/SelectMultiOptionModal"
 import MyAudioRecorder from "../../utils/MyAudioRecorder"
 import FullImageView from "../../utils/FullImageView"
-import { ButtonGroup } from 'react-native-elements'
+import { ButtonGroup, CheckBox } from 'react-native-elements'
 
 const LINE_DOWN_DEF_VAL = "LINE DOWN"
+const PTYPE_NA_VAL = "1"
 const GEN_QA_CHECK = "general qa check"
 const webHandler = new WebHandler()
 var count = 0
@@ -65,19 +66,7 @@ class CheckDetailForm extends Component {
 
     componentDidMount() {
         this.setState({ isLoading: true })
-        var programType = [
-            { id: 0, key: "N/A", isSelecetd: false },
-            { id: 1, key: "Seafood", isSelecetd: false },
-            { id: 2, key: "USDA", isSelecetd: false },
-            { id: 3, key: "FDA", isSelecetd: false },
-            { id: 4, key: "Gluten free", isSelecetd: false },
-            { id: 5, key: "Organic", isSelecetd: false },
-            { id: 6, key: "TKosher", isSelecetd: false },
-            { id: 7, key: "Halal", isSelecetd: false },
-            { id: 8, key: "Non- GMO", isSelecetd: false },
-            { id: 9, key: "5S Program", isSelecetd: false },
-        ]
-        this.setState({ selectedProgramtypes: programType })
+        this.loadProgramTypes()
         this.loadData()
     }
 
@@ -109,6 +98,22 @@ class CheckDetailForm extends Component {
                 this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: error })
             }
         )
+    }
+
+    loadProgramTypes() {
+        var programType = [
+            { id: 1, key: "N/A", isSelecetd: false, isAcceptable: false },
+            { id: 2, key: "Seafood", isSelecetd: false, isAcceptable: true },
+            { id: 3, key: "USDA", isSelecetd: false, isAcceptable: true },
+            { id: 4, key: "FDA", isSelecetd: false, isAcceptable: true },
+            { id: 5, key: "Gluten free", isSelecetd: false, isAcceptable: true },
+            { id: 6, key: "Organic", isSelecetd: false, isAcceptable: true },
+            { id: 7, key: "TKosher", isSelecetd: false, isAcceptable: true },
+            { id: 8, key: "Halal", isSelecetd: false, isAcceptable: true },
+            { id: 9, key: "Non- GMO", isSelecetd: false, isAcceptable: true },
+            { id: 10, key: "5S Program", isSelecetd: false, isAcceptable: true },
+        ]
+        this.setState({ selectedProgramtypes: programType })
     }
 
     renderItem(item, index) {
@@ -195,16 +200,17 @@ class CheckDetailForm extends Component {
                         }
                     </View>
 
-                    {this.state.checkType == GEN_QA_CHECK &&
+                    {/* {this.state.checkType == GEN_QA_CHECK &&
                         <View style={[styles.round_white_bg_container, { marginTop: 10 }]}>
-                            <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                                <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor, marginBottom: 5 }}>Program Types:</Text>
-                                <TouchableOpacity
-                                    onPress={() => { this.refs._selectMultiOptionModal.showProgramsTypes(this.state.selectedProgramtypes) }}
-                                >
+                            <TouchableOpacity
+                                onPress={() => { this.refs._selectMultiOptionModal.showProgramsTypes(this.state.selectedProgramtypes) }}
+                            >
+                                <View
+                                    style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginVertical: 5 }}>
+                                    <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", color: appPinkColor }}>Program Types:</Text>
                                     <Icon name="edit" color={appGreyColor} size={24} />
-                                </TouchableOpacity>
-                            </View>
+                                </View>
+                            </TouchableOpacity>
                             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                                 {
                                     this.state.selectedProgramtypes.map((item, index) => {
@@ -217,7 +223,8 @@ class CheckDetailForm extends Component {
                                 }
                             </View>
                         </View>
-                    }
+                    } */}
+
                 </View>
                 {this.state.lineStatusIndex == 1 && <View style={[styles.overlay, { height: '100%' }]} />}
 
@@ -349,7 +356,7 @@ class CheckDetailForm extends Component {
     verifyForSubmit(topicId, quesData) {
         var allResp = [...this.state.checkQuesRefs]
         var topicResp = []
-        var pTypes = ""
+        var pTypes = PTYPE_NA_VAL
 
         if (this.state.lineStatusIndex == 1) {
             this.handleForLineDown()
@@ -376,14 +383,15 @@ class CheckDetailForm extends Component {
             }
         })
 
-        if (this.state.checkType == GEN_QA_CHECK) {
-            pTypes = this.getSelectedProgramTypes()
-            if (pTypes == "") {
-                MyUtils.showSnackbar("Please select a program type.", "")
-                isAllOK = false
-                return
-            }
-        }
+        // if (this.state.checkType == GEN_QA_CHECK) {
+        //     pTypes = ""
+        //     pTypes = this.getSelectedProgramTypes()
+        //     if (pTypes == "") {
+        //         MyUtils.showSnackbar("Please select a program type.", "")
+        //         isAllOK = false
+        //         return
+        //     }
+        // }
 
         if (isAllOK) {
             this.submitData(JSON.stringify(topicResp), pTypes)
@@ -406,7 +414,7 @@ class CheckDetailForm extends Component {
                 }
                 ans.push({ resp: resp })
             })
-            this.submitData(JSON.stringify(ans), "")
+            this.submitData(JSON.stringify(ans), PTYPE_NA_VAL)
         }
     }
 
@@ -472,7 +480,7 @@ class CheckDetailForm extends Component {
         var values = ""
         this.state.selectedProgramtypes.map(item => {
             if (item.isSelecetd) {
-                values = values + item.key + ","
+                values = values + item.id + ","
             }
         })
         return values;

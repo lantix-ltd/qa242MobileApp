@@ -5,6 +5,8 @@ import MyUtils from "../../utils/MyUtils";
 import { primaryColor } from "../../utils/AppStyles";
 import { DrawerActions } from 'react-navigation';
 import WebHandler from "../../data/remote/WebHandler"
+import firebase from 'react-native-firebase';
+import { connect } from "react-redux"
 
 const webHandler = new WebHandler()
 class Chats extends Component {
@@ -24,9 +26,37 @@ class Chats extends Component {
                 this.loadData()
             }
         })
-
+        this.setUpForMessaging()
         this.setState({ isLoading: true, isFirstLoaded: true })
         this.loadData()
+    }
+
+    componentWillUnmount() {
+        if (this.messageListener !== undefined) {
+            this.messageListener();
+        }
+    }
+
+    async setUpForMessaging() {
+        const enabled = await firebase.messaging().hasPermission();
+        if (enabled) {
+            this.messageListener = firebase.messaging().onMessage((message) => {
+                // Process your message when app is visible to user
+                var data = JSON.parse(message.data.data);
+                if (data.is_background_task && data.title == "chat_message" && data.message == "chat_message") {
+                    this.loadData()
+                }
+            });
+        } else {
+            try {
+                await firebase.messaging().requestPermission();
+                // User has authorised
+                this.setUpForMessaging()
+            } catch (error) {
+                // User has rejected permissions
+                alert("You may not receive any push notifications.")
+            }
+        }
     }
 
     handleToggle() {
@@ -39,6 +69,7 @@ class Chats extends Component {
                 chatHistoryData: responseJson.left_panel,
                 refreshing: false, isLoading: false
             })
+            this.props.updateChatCounter(responseJson.total_counter)
         }, (error) => {
             this.setState({ refreshing: false, isLoading: false, isError: true, errorMsg: error })
             MyUtils.showSnackbar(error, "")
@@ -53,21 +84,37 @@ class Chats extends Component {
                         <View style={{ flex: 1, padding: 10, flexDirection: "row" }}>
                             {this.circledImage({ uri: item.image })}
                             <View style={{ flex: 1, marginStart: 10, paddingHorizontal: 10, justifyContent: "center" }}>
-                                <Text style={{ fontWeight: "bold" }}>{item.name}</Text>
+                                <View style={{ flexDirection: "row" }}>
+                                    <Text style={{ fontWeight: "bold", marginEnd: 5 }}>{item.name}</Text>
+                                    {(item.type == "user" && item.is_online) &&
+                                        <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                            <Icon name="circle" style={{ marginTop: 3 }} size={14} color="green" />
+                                        </View>
+                                    }
+                                </View>
                                 <Text>{item.last_message}</Text>
                             </View>
-                            {(item.type == "user" && item.is_online) &&
+
+                            {(item.counter > 0) &&
+                                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                    <View style={{ padding: 5, borderRadius: 150 / 2, backgroundColor: primaryColor, minWidth: 25 }}>
+                                        <Text style={{ fontSize: 12, fontWeight: "bold", color: "#fff", textAlign: "center" }}>{item.counter}</Text>
+                                    </View>
+                                </View>
+                            }
+
+                            {/* {(item.type == "user" && item.is_online) &&
                                 <View style={{ alignItems: "center", justifyContent: "center" }}>
                                     <Icon name="circle" style={{ marginTop: 3 }} size={14} color="green" />
                                 </View>
-                            }
+                            } */}
 
                             {/* <View style={{ alignItems: "center", justifyContent: "center" }}>
                             <Text >{item.online_time}</Text>
                             {item.online &&
                                 <Icon name="circle" style={{ marginTop: 3 }} size={14} color="green" />
                             }
-                        </View> */}
+                            </View> */}
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -114,7 +161,7 @@ class Chats extends Component {
                     </View>
                     {this.state.isLoading && MyUtils.renderLoadingView()}
                     {(!this.state.isLoading && !this.state.isError) &&
-                        <View style={styles.container}>
+                        <View style={[styles.container, { marginTop: 10 }]}>
                             {!MyUtils.isEmptyArray(this.state.chatHistoryData) &&
                                 <FlatList
                                     style={{ flex: 1 }}
@@ -154,6 +201,7 @@ class Chats extends Component {
             _userId: item.id,
             _chatId: item.trackig_id,
             _chatType: item.type,
+            _unreadMsgCount: item.counter
         })
     }
 
@@ -179,4 +227,10 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Chats;
+const mapDispatchToProps = (dispatch) => {
+    return {
+        updateChatCounter: (counts) => dispatch({ type: 'UPDATE_CHAT_MSG_COUNTER', chat_counter: counts }),
+        resetChatCounter: () => dispatch({ type: 'RESET_CHAT_MSG_COUNTER' })
+    }
+}
+export default connect(null, mapDispatchToProps)(Chats)

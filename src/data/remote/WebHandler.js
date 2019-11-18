@@ -72,11 +72,10 @@ export default class WebHandler {
                         prefManager.getLineProductData((isLineProductNA, selectedLPIndx, selecetedLPId) => {
 
                             if (userData.userPrimaryType != prefManager.EDITOR && userData.userPrimaryType != prefManager.ADMIN &&
-                                MyUtils.isEmptyString(selecetedLPId)) {
+                                line != "N/A" && MyUtils.isEmptyString(selecetedLPId)) {
                                 onFailure("Please define line product")
                                 return
                             }
-
                             var body =
                                 "user_id=" + userData.id +
                                 "&outlet_id=" + userData.businessId +
@@ -473,6 +472,31 @@ export default class WebHandler {
         })
     }
 
+    updateMessageStatus(callingType, chatType, messageId, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&calling_type=" + callingType +
+                    "&chat_type=" + chatType +
+                    "&type_id=" + messageId +
+                    "&session_token=" + userData.sessionToken
+                this.sendSimplePostFormRequest(Urls.UPDATE_CHAT_MESSAGE_STATUS_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
     submitAsApproved(assignId, comment, onSuccess, onFailure) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
@@ -583,7 +607,6 @@ export default class WebHandler {
                     "&outlet_id=" + userData.businessId +
                     "&session_token=" + userData.sessionToken +
                     "&check_id=" + checkId
-
                 this.sendSimplePostFormRequest(Urls.FIXED_CHECK_DATA_URL, body, (responseJson) => {
                     if (responseJson.status) {
                         onSuccess(responseJson)
@@ -593,14 +616,13 @@ export default class WebHandler {
                 }, (error) => {
                     onFailure(error)
                 })
-
             } else {
                 onFailure("User session not exist!")
             }
         })
     }
 
-    submitFixedFormData(formId, response, onSuccess, onFailure) {
+    submitFixedFormData(formId, assignId, response, onSuccess, onFailure) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
                 this.getSelectedLinesAndShift((plant, line, shift) => {
@@ -616,7 +638,8 @@ export default class WebHandler {
                             "&shift_no=" + shift +
                             "&plant_name=" + plant +
                             "&response=" + response +
-                            "&check_id=" + formId
+                            "&check_id=" + formId +
+                            "&assign_id=" + assignId
                         this.sendSimplePostFormRequest(Urls.SUBMIT_FIXED_FORM_DATA_URL, body, (responseJson) => {
                             if (responseJson.status) {
                                 onSuccess(responseJson)
@@ -658,6 +681,107 @@ export default class WebHandler {
         })
     }
 
+    submitFixedFormAsDraftData(formId, assignId, response, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                this.getSelectedLinesAndShift((plant, line, shift) => {
+                    if (plant === "" || line === "" || shift === "") {
+                        onFailure("Please define your Lines & Shift")
+                    } else {
+                        var body =
+                            "user_id=" + userData.id +
+                            "&outlet_id=" + userData.businessId +
+                            "&session_token=" + userData.sessionToken +
+                            // "&line_no=" + line.substring(0, line.lastIndexOf(",")) +
+                            "&line_no=" + line +
+                            "&shift_no=" + shift +
+                            "&plant_name=" + plant +
+                            "&response=" + response +
+                            "&check_id=" + formId +
+                            "&assign_id=" + assignId
+
+                        this.sendSimplePostFormRequest(Urls.SUBMIT_FIXED_FORM_AS_DRAFT_URL, body, (responseJson) => {
+                            if (responseJson.status) {
+                                onSuccess(responseJson)
+                            } else {
+                                onFailure(responseJson.message)
+                            }
+                        }, (error) => {
+                            onFailure(error)
+                        })
+                    }
+                }, error => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    getFixedFormsDrafts(pageNo, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                this.getSelectedLinesAndShift((plant, line, shift) => {
+                    if (plant === "" || line === "" || shift === "") {
+                        onFailure("Please define your Lines & Shift")
+                    } else {
+                        var body =
+                            "user_id=" + userData.id +
+                            "&outlet_id=" + userData.businessId +
+                            "&session_token=" + userData.sessionToken +
+                            "&group_id=" + userData.userPrimaryGId +
+                            // "&line_no=" + line.substring(0, line.lastIndexOf(",")) +
+                            "&line_no=" + line +
+                            "&shift_no=" + shift +
+                            "&plant_name=" + plant +
+                            "&page_no=" + pageNo
+
+                        this.sendSimplePostFormRequest(Urls.GET_FIXED_FORM_DRAFT_URL, body, (responseJson) => {
+                            if (responseJson.status) {
+                                onSuccess(responseJson)
+                            } else {
+                                onFailure(responseJson.message)
+                            }
+                        }, (error) => {
+                            onFailure(error)
+                        })
+                    }
+                }, error => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+    getFixedFormDraftDetail(checkId, assignId, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var body =
+                    "user_id=" + userData.id +
+                    "&outlet_id=" + userData.businessId +
+                    "&session_token=" + userData.sessionToken +
+                    "&group_id=" + userData.userPrimaryGId +
+                    "&check_id=" + checkId +
+                    "&assign_id=" + assignId
+
+                this.sendSimplePostFormRequest(Urls.GET_FIXED_FORM_DRAFT_DETAIL_URL, body, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
     sendSimplePostFormRequest(url, _body, onResponse, onError) {
         var dt = Date.now().toString()
         var data = dt + url
@@ -678,9 +802,28 @@ export default class WebHandler {
             .then((responseJson) => {
                 onResponse(responseJson)
             }).catch((error) => {
-                onError(error.message)
+                // onError(error.message)
                 // controller.abort();
                 // onError('Something went wrong while connecting to server.')
+                fetch(url, {
+                    method: 'POST',
+                    // signal: signal,
+                    headers: new Headers({
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'dateTime': dt,
+                        'url': url,
+                        'key': key
+                    }),
+                    body: _body
+                })
+                    .then((response) => response.text())
+                    .then((responseText) => {
+                        alert(JSON.stringify(responseText))
+                        onError(error.message)
+                    }).catch((error2) => {
+                        alert(error2.message)
+                        onError(error2.message)
+                    });
             });
     }
 
@@ -708,4 +851,5 @@ export default class WebHandler {
                 onError('Something went wrong while connecting to server.')
             });
     }
+
 }

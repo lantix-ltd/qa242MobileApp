@@ -7,6 +7,7 @@ import MyUtils from "../utils/MyUtils";
 import { SafeAreaView } from "react-native"
 import WebHandler from "../data/remote/WebHandler"
 
+const OVERALL_CALL = "Overall", SINGLE_CALL = "Single"
 const webHandler = new WebHandler()
 const prefManager = new PrefManager()
 class ConversationScreen extends Component {
@@ -20,11 +21,13 @@ class ConversationScreen extends Component {
             userId: props.navigation.getParam("_userId", ""),
             chatId: props.navigation.getParam("_chatId", ""),
             chatType: props.navigation.getParam("_chatType", ""),
+            unReadMsgsCount: props.navigation.getParam("_unreadMsgCount", 0),
             messages: [],
             loadEarlier: false,
             isLoadingEarlier: false,
             isAllMessagesLoaded: false,
-            lastLoadedDoc: null
+            lastLoadedDoc: null,
+            isFirstLoaded: false
         }
     }
 
@@ -35,6 +38,9 @@ class ConversationScreen extends Component {
     };
 
     componentDidMount() {
+        if (this.state.unReadMsgsCount > 0) {
+            this.updateMessageStatus(OVERALL_CALL, this.state.userId)
+        }
         prefManager.getFirebaseDBRoot(dbRoot => {
             if (!MyUtils.isEmptyString(dbRoot)) {
                 this.ref = firebase.firestore().collection('qaproject').doc(dbRoot);
@@ -69,6 +75,7 @@ class ConversationScreen extends Component {
                         var msg_data = doc.data()
                         var msg = {
                             _id: doc.id,
+                            chatId: msg_data.chat_id,
                             text: msg_data.text,
                             createdAt: msg_data.createdAt != null ? msg_data.createdAt.toDate() : new Date(),
                             user: {
@@ -79,8 +86,15 @@ class ConversationScreen extends Component {
                         }
                         _messages.push(msg)
                     })
+
+                    if (this.state.isFirstLoaded && !MyUtils.isEmptyArray(_messages)) {
+                        let data = _messages[0]
+                        if (data.user._id != this.state.myUserId) {                            
+                            this.updateMessageStatus(SINGLE_CALL, data.chatId)
+                        }
+                    }
                 }
-                this.setState({ messages: _messages })
+                this.setState({ messages: _messages, isFirstLoaded: true })
             })
     }
 
@@ -110,6 +124,17 @@ class ConversationScreen extends Component {
                     })
             }, (error) => {
                 MyUtils.showSnackbar(error, "")
+            })
+    }
+
+    updateMessageStatus(type, id) {
+        webHandler.updateMessageStatus(type, this.state.chatType, id,
+            (respJson) => {
+                console.log(JSON.stringify(respJson))
+                // alert(JSON.stringify(respJson))
+            }, (error) => {
+                console.log(JSON.stringify(error))
+                //alert(JSON.stringify(error))
             })
     }
 

@@ -238,7 +238,8 @@ class LinesAndShift extends Component {
                         this.state.isProductsLoading && MyUtils.renderLoadingView()}
 
                     {this.state.userRole != prefManager.EDITOR && this.state.userRole != prefManager.ADMIN &&
-                        !this.state.isProductsLoading && !MyUtils.isEmptyArray(this.state.productsData) && this.state.selectedProductId > -1 &&
+                        !this.state.isProductsLoading && !MyUtils.isEmptyArray(this.state.productsData) &&
+                        !this.state.isPlantNA && !this.state.isLineNA && this.state.selectedProductId > -1 &&
                         this.renderLineProducts()
                     }
 
@@ -370,6 +371,16 @@ class LinesAndShift extends Component {
     }
 
     handleSaveAction() {
+        let shiftId = ""
+        if (!MyUtils.isEmptyArray(this.state.shiftsData) && this.state.selectedShiftIndex > -1) {
+            shiftId = this.state.shiftsData[this.state.selectedShiftIndex].id
+        }
+        prefManager.setShiftCheckData(
+            this.state.isShiftNA,
+            this.state.selectedShiftIndex,
+            shiftId
+        )
+
         let plantId = ""
         if (!MyUtils.isEmptyArray(this.state.plantsData) && this.state.selectedPlantIndex > -1) {
             plantId = this.state.plantsData[this.state.selectedPlantIndex].id
@@ -386,23 +397,13 @@ class LinesAndShift extends Component {
         // )
 
         let lineId = ""
-        if (!MyUtils.isEmptyArray(this.state.linesData) && this.state.selectedLineIndex > -1) {
+        if (!this.state.isPlantNA && !MyUtils.isEmptyArray(this.state.linesData) && this.state.selectedLineIndex > -1) {
             lineId = this.state.linesData[this.state.selectedLineIndex].id
         }
         prefManager.setLineCheckData(
             this.state.isLineNA,
             this.state.selectedLineIndex,
             lineId
-        )
-
-        let shiftId = ""
-        if (!MyUtils.isEmptyArray(this.state.shiftsData) && this.state.selectedShiftIndex > -1) {
-            shiftId = this.state.shiftsData[this.state.selectedShiftIndex].id
-        }
-        prefManager.setShiftCheckData(
-            this.state.isShiftNA,
-            this.state.selectedShiftIndex,
-            shiftId
         )
 
         // let lineStatus = ""
@@ -414,7 +415,7 @@ class LinesAndShift extends Component {
         // )
 
         let productId = ""
-        if (!MyUtils.isEmptyArray(this.state.productsData) && this.state.selectedProductId > -1) {
+        if (!this.state.isLineNA && !MyUtils.isEmptyArray(this.state.productsData) && this.state.selectedProductId > -1) {
             prefManager.setDummyLineProductsData(this.state.productsData)
             productId = this.state.selectedProductId
         }

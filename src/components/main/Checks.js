@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, SafeAreaView, Dimensions } from "react-native";
 import PrefManager from "../../data/local/PrefManager"
 import MyUtils from "../../utils/MyUtils";
 import NotificationIcon from '../../utils/NotificationIcon'
@@ -14,6 +14,7 @@ import WebHandler from "../../data/remote/WebHandler"
 import firebase from 'react-native-firebase';
 import { connect } from "react-redux"
 
+const screenWidth = Dimensions.get('window').width
 const webHandler = new WebHandler()
 const prefManager = new PrefManager()
 
@@ -28,7 +29,7 @@ class Checks extends Component {
             checksData: [],
             totalPages: 1,
             currentPage: 1,
-            newChecks: 0, overDueChecks: 0, submittedChecks: 0,
+            newChecks: 0, overDueChecks: 0, submittedChecks: 0, inProgressChecks: 0,
             userRole: "",
             isError: false, errorMsg: "",
             openedCheck: "Open"
@@ -71,7 +72,11 @@ class Checks extends Component {
                 var data = JSON.parse(message.data.data);
                 //this.showMessage(data.title, data.message)
                 //alert(message.data.data)
-                this.props.updateCounter(1)
+                if (data.is_background_task && data.title == "chat_message" && data.message == "chat_message") {
+                    this.props.updateChatCounter(1)
+                } else {
+                    this.props.updateCounter(1)
+                }
             });
         } else {
             try {
@@ -103,6 +108,7 @@ class Checks extends Component {
                 newChecks: responseJson.open,
                 overDueChecks: responseJson.overdue,
                 submittedChecks: responseJson.complete,
+                inProgressChecks: responseJson.in_progress,
                 currentPage: 1,
                 isLoading: false, refreshing: false
             })
@@ -152,19 +158,25 @@ class Checks extends Component {
                 <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleHeaderItemClick("Open") }}>
                     <View style={[styles.round_new_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10 }]}>
                         <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.newChecks}</Text>
-                        <Text style={{ color: "#fff", fontSize: 14 }}>NEW</Text>
+                        <Text style={{ color: "#fff", fontSize: 0.025 * screenWidth }}>NEW</Text>
                     </View>
                 </TouchableOpacity>
                 <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleHeaderItemClick("OverDue") }}>
                     <View style={[styles.round_overdue_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10, marginHorizontal: 5 }]}>
                         <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.overDueChecks}</Text>
-                        <Text style={{ color: "#fff", fontSize: 14 }}>OVER DUE</Text>
+                        <Text style={{ color: "#fff", fontSize: 0.025 * screenWidth }}>OVER DUE</Text>
                     </View>
                 </TouchableOpacity>
                 <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleHeaderItemClick("Completed") }}>
-                    <View style={[styles.round_submitted_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10 }]}>
+                    <View style={[styles.round_submitted_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10, marginEnd: 5 }]}>
                         <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.submittedChecks}</Text>
-                        <Text style={{ color: "#fff", fontSize: 14 }}>SUBMITTED</Text>
+                        <Text style={{ color: "#fff", fontSize: 0.025 * screenWidth }}>SUBMITTED</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleHeaderItemClick("InProgress") }}>
+                    <View style={[styles.round_inprogress_checks_bg, { alignItems: "center", justifyContent: "center", padding: 10 }]}>
+                        <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>{this.state.inProgressChecks}</Text>
+                        <Text style={{ color: "#fff", fontSize: 0.025 * screenWidth }}>IN-PROGRESS</Text>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -233,6 +245,26 @@ class Checks extends Component {
         )
     }
 
+    renderDraftItem(item, index) {
+        let title_color = "#A6A6A6"
+        return (
+            <Panel key={index}
+                timeStamp={item.timestamp}
+                title={item.sf_name} collapse="true"
+                titleColor={title_color}
+                onItemClick={() => { this.handleOnDraftItemClick(item) }}
+            >
+                <View style={{ flex: 1, flexDirection: 'column' }}>
+                    <Button
+                        title="Start"
+                        onPress={() => { this.handleOnDraftItemClick(item) }}
+                        containerStyle={{ width: 100, marginTop: 5, alignSelf: "flex-end" }}
+                    />
+                </View>
+            </Panel >
+        )
+    }
+
     render() {
         return (
             <SafeAreaView style={{ flex: 1 }}>
@@ -266,12 +298,18 @@ class Checks extends Component {
                                 <FlatList
                                     style={{ flex: 1 }}
                                     data={this.state.checksData}
-                                    renderItem={({ item, index }) => this.renderItem(item, index)}
+                                    renderItem={({ item, index }) => {
+                                        if (this.state.openedCheck == "InProgress") {
+                                            return this.renderDraftItem(item, index)
+                                        } else {
+                                            return this.renderItem(item, index)
+                                        }
+                                    }}
                                     keyExtractor={(item, index) => index.toString()}
                                     onRefresh={() => this.handleRefresh()}
                                     refreshing={this.state.refreshing}
                                     onEndReached={() => this.handleLoadMore()}
-                                    onEndReachedThreshold={0.2}
+                                    onEndReachedThreshold={0.5}
                                 />
                             }
                             {MyUtils.isEmptyArray(this.state.checksData) &&
@@ -296,7 +334,11 @@ class Checks extends Component {
 
     handleHeaderItemClick(type) {
         this.setState({ isLoading: true, openedCheck: type })
-        this.loadDataFromServer(type)
+        if (type == "InProgress") {
+            this.loadInProgressChecks()
+        } else {
+            this.loadDataFromServer(type)
+        }
     }
 
     handleOnItemClick(item) {
@@ -307,7 +349,7 @@ class Checks extends Component {
                 _user_type: this.state.userRole,
                 _check_type: item.checktype,
                 _is_user_completed: this.state.openedCheck == "Completed",
-                onReload: () => { this.handleRefresh() }
+                onReload: () => { this.handleHeaderItemClick("Open") }
             })
         } else {
             this.props.navigation.navigate(this.state.openedCheck == "Completed" ? "CheckDetailView" : "CheckDetailForm", {
@@ -316,13 +358,27 @@ class Checks extends Component {
                 _user_type: this.state.userRole,
                 _check_type: item.checktype,
                 _is_user_completed: this.state.openedCheck == "Completed",
-                onReload: () => { this.handleRefresh() }
+                onReload: () => { this.handleHeaderItemClick("Open") }
             })
         }
     }
 
+    handleOnDraftItemClick(item) {
+        this.props.navigation.navigate("FormDetail", {
+            _formId: item.sd_check_id,
+            _assignId: item.sd_id,
+            _formName: item.sf_name,
+            _isDraft: true,
+            onReload: () => { this.handleHeaderItemClick("Open") }
+        })
+    }
+
     handleRefresh() {
         this.setState({ refreshing: true })
+        if (this.state.openedCheck == "InProgress") {
+            this.loadInProgressChecks()
+            return
+        }
         this.loadDataFromServer(this.state.openedCheck)
     }
 
@@ -331,20 +387,49 @@ class Checks extends Component {
         page++;
         if (page <= this.state.totalPages) {
             this.setState({ refreshing: true })
-            webHandler.getUserChecks(page, this.state.openedCheck, (responseJson) => {
-                this.setState({
-                    checksData: [...this.state.checksData, ...responseJson.data],
-                    currentPage: page,
-                    refreshing: false
+            if (this.state.openedCheck == "InProgress") {
+                webHandler.getFixedFormsDrafts(page, (responseJson) => {
+                    this.setState({
+                        checksData: [...this.state.checksData, ...responseJson.check_array],
+                        totalPages: responseJson.total_pages,
+                        currentPage: page,
+                        isLoading: false, refreshing: false
+                    })
+                }, (errorMsg) => {
+                    MyUtils.showSnackbar(errorMsg, "")
+                    this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: errorMsg })
                 })
-            }, (errorMsg) => {
-                this.setState({ refreshing: false })
-                MyUtils.showSnackbar(errorMsg, "")
-            }, (checksData) => {
-                this.setState({ refreshing: false })
-            })
+            } else {
+                webHandler.getUserChecks(page, this.state.openedCheck, (responseJson) => {
+                    this.setState({
+                        checksData: [...this.state.checksData, ...responseJson.data],
+                        currentPage: page,
+                        refreshing: false
+                    })
+                }, (errorMsg) => {
+                    this.setState({ refreshing: false })
+                    MyUtils.showSnackbar(errorMsg, "")
+                }, (checksData) => {
+                    this.setState({ refreshing: false })
+                })
+            }
         }
     }
+
+    loadInProgressChecks() {
+        webHandler.getFixedFormsDrafts(1, (responseJson) => {
+            this.setState({
+                checksData: responseJson.check_array,
+                totalPages: responseJson.total_pages,
+                currentPage: 1,
+                isLoading: false, refreshing: false
+            })
+        }, (errorMsg) => {
+            MyUtils.showSnackbar(errorMsg, "")
+            this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: errorMsg })
+        })
+    }
+
 }
 
 const styles = StyleSheet.create({
@@ -363,7 +448,12 @@ const styles = StyleSheet.create({
         borderRadius: 5
     },
     round_submitted_checks_bg: {
-        backgroundColor: '#629AE5',
+        backgroundColor: '#b6e2b6',
+        overflow: 'hidden',
+        borderRadius: 5
+    },
+    round_inprogress_checks_bg: {
+        backgroundColor: '#A3C1E8',
         overflow: 'hidden',
         borderRadius: 5
     },
@@ -383,7 +473,8 @@ const styles = StyleSheet.create({
 const mapDispatchToProps = (dispatch) => {
     return {
         updateCounter: (counts) => dispatch({ type: 'UPDATE_NOTIFICATIONS_COUNTER', counts: counts }),
-        resetCounter: () => dispatch({ type: 'RESET_NOTIFICATIONS_COUNTER' })
+        resetCounter: () => dispatch({ type: 'RESET_NOTIFICATIONS_COUNTER' }),
+        updateChatCounter: (counts) => dispatch({ type: 'UPDATE_CHAT_MSG_COUNTER', chat_counter: counts }),
     }
 }
 export default connect(null, mapDispatchToProps)(Checks)

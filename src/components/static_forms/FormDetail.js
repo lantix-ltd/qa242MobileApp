@@ -4,7 +4,10 @@ import WebHandler from '../../data/remote/WebHandler'
 import MyUtils from '../../utils/MyUtils';
 import FormQuestion from './FormQuestion'
 import { Button } from 'react-native-elements'
+import PrefManager from '../../data/local/PrefManager'
 
+const prefManager = new PrefManager()
+const DRAFT_TYPE = "DRAFT", SUBMIT_TYPE = "SUBMIT"
 const webHandler = new WebHandler()
 
 export default class FormDetail extends Component {
@@ -22,6 +25,8 @@ export default class FormDetail extends Component {
             isSubmitting: false,
             formData: [],
             formId: props.navigation.getParam('_formId'),
+            assignId: props.navigation.getParam('_assignId'),
+            isDraft: props.navigation.getParam('_isDraft', false),
             formQuesAns: []
         }
     }
@@ -32,15 +37,27 @@ export default class FormDetail extends Component {
 
     loadData() {
         this.setState({ isLoading: true })
-        webHandler.getFixedCheckData(this.state.formId, (responseJson) => {
-            this.setState({
-                formData: responseJson.final_array,
-                isLoading: false
+        if (this.state.isDraft) {
+            webHandler.getFixedFormDraftDetail(this.state.formId, this.state.assignId, (responseJson) => {
+                this.setState({
+                    formData: responseJson.final_array,
+                    isLoading: false
+                })
+            }, (error) => {
+                this.setState({ isLoading: false })
+                MyUtils.showSnackbar(error, "")
             })
-        }, (error) => {
-            this.setState({ isLoading: false })
-            MyUtils.showSnackbar(error, "")
-        })
+        } else {
+            webHandler.getFixedCheckData(this.state.formId, (responseJson) => {
+                this.setState({
+                    formData: responseJson.final_array,
+                    isLoading: false
+                })
+            }, (error) => {
+                this.setState({ isLoading: false })
+                MyUtils.showSnackbar(error, "")
+            })
+        }
     }
 
     render() {
@@ -61,6 +78,7 @@ export default class FormDetail extends Component {
                                         key={index}
                                         quesNo={(index + 1)}
                                         quesData={item}
+                                        givenAnswer={item.given_answer}
                                         onResponse={(resp) => { this.updateCheckResp(item.question_id, resp) }}
                                     />
                                 )
@@ -72,7 +90,13 @@ export default class FormDetail extends Component {
                                     title={"Submit"}
                                     containerStyle={{ flex: 1 }}
                                     buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
-                                    onPress={() => { this.verifyForSubmit() }}
+                                    onPress={() => { this.verifyForSubmit(SUBMIT_TYPE) }}
+                                />
+                                <Button
+                                    title={"Save as draft"}
+                                    containerStyle={{ flex: 1 }}
+                                    buttonStyle={{ backgroundColor: "orange", marginEnd: 5 }}
+                                    onPress={() => { this.verifyForSubmit(DRAFT_TYPE) }}
                                 />
                                 <Button
                                     title="CANCEL"
@@ -105,7 +129,7 @@ export default class FormDetail extends Component {
         this.setState({ formQuesAns: _prevResp })
     }
 
-    verifyForSubmit() {
+    verifyForSubmit(type) {
         var formQuesAns = [...this.state.formQuesAns]
         var allQues = [...this.state.formData]
         var allQResp = []
@@ -114,34 +138,68 @@ export default class FormDetail extends Component {
             allQResp.push(item.resp)
         })
 
-        if (allQResp.length == 0 || allQues.length != allQResp.length) {
+        var isAllOK = true
+        if (type == SUBMIT_TYPE && (allQResp.length == 0 || allQues.length != allQResp.length)) {
             MyUtils.showSnackbar("Please you need to provide valid answers to all questions.", "")
-            return
+            isAllOK = false
+        } else if (type == SUBMIT_TYPE) {
+            allQResp.map((item, index) => {
+                if (!item.isAcceptableAnswer && item.comment == "") {
+                    MyUtils.showSnackbar("Please you need to provide a corrective action.", "")
+                    isAllOK = false
+                    return
+                }
+            })
         }
 
-        var isAllOK = true
-        allQResp.map((item, index) => {
-            if (!item.isAcceptableAnswer && item.comment == "") {
-                MyUtils.showSnackbar("Please you need to provide valid answers to all questions.", "")
-                isAllOK = false
-                return
-            }
-        })
+        if (type == DRAFT_TYPE && allQResp.length == 0) {
+            MyUtils.showSnackbar("Please you need to provide valid answers to all questions.", "")
+            isAllOK = false
+        }
 
-        if (isAllOK) {
-            console.log(JSON.stringify(allQResp))
+        // allQResp.map((item, index) => {
+        //     if (!item.isAcceptableAnswer && item.comment == "") {
+        //         MyUtils.showSnackbar("Please you need to provide a corrective action.", "")
+        //         isAllOK = false
+        //         return
+        //     }
+        // })
+
+        console.log(JSON.stringify(allQResp))
+        if (isAllOK && type == SUBMIT_TYPE) {
             this.submitData(JSON.stringify(allQResp))
+        } else if (isAllOK && type == DRAFT_TYPE) {
+            this.saveAsDraft(JSON.stringify(allQResp))
         }
     }
 
     submitData(respData) {
         this.setState({ isSubmitting: true })
-        webHandler.submitFixedFormData(this.state.formId, respData, (responseJson) => {
+        webHandler.submitFixedFormData(this.state.formId, this.state.assignId, respData, (responseJson) => {
             MyUtils.showSnackbar("form submitted successfully", "")
+            if (this.props.navigation.state.params.onReload) {
+                this.props.navigation.state.params.onReload()
+            }
             this.props.navigation.goBack()
         }, (error) => {
             MyUtils.showSnackbar(error, "")
             this.setState({ isFormSubmitting: false })
         })
     }
+
+    saveAsDraft(respData) {
+        this.setState({ isSubmitting: true })
+        webHandler.submitFixedFormAsDraftData(this.state.formId, this.state.assignId, respData, (responseJson) => {
+            MyUtils.showSnackbar("form saved as draft", "")
+            if (this.props.navigation.state.params.onReload) {
+                this.props.navigation.state.params.onReload()
+            }
+            prefManager.setReloadReq(true)
+            this.props.navigation.goBack()
+        }, (error) => {
+            MyUtils.showSnackbar(error, "")
+            this.setState({ isFormSubmitting: false })
+        })
+    }
+
 }
