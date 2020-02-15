@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, SafeAreaView, Dimensions } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, SafeAreaView, Dimensions, ActivityIndicator } from "react-native";
 import PrefManager from "../../data/local/PrefManager"
 import MyUtils from "../../utils/MyUtils";
 import NotificationIcon from '../../utils/NotificationIcon'
@@ -13,10 +13,13 @@ import Modal from "react-native-modal";
 import WebHandler from "../../data/remote/WebHandler"
 import firebase from 'react-native-firebase';
 import { connect } from "react-redux"
+import NetInfo from '@react-native-community/netinfo'
+import LocalDBManager from "../../data/local/LocalDBManager";
 
 const screenWidth = Dimensions.get('window').width
 const webHandler = new WebHandler()
 const prefManager = new PrefManager()
+const localDB = new LocalDBManager()
 
 class Checks extends Component {
 
@@ -32,7 +35,11 @@ class Checks extends Component {
             newChecks: 0, overDueChecks: 0, submittedChecks: 0, inProgressChecks: 0,
             userRole: "",
             isError: false, errorMsg: "",
-            openedCheck: "Open"
+            openedCheck: "Open",
+            isNetworkAvailable: true,
+
+            isOfflineFormsUploading: false,
+            offlineFormsCount: 0,
         }
     }
 
@@ -46,6 +53,7 @@ class Checks extends Component {
                 // }
             }
         })
+        this.setUpForInternetConnectivity()
         this.setUpForMessaging()
         this.props.navigation.addListener('willFocus', (playload) => {
             prefManager.getReloadReq(isReq => {
@@ -62,6 +70,21 @@ class Checks extends Component {
         if (this.messageListener !== undefined) {
             this.messageListener();
         }
+        if (this.internetListener) {
+            this.internetListener()
+        }
+    }
+
+    setUpForInternetConnectivity() {
+        this.internetListener = NetInfo.addEventListener(info => {
+            this.setState({ isNetworkAvailable: info.isConnected })
+            if (info.isConnected) {
+                //MyUtils.showSnackbar("Connected", "")
+                this.checkForOfflinePendingForms()
+            } else {
+                this.loadOfflineChecks()
+            }
+        })
     }
 
     async setUpForMessaging() {
@@ -97,32 +120,6 @@ class Checks extends Component {
                     text: 'OK', onPress: () => { }
                 }
             ]
-        )
-    }
-
-    loadDataFromServer(checkType) {
-        webHandler.getUserChecks(1, checkType, (responseJson) => {
-            this.setState({
-                checksData: responseJson.data,
-                totalPages: responseJson.total_pages,
-                newChecks: responseJson.open,
-                overDueChecks: responseJson.overdue,
-                submittedChecks: responseJson.complete,
-                inProgressChecks: responseJson.in_progress,
-                currentPage: 1,
-                isLoading: false, refreshing: false
-            })
-            this.props.updateCounter(responseJson.total_notification)
-        }, (errorMsg) => {
-            MyUtils.showSnackbar(errorMsg, "")
-            this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: errorMsg })
-        },
-            (checksData) => {
-                this.setState({
-                    checksData: checksData,
-                    isLoading: false, refreshing: false
-                })
-            }
         )
     }
 
@@ -269,6 +266,39 @@ class Checks extends Component {
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1, backgroundColor: '#F8F8F8' }}>
+                    {!this.state.isNetworkAvailable &&
+                        <View style={{ backgroundColor: "red", justifyContent: "center", alignItems: "center" }}>
+                            <Text style={{ padding: 5, color: "#fff", fontSize: 12, fontWeight: "bold" }}>
+                                No Internet Connection: Offline Mode
+                            </Text>
+                        </View>
+                    }
+                    {this.state.offlineFormsCount > 0 &&
+                        <View style={{ backgroundColor: "orange", justifyContent: "center", alignItems: "center" }}>
+                            {this.state.isOfflineFormsUploading &&
+                                <View style={{ flexDirection: "row" }}>
+                                    <Text style={{ padding: 5, color: "#fff", fontSize: 12, fontWeight: "bold" }}>
+                                        {"Uploading offline data..."}
+                                    </Text>
+                                    <ActivityIndicator size="small" color={"#fff"} />
+                                </View>
+                            }
+                            {!this.state.isOfflineFormsUploading &&
+                                <View style={{ flexDirection: "row", }}>
+                                    <Text style={{ padding: 5, color: "#fff", fontSize: 12, fontWeight: "bold" }}>
+                                        <Text style={{ color: "#fff", fontSize: 14, fontWeight: "bold" }}>
+                                            {this.state.offlineFormsCount}
+                                        </Text>
+                                        {" offline form pending to upload."}
+                                    </Text>
+                                    <TouchableOpacity style={{ padding: 5 }}
+                                        onPress={() => { this.uploadOfflineChecks() }}>
+                                        <Icon name={"refresh-ccw"} size={20} color={"#fff"} />
+                                    </TouchableOpacity>
+                                </View>
+                            }
+                        </View>
+                    }
                     {this.renderLineAndShiftModal()}
                     {/* {this.state.userRole == prefManager.AGENT && this.renderLineAndShiftModal()} */}
                     <View style={{ padding: 5, height: 60, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: primaryColor }}>
@@ -332,12 +362,113 @@ class Checks extends Component {
         );
     }
 
+    loadDataFromServer(checkType) {
+        webHandler.getUserChecks(1, checkType, (responseJson) => {
+            this.setState({ checksData: [] })
+            this.setState({
+                checksData: responseJson.data,
+                totalPages: responseJson.total_pages,
+                newChecks: responseJson.open,
+                overDueChecks: responseJson.overdue,
+                submittedChecks: responseJson.complete,
+                inProgressChecks: responseJson.in_progress,
+                currentPage: 1,
+                isLoading: false, refreshing: false
+            })
+            this.props.updateCounter(responseJson.total_notification)
+        }, (errorMsg) => {
+            MyUtils.showSnackbar(errorMsg, "")
+            this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: errorMsg })
+        })
+    }
+
+    loadInProgressChecks() {
+        webHandler.getFixedFormsDrafts(1, (responseJson) => {
+            this.setState({
+                checksData: responseJson.check_array,
+                totalPages: responseJson.total_pages,
+                currentPage: 1,
+                isLoading: false, refreshing: false
+            })
+        }, (errorMsg) => {
+            MyUtils.showSnackbar(errorMsg, "")
+            this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: errorMsg })
+        })
+    }
+
+    loadOfflineChecks() {
+        this.setState({ isLoading: true, checksData: [] })
+        localDB.getLastFetchedData(respData => {
+            this.setState({
+                checksData: respData.data,
+                totalPages: respData.total_pages,
+                newChecks: respData.open,
+                overDueChecks: respData.overdue,
+                submittedChecks: respData.complete,
+                inProgressChecks: respData.in_progress,
+                currentPage: 1,
+                isLoading: false, refreshing: false
+            })
+        })
+        this.checkForOfflinePendingForms()
+    }
+
+    handleRefresh() {
+        if (this.state.isNetworkAvailable) {
+            this.setState({ refreshing: true })
+            if (this.state.openedCheck == "InProgress") {
+                this.loadInProgressChecks()
+                return
+            }
+            this.loadDataFromServer(this.state.openedCheck)
+        }
+    }
+
+    handleLoadMore() {
+        if (this.state.isNetworkAvailable) {
+            var page = this.state.currentPage
+            page++;
+            if (page <= this.state.totalPages) {
+                this.setState({ refreshing: true })
+                if (this.state.openedCheck == "InProgress") {
+                    webHandler.getFixedFormsDrafts(page, (responseJson) => {
+                        this.setState({
+                            checksData: [...this.state.checksData, ...responseJson.check_array],
+                            totalPages: responseJson.total_pages,
+                            currentPage: page,
+                            isLoading: false, refreshing: false
+                        })
+                    }, (errorMsg) => {
+                        MyUtils.showSnackbar(errorMsg, "")
+                        this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: errorMsg })
+                    })
+                } else {
+                    webHandler.getUserChecks(page, this.state.openedCheck, (responseJson) => {
+                        this.setState({
+                            checksData: [...this.state.checksData, ...responseJson.data],
+                            currentPage: page,
+                            refreshing: false
+                        })
+                    }, (errorMsg) => {
+                        this.setState({ refreshing: false })
+                        MyUtils.showSnackbar(errorMsg, "")
+                    })
+                }
+            }
+        }
+    }
+
     handleHeaderItemClick(type) {
-        this.setState({ isLoading: true, openedCheck: type })
-        if (type == "InProgress") {
-            this.loadInProgressChecks()
+        if (this.state.isNetworkAvailable) {
+            this.setState({ isLoading: true, openedCheck: type })
+            if (type == "InProgress") {
+                this.loadInProgressChecks()
+            } else {
+                this.loadDataFromServer(type)
+            }
         } else {
-            this.loadDataFromServer(type)
+            this.loadOfflineChecks()
+            MyUtils.showSnackbar("Not Connected: Offline Mode")
         }
     }
 
@@ -358,6 +489,7 @@ class Checks extends Component {
                 _user_type: this.state.userRole,
                 _check_type: item.checktype,
                 _is_user_completed: this.state.openedCheck == "Completed",
+                _check_detail: this.state.openedCheck == "Completed" ? null : item.detail,
                 onReload: () => { this.handleHeaderItemClick("Open") }
             })
         }
@@ -373,62 +505,124 @@ class Checks extends Component {
         })
     }
 
-    handleRefresh() {
-        this.setState({ refreshing: true })
-        if (this.state.openedCheck == "InProgress") {
-            this.loadInProgressChecks()
-            return
-        }
-        this.loadDataFromServer(this.state.openedCheck)
-    }
-
-    handleLoadMore() {
-        var page = this.state.currentPage
-        page++;
-        if (page <= this.state.totalPages) {
-            this.setState({ refreshing: true })
-            if (this.state.openedCheck == "InProgress") {
-                webHandler.getFixedFormsDrafts(page, (responseJson) => {
-                    this.setState({
-                        checksData: [...this.state.checksData, ...responseJson.check_array],
-                        totalPages: responseJson.total_pages,
-                        currentPage: page,
-                        isLoading: false, refreshing: false
-                    })
-                }, (errorMsg) => {
-                    MyUtils.showSnackbar(errorMsg, "")
-                    this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: errorMsg })
-                })
-            } else {
-                webHandler.getUserChecks(page, this.state.openedCheck, (responseJson) => {
-                    this.setState({
-                        checksData: [...this.state.checksData, ...responseJson.data],
-                        currentPage: page,
-                        refreshing: false
-                    })
-                }, (errorMsg) => {
-                    this.setState({ refreshing: false })
-                    MyUtils.showSnackbar(errorMsg, "")
-                }, (checksData) => {
-                    this.setState({ refreshing: false })
+    checkForOfflinePendingForms() {
+        localDB.getLocalPendingFormsData(data => {
+            if (data && data != null) {
+                this.setState({
+                    offlineFormsCount: data.length
                 })
             }
-        }
-    }
-
-    loadInProgressChecks() {
-        webHandler.getFixedFormsDrafts(1, (responseJson) => {
-            this.setState({
-                checksData: responseJson.check_array,
-                totalPages: responseJson.total_pages,
-                currentPage: 1,
-                isLoading: false, refreshing: false
-            })
-        }, (errorMsg) => {
-            MyUtils.showSnackbar(errorMsg, "")
-            this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: errorMsg })
         })
     }
+
+    uploadOfflineChecks() {
+        localDB.getLocalPendingFormsData(data => {
+
+            if (data && data != null) {
+
+                console.log(JSON.stringify(data))
+
+                let formsCount = data.length
+                if (formsCount == 0) {
+                    return
+                }
+                this.setState({ isOfflineFormsUploading: true })
+                var uploadPromises = []
+                data.map((checkData, indx) => {
+                    var p = new Promise((resolve, reject) => {
+                        webHandler.submitCheck(checkData.checkId, checkData.checkTitle,
+                            checkData.quesResp, checkData.PTypes,
+                            (responseJson) => {
+                                if (!MyUtils.isEmptyArray(checkData.mediaFiles)) {
+                                    resolve("Form " + (indx + 1) + " uploaded")
+                                } else {
+                                    localDB.removeFromPendingFormsData(checkData.checkId, () => {
+                                        resolve("Form " + (indx + 1) + " uploaded")
+                                    })
+                                }
+                            }, error => {
+                                MyUtils.showSnackbar(error, "red")
+                                reject(new Error(error))
+                            }
+                        )
+                    })
+                    uploadPromises.push(p)
+                })
+
+                Promise.all(uploadPromises).then(result => {
+                    if (result.length == formsCount) {
+                        this.uploadCheckMedia()
+                    } else {
+                        MyUtils.showSnackbar("Unable to upload all data, try again", "red")
+                        this.setState({ isOfflineFormsUploading: false })
+                    }
+                }).catch(error => {
+                    MyUtils.showSnackbar("Unable to upload all data, try again", "red")
+                    this.setState({ isOfflineFormsUploading: false })
+                })
+
+            }
+        })
+    }
+
+    uploadCheckMedia() {
+        localDB.getLocalPendingFormsData(data => {
+            if (data && data != null) {
+                let formsCount = data.length
+                if (formsCount == 0) {
+                    MyUtils.showSnackbar("All data uploaded successfully", "green")
+                    this.setState({ isOfflineFormsUploading: false, offlineFormsCount: 0 })
+                    this.loadDataFromServer("Open")
+                    return
+                }
+                this.setState({ isOfflineFormsUploading: true })
+                MyUtils.showSnackbar("Uploading media files...", "")
+                var uploadPromises = []
+                data.map((checkData, indx) => {
+                    var p = new Promise((resolve, reject) => {
+                        var uploadPromises2 = []
+                        checkData.mediaFiles.map((item, indx2) => {
+                            var p2 = new Promise((resolve2, reject2) => {
+                                webHandler.uploadCheckMedia(checkData.checkId, item.file.uri, item.type, (responseJson) => {
+                                    resolve2("File " + (indx2 + 1) + " uploaded")
+                                }, (error) => {
+                                    reject2(new Error(error))
+                                })
+                            })
+                            uploadPromises2.push(p2)
+                        })
+                        Promise.all(uploadPromises2).then(result => {
+                            if (checkData.mediaFiles.length == result.length) {
+                                localDB.removeFromPendingFormsData(checkData.checkId, () => {
+                                    resolve("Form " + (indx + 1) + " media uploaded")
+                                })
+                            } else {
+                                reject(new Error("Unable to uplaod form " + (indx + 1) + " media files"))
+                            }
+                        }).catch(error => { reject(error) })
+
+                    })
+                    uploadPromises.push(p)
+                })
+
+                Promise.all(uploadPromises).then(result => {
+                    if (result.length == formsCount) {
+                        MyUtils.showSnackbar("All data uploaded successfully", "green")
+                        this.setState({ isOfflineFormsUploading: false, offlineFormsCount: 0 })
+                        this.loadDataFromServer("Open")
+                    } else {
+                        MyUtils.showSnackbar("Unable to upload all data, try again", "red")
+                        this.setState({ isOfflineFormsUploading: false })
+                    }
+                }).catch(error => {
+                    MyUtils.showSnackbar("Unable to upload all data, try again", "red")
+                    this.setState({ isOfflineFormsUploading: false })
+                })
+            }
+        })
+
+    }
+
 
 }
 

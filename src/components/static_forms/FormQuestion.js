@@ -51,6 +51,7 @@ export default class FormQuestion extends Component {
                         })
                     })
                     this.setState({ multiOptions: opts })
+                    this.handleMultiChoiceChange(opts)
                 } else if (ga.da_answer_type == RANGE_TYPE) {
                     this.handleRangeInputChange(ga.answer)
                 } else if (ga.da_answer_type == TEXT_TYPE) {

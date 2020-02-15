@@ -62,7 +62,7 @@ export default class WebHandler {
             });
     }
 
-    getUserChecks(pageNo, checkTypes, onSuccess, onFailure, onOffLineData) {
+    getUserChecks(pageNo, checkTypes, onSuccess, onFailure) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
                 this.getSelectedLinesAndShift((plant, line, shift) => {
@@ -88,11 +88,14 @@ export default class WebHandler {
                                 "&plant_name=" + plant +
                                 "&calling_status=" + checkTypes +
                                 "&product_id=" + selecetedLPId +
+                                "&limit=" + 10 +
                                 "&page_number=" + pageNo
 
                             this.sendSimplePostFormRequest(Urls.CHECKS_LIST_URL, body, (responseJson) => {
+                                if (pageNo == 1) {
+                                    localDB.updateLastFetchedData(responseJson, checkTypes)
+                                }
                                 if (responseJson.status) {
-                                    localDB.addNewChecks(responseJson.data)
                                     onSuccess(responseJson)
                                 } else {
                                     onFailure(responseJson.message)
@@ -180,6 +183,8 @@ export default class WebHandler {
                             "&outlet_id=" + userData.businessId +
                             "&program_types=" + pTypes +
                             "&session_token=" + userData.sessionToken
+
+                        console.log(body)
 
                         this.sendSimplePostFormRequest(Urls.SUBMIT_CHECK_URL, body, (responseJson) => {
                             if (responseJson.status) {
@@ -787,6 +792,8 @@ export default class WebHandler {
         var data = dt + url
         var key = CryptoJS.HmacSHA1(data, API_KEY)
 
+        console.log("URL==> " + url)
+        console.log("PARAMS==> " + _body)
         fetch(url, {
             method: 'POST',
             // signal: signal,
@@ -798,32 +805,38 @@ export default class WebHandler {
             }),
             body: _body
         })
-            .then((response) => response.json())
+            .then((response) => {
+                return response.json()
+            })
             .then((responseJson) => {
+                console.log("RESPONSE==> " + JSON.stringify(responseJson))
                 onResponse(responseJson)
             }).catch((error) => {
+                console.log(error.message)
                 // onError(error.message)
-                // controller.abort();
-                // onError('Something went wrong while connecting to server.')
-                fetch(url, {
-                    method: 'POST',
-                    // signal: signal,
-                    headers: new Headers({
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'dateTime': dt,
-                        'url': url,
-                        'key': key
-                    }),
-                    body: _body
-                })
-                    .then((response) => response.text())
-                    .then((responseText) => {
-                        alert(JSON.stringify(responseText))
-                        onError(error.message)
-                    }).catch((error2) => {
-                        alert(error2.message)
-                        onError(error2.message)
-                    });
+                onError('Something went wrong while connecting to server.')
+
+                // fetch(url, {
+                //     method: 'POST',
+                //     // signal: signal,
+                //     headers: new Headers({
+                //         'Content-Type': 'application/x-www-form-urlencoded',
+                //         'dateTime': dt,
+                //         'url': url,
+                //         'key': key
+                //     }),
+                //     body: _body
+                // })
+                //     .then((response) => response.text())
+                //     .then((responseText) => {
+                //         console.log("RESPONSE==> " + responseText)
+                //         alert(JSON.stringify(responseText))
+                //         onError(error.message)
+                //     }).catch((error2) => {
+                //         console.log("RESPONSE==> " + error2.message)
+                //         alert(error2.message)
+                //         onError(error2.message)
+                //     });
             });
     }
 
@@ -847,7 +860,7 @@ export default class WebHandler {
             .then((responseJson) => {
                 onResponse(responseJson)
             }).catch((error) => {
-                // controller.abort();
+                console.log(error.message)
                 onError('Something went wrong while connecting to server.')
             });
     }

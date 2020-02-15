@@ -33,11 +33,13 @@ import { Dimensions, StyleSheet, View } from "react-native"
 
 import PrefManager from "./src/data/local/PrefManager"
 import WebHandler from "./src/data/remote/WebHandler"
+import LocalDBManager from "./src/data/local/LocalDBManager";
 
 const win = Dimensions.get('window');
 const width = win.width * 70 / 100
 const prefManager = new PrefManager()
 const webHandler = new WebHandler()
+const localDB = new LocalDBManager()
 
 const BottomNavigation = createBottomTabNavigator({
     Checks: {
@@ -176,6 +178,7 @@ export default class App extends React.Component {
     componentWillUnmount() {
         // prefManager.cleanLinesAndShiftData()
         prefManager.destroyUserSession()
+        localDB.removeLastFetchedData()
         webHandler.logOutUser(
             (responseJson) => {
                 console.log("Logged Out!")
@@ -222,5 +225,5 @@ const reducer2 = (state = initialState2, action) => {
     return state
 }
 
-const reducers = combineReducers({reducer, reducer2})
+const reducers = combineReducers({ reducer, reducer2 })
 const store = createStore(reducers)

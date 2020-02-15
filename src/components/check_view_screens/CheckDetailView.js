@@ -101,7 +101,7 @@ class CheckDetailView extends Component {
         )
     }
 
-    renderSubmittedByView(lineNo, shiftNo, fullName, dateTime) {
+    renderSubmittedByView(lineNo, shiftNo, fullName, dateTime, signature) {
         return (
             <View style={[styles.round_white_bg_container, { marginTop: 5 }]}>
                 <Text style={{
@@ -112,6 +112,9 @@ class CheckDetailView extends Component {
                 {lineNo != undefined && this.renderTVRow("Working Line(s)", lineNo)}
                 {shiftNo != undefined && this.renderTVRow("Working Shift", shiftNo)}
                 {dateTime != undefined && this.renderTVRow("Date & Time", dateTime)}
+                {(signature != undefined && signature != "") &&
+                    <Image source={{ uri: signature }} style={{ height: 100 }} resizeMode="contain" />
+                }
             </View>
         )
     }
@@ -131,7 +134,7 @@ class CheckDetailView extends Component {
         )
     }
 
-    renderReviewedByView(fullName, dateTime, comment) {
+    renderReviewedByView(fullName, dateTime, comment, signature) {
         return (
             <View style={[styles.round_white_bg_container, { marginTop: 5 }]}>
                 <Text style={{
@@ -141,6 +144,26 @@ class CheckDetailView extends Component {
                 {fullName != undefined && this.renderTVRow("Name", fullName)}
                 {dateTime != undefined && this.renderTVRow("Date & Time", dateTime)}
                 {comment != undefined && this.renderTVRow("Comment", comment)}
+                {(signature != undefined && signature != "") &&
+                    <Image source={{ uri: signature }} style={{ height: 100 }} resizeMode="contain" />
+                }
+            </View>
+        )
+    }
+
+    renderApprovedByView(fullName, dateTime, comment, signature) {
+        return (
+            <View style={[styles.round_white_bg_container, { marginTop: 5 }]}>
+                <Text style={{
+                    fontSize: 16, fontWeight: "bold",
+                    color: appPinkColor, marginBottom: 5
+                }}>Approved By:</Text>
+                {fullName != undefined && this.renderTVRow("Name", fullName)}
+                {dateTime != undefined && this.renderTVRow("Date & Time", dateTime)}
+                {comment != undefined && this.renderTVRow("Comment", comment)}
+                {(signature != undefined && signature != "") &&
+                    <Image source={{ uri: signature }} style={{ height: 100 }} resizeMode="contain" />
+                }
             </View>
         )
     }
@@ -167,13 +190,17 @@ class CheckDetailView extends Component {
         )
     }
 
-    renderCheckView(questions) {
+    renderCheckView(questions, isAutoCalculation) {
         return (
             <View style={{ marginHorizontal: 5 }}>
                 {questions.map((quest, q_index) => {
                     return (
                         <View key={q_index}>
-                            {(quest.question_type === "Dropdown" || quest.question_type === "Fixed" || quest.question_type === "Choice") &&
+                            {(quest.question_type === "Dropdown" || quest.question_type === "Fixed" ||
+                                quest.question_type === "Choice" || quest.question_type === "multi_select" ||
+                                quest.question_type === "Date" || quest.question_type === "Time" ||
+                                quest.question_type === "DateTime"
+                            ) &&
                                 <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
                                     <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
                                         {(q_index + 1) + ". "}
@@ -200,6 +227,24 @@ class CheckDetailView extends Component {
                                                 + quest.answers[0].max + ")"
                                             }
                                         </Text>
+                                    </View>
+                                </View>
+                            }
+
+                            {isAutoCalculation && (quest.question_type === "Weight" || quest.question_type === "Percentage") &&
+                                <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
+                                    <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
+                                        {(q_index + 1) + ". "}
+                                    </Text>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ fontSize: 16, color: appPinkColor }}>
+                                            {quest.question_title}
+                                        </Text>
+                                        {quest.question_type === "Percentage" &&
+                                            <Text style={{ fontSize: 14 }}>
+                                                {"(Acceptable answer: " + quest.answers[0].possible_answer + ")"}
+                                            </Text>
+                                        }
                                     </View>
                                 </View>
                             }
@@ -267,7 +312,10 @@ class CheckDetailView extends Component {
                                     fontWeight: "bold", marginTop: 10
                                 }}>{this.state.checkDetail[0].productname}</Text>
 
-                                {this.renderCheckView(this.state.checkDetail[0].questions)}
+                                {this.renderCheckView(
+                                    this.state.checkDetail[0].questions,
+                                    this.state.checkDetail[0].is_calculation == "1"
+                                )}
                                 {this.renderCheckMediaFiles(this.state.mediaFiles)}
 
                                 {this.state.userRole != prefManager.AGENT &&
@@ -276,7 +324,8 @@ class CheckDetailView extends Component {
                                             this.state.checkDetail[0].line_no,
                                             this.state.checkDetail[0].shift_no,
                                             this.state.checkDetail[0].full_name,
-                                            this.state.checkDetail[0].complete_datetime
+                                            this.state.checkDetail[0].complete_datetime,
+                                            this.state.checkDetail[0].submit_sign
                                         )}
 
                                         {this.state.isReAssign &&
@@ -285,7 +334,10 @@ class CheckDetailView extends Component {
                                                     fontSize: 16, textAlign: "center",
                                                     fontWeight: "bold", marginTop: 10
                                                 }}>Check Re-Assign Data</Text>
-                                                {this.renderCheckView(this.state.checkDetail[0].reassign_data.question)}
+                                                {this.renderCheckView(
+                                                    this.state.checkDetail[0].reassign_data.question,
+                                                    this.state.checkDetail[0].reassign_data.is_calculation == "1"
+                                                )}
                                                 {this.renderCheckMediaFiles(this.state.mediaFiles)}
                                                 {this.state.isReAssignAnswered && this.renderReSubmittedByView(
                                                     this.state.checkDetail[0].reassign_data.line_no,
@@ -300,7 +352,17 @@ class CheckDetailView extends Component {
                                             this.renderReviewedByView(
                                                 this.state.checkDetail[0].review_user,
                                                 this.state.checkDetail[0].reviewer_datetime,
-                                                this.state.checkDetail[0].review_comments
+                                                this.state.checkDetail[0].review_comments,
+                                                this.state.checkDetail[0].review_sign
+                                            )
+                                        }
+
+                                        {this.state.userRole == prefManager.ADMIN && this.state.isUserCompletedView &&
+                                            this.renderApprovedByView(
+                                                this.state.checkDetail[0].approval_user,
+                                                this.state.checkDetail[0].approval_datetime,
+                                                this.state.checkDetail[0].appoval_comments,
+                                                this.state.checkDetail[0].approval_sign
                                             )
                                         }
 

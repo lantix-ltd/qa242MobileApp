@@ -27,7 +27,6 @@ const IS_PLANT_CHECK_NA = "@General:IsPlantCheckNA"
 const SELECTED_PLANT_INDEX = "@General:SelectedPlantIndex"
 const SELECTED_PLANT_VAL = "@General:SelectedPlantVal"
 
-// const LINES_DATA = "@General:linesData"
 const IS_LINE_CHECK_EXIST = "@General:IsLineCheckExist"
 const IS_LINE_CHECK_NA = "@General:IsLineCheckNA"
 const SELECTED_LINE_INDEX = "@General:SelectedLineIndex"
@@ -190,7 +189,6 @@ export default class PrefManager {
 
                 DUMMY_LINES_DATA, DUMMY_SHIFTS_DATA, DUMMY_PLANTS_DATA, DUMMY_LINE_PRODUCTS_DATA,
 
-                //LINES_DATA,
                 IS_SHIFT_CHECK_EXIST, IS_SHIFT_CHECK_NA, SELECTED_SHIFT_VAL, SELECTED_SHIFT_INDEX,
                 IS_PLANT_CHECK_EXIST, IS_PLANT_CHECK_NA, SELECTED_PLANT_INDEX, SELECTED_PLANT_VAL,
                 IS_LINE_CHECK_EXIST, IS_LINE_CHECK_NA, SELECTED_LINE_INDEX, SELECTED_LINE_VAL,
@@ -229,30 +227,6 @@ export default class PrefManager {
             console.warn(ex.message)
         }
     }
-
-    // async setLineCheckData(isLineNA, linesData) {
-    //     try {
-    //         await AsyncStorage.setItem(IS_LINE_CHECK_NA, String(isLineNA));
-    //         await AsyncStorage.setItem(LINES_DATA, linesData);
-    //         await AsyncStorage.setItem(IS_LINE_CHECK_EXIST, "true");
-    //     } catch (ex) {
-    //         console.warn(ex.message)
-    //     }
-    // }
-
-    // async getLineCheckData(onResult) {
-    //     try {
-    //         const v1 = await AsyncStorage.getItem(IS_LINE_CHECK_NA);
-    //         const LD = await AsyncStorage.getItem(LINES_DATA);
-    //         onResult(
-    //             (v1 != undefined && v1 == 'true'),
-    //             JSON.parse(LD)
-    //         )
-    //     } catch (ex) {
-    //         onResult(false, null)
-    //         console.warn(ex.message)
-    //     }
-    // }
 
     async setLineCheckData(isLineNA, selectedIndx, selecetedVal) {
         try {
@@ -391,7 +365,6 @@ export default class PrefManager {
 
     async setDummyLinesAndShiftsData(shifts, plants) {
         try {
-            // await AsyncStorage.setItem(DUMMY_LINES_DATA, JSON.stringify(lines));
             await AsyncStorage.setItem(DUMMY_SHIFTS_DATA, JSON.stringify(shifts));
             await AsyncStorage.setItem(DUMMY_PLANTS_DATA, JSON.stringify(plants));
         } catch (ex) {
@@ -401,7 +374,6 @@ export default class PrefManager {
 
     async getDummyLinesAndShiftsData(onResult) {
         try {
-            // const LD = await AsyncStorage.getItem(DUMMY_LINES_DATA);
             const SD = await AsyncStorage.getItem(DUMMY_SHIFTS_DATA);
             const PD = await AsyncStorage.getItem(DUMMY_PLANTS_DATA);
             onResult(JSON.parse(SD), JSON.parse(PD))
@@ -425,17 +397,6 @@ export default class PrefManager {
             onResult(JSON.parse(PD))
         } catch (ex) {
             onResult(null)
-            console.warn(ex.message)
-        }
-    }
-
-    async cleanDummyLinesAndShiftsData() {
-        try {
-            await AsyncStorage.multiRemove([
-                DUMMY_LINES_DATA, DUMMY_SHIFTS_DATA,
-                DUMMY_PLANTS_DATA
-            ])
-        } catch (ex) {
             console.warn(ex.message)
         }
     }

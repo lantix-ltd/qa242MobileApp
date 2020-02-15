@@ -19,12 +19,18 @@ class QuesDetailView extends Component {
     componentDidMount() {
         const qData = this.state.checkQuesData
         if (qData != undefined && qData != null && !MyUtils.isEmptyArray(qData.givenanswers)) {
-            if (qData.question_type === "Dropdown" || qData.question_type === "Choice") {
+            if (qData.question_type === "Dropdown" || qData.question_type === "Choice" ||
+                qData.question_type === "multi_select" ||
+                qData.question_type === "Date" || qData.question_type === "Time" ||
+                qData.question_type === "DateTime" || qData.question_type === "Weight" ||
+                qData.question_type === "Percentage"
+            ) {
                 this.setState({
                     selectedAnsValue: qData.givenanswers[0].given_answer,
                     quesComment: qData.givenanswers[0].comments,
+                    isAcceptableAnswer: MyUtils.isEmptyString(qData.givenanswers[0].comments)
                 })
-                this.handleAnswereChange(qData.givenanswers[0].answer_id)
+                // this.handleAnswereChange(qData.givenanswers[0].answer_id)
             } else if (qData.question_type === "Range") {
                 this.setState({
                     rangeInput: qData.givenanswers[0].range,
@@ -41,16 +47,16 @@ class QuesDetailView extends Component {
         }
     }
 
-    handleAnswereChange(selecetdAnsId) {
-        var answers = this.state.checkQuesData.answers
-        var indx = answers.findIndex(item => item.answer_id == selecetdAnsId)
-        var isAcceptable = false
-        if (indx != undefined && indx > -1) {
-            var my_ans = answers[indx]
-            isAcceptable = my_ans.is_acceptable == "1"
-        }
-        this.setState({ isAcceptableAnswer: isAcceptable })
-    }
+    // handleAnswereChange(selecetdAnsId) {
+    //     var answers = this.state.checkQuesData.answers
+    //     var indx = answers.findIndex(item => item.answer_id == selecetdAnsId)
+    //     var isAcceptable = false
+    //     if (indx != undefined && indx > -1) {
+    //         var my_ans = answers[indx]
+    //         isAcceptable = my_ans.is_acceptable == "1"
+    //     }
+    //     this.setState({ isAcceptableAnswer: isAcceptable })
+    // }
 
     handleRangeInputChange(txt) {
         this.setState({ rangeInput: txt })
@@ -65,7 +71,11 @@ class QuesDetailView extends Component {
         return (
             <View style={styles.container}>
                 {(this.state.checkQuesData.question_type === "Dropdown" || this.state.checkQuesData.question_type === "Fixed" ||
-                    this.state.checkQuesData.question_type === "Choice") &&
+                    this.state.checkQuesData.question_type === "Choice" || this.state.checkQuesData.question_type === "multi_select" ||
+                    this.state.checkQuesData.question_type === "Date" || this.state.checkQuesData.question_type === "Time" ||
+                    this.state.checkQuesData.question_type === "DateTime" ||
+                    this.state.checkQuesData.question_type === "Weight" || this.state.checkQuesData.question_type === "Percentage"
+                ) &&
                     <View style={styles.round_white_bg_container}>
                         <Text style={{ paddingHorizontal: 10, fontSize: 15 }}>
                             {this.state.selectedAnsValue}

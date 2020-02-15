@@ -18,7 +18,10 @@ import SelectMultiOptionModal from "../../utils/SelectMultiOptionModal"
 import MyAudioRecorder from "../../utils/MyAudioRecorder"
 import FullImageView from "../../utils/FullImageView"
 import { ButtonGroup, CheckBox } from 'react-native-elements'
+import NetInfo from '@react-native-community/netinfo'
+import LocalDBManager from "../../data/local/LocalDBManager";
 
+const localDB = new LocalDBManager()
 const LINE_DOWN_DEF_VAL = "LINE DOWN"
 const PTYPE_NA_VAL = "1"
 const GEN_QA_CHECK = "general qa check"
@@ -47,14 +50,15 @@ class CheckDetailForm extends Component {
             checkId: props.navigation.getParam("_id", ""),
             checkTitle: props.navigation.getParam("_title", ""),
             checkType: props.navigation.getParam("_check_type", ""),
-            checkDetail: [],
+            checkDetail: props.navigation.getParam("_check_detail", []),
             isError: false, errorMsg: "",
             checkQuesRefs: [],
             isFormSubmitting: false,
             selectedProgramtypes: [],
             isMediaReUploading: false,
 
-            lineStatusIndex: 0
+            lineStatusIndex: 0,
+            isNetworkAvailable: true
         }
     }
 
@@ -66,8 +70,22 @@ class CheckDetailForm extends Component {
 
     componentDidMount() {
         this.setState({ isLoading: true })
+        this.setUpForInternetConnectivity()
         this.loadProgramTypes()
         this.loadData()
+    }
+
+
+    componentWillUnmount() {
+        if (this.internetListener) {
+            this.internetListener()
+        }
+    }
+
+    setUpForInternetConnectivity() {
+        this.internetListener = NetInfo.addEventListener(info => {
+            this.setState({ isNetworkAvailable: info.isConnected })
+        })
     }
 
     renderLoadingDialog() {
@@ -86,18 +104,22 @@ class CheckDetailForm extends Component {
     }
 
     loadData() {
-        webHandler.getCheckListDetail(this.state.checkId,
-            (responseJson) => {
-                this.setState({
-                    checkDetail: responseJson.data,
-                    isLoading: false, refreshing: false
-                })
-            },
-            (error) => {
-                MyUtils.showSnackbar(error, "")
-                this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: error })
-            }
-        )
+        if (!this.state.checkDetail || this.state.checkDetail == []) {
+            webHandler.getCheckListDetail(this.state.checkId,
+                (responseJson) => {
+                    this.setState({
+                        checkDetail: responseJson.data[0],
+                        isLoading: false, refreshing: false
+                    })
+                },
+                (error) => {
+                    MyUtils.showSnackbar(error, "")
+                    this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: error })
+                }
+            )
+        } else {
+            this.setState({ isLoading: false })
+        }
     }
 
     loadProgramTypes() {
@@ -134,7 +156,11 @@ class CheckDetailForm extends Component {
                     {item.questions.map((quest, q_index) => {
                         return (
                             <View key={q_index}>
-                                {(quest.question_type === "Dropdown" || quest.question_type === "Fixed" || quest.question_type === "Choice") &&
+                                {(quest.question_type === "Dropdown" || quest.question_type === "Fixed" ||
+                                    quest.question_type === "Choice" || quest.question_type === "multi_select" ||
+                                    quest.question_type === "Date" || quest.question_type === "Time" ||
+                                    quest.question_type === "DateTime"
+                                ) &&
                                     <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
                                         <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
                                             {(q_index + 1) + ". "}
@@ -166,11 +192,32 @@ class CheckDetailForm extends Component {
                                     </View>
                                 }
 
+                                {item.is_calculation == "1" && (quest.question_type === "Weight" || quest.question_type === "Percentage") &&
+                                    <View style={{ flex: 1, flexDirection: "row", padding: 10, justifyContent: "center" }}>
+                                        <Text style={{ fontSize: 16, fontWeight: "700", color: appPinkColor }}>
+                                            {(q_index + 1) + ". "}
+                                        </Text>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={{ fontSize: 16, color: appPinkColor }}>
+                                                {quest.question_title}
+                                            </Text>
+                                            {quest.question_type === "Percentage" &&
+                                                <Text style={{ fontSize: 14 }}>
+                                                    {"(Acceptable answer: " + quest.answers[0].possible_answer + ")"}
+                                                </Text>
+                                            }
+                                        </View>
+                                    </View>
+                                }
+
                                 <View style={{ width: "100%" }}>
                                     <QuesDetailForm _quesData={quest}
+                                        isProductionCheckCalculation={item.is_calculation == "1"}
                                         onResponse={(resp) => {
                                             this.updateCheckResp(item.productid, resp)
                                         }}
+                                        getCalculatedFillingWeight={() => { return this.getFillingValue(item.productid, quest, "weight") }}
+                                        getCalculatedFillingPercentage={() => { return this.getFillingValue(item.productid, quest, "percentage") }}
                                     />
                                 </View>
                                 <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
@@ -232,6 +279,36 @@ class CheckDetailForm extends Component {
         )
     }
 
+    getFillingValue(topicId, ques, type) {
+        let val = 0
+        let { checkQuesRefs } = this.state
+        console.log(JSON.stringify(ques))
+        console.log(JSON.stringify(checkQuesRefs))
+
+        let wwIndx = checkQuesRefs.findIndex(item => (item.topicId == topicId && item.resp.quesTitle == "Whole Weight"))
+        let dwIndx = checkQuesRefs.findIndex(item => (item.topicId == topicId && item.resp.quesTitle == "Dough Weight"))
+
+        if (wwIndx > -1 && dwIndx > -1) {
+            let ww = checkQuesRefs[wwIndx].resp.givenAns
+            let dw = checkQuesRefs[dwIndx].resp.givenAns
+            if ((ww && ww != "" && !isNaN(ww)) && (dw && dw != "" && !isNaN(dw))) {
+                if (type == "weight") {
+                    val = parseFloat(ww) - parseFloat(dw)
+                } else if (type == "percentage") {
+                    let fw = parseFloat(ww) - parseFloat(dw)
+                    val = fw / parseFloat(ww) * 100
+                }
+            }
+        }
+
+        console.log("VAL: " + val)
+        if (val > 0) {
+            val = val.toFixed(2)
+        }
+
+        return val
+    }
+
     renderLineStatusView() {
         return (
             <View style={styles.round_white_bg_container}>
@@ -252,23 +329,30 @@ class CheckDetailForm extends Component {
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={styles.container}>
                     {this.renderLoadingDialog()}
+                    {!this.state.isNetworkAvailable &&
+                        <View style={{ backgroundColor: "red", justifyContent: "center", alignItems: "center" }}>
+                            <Text style={{ padding: 5, color: "#fff", fontSize: 12, fontWeight: "bold" }}>
+                                No Internet Connection: Offline Mode
+                            </Text>
+                        </View>
+                    }
                     {this.state.isLoading && MyUtils.renderLoadingView()}
                     {(!this.state.isLoading && !this.state.isError && !MyUtils.isEmptyArray(this.state.checkDetail)) &&
 
                         <View style={{ flex: 1 }}>
-                            {MyUtils.isEmptyArray(this.state.checkDetail[0].questions) &&
+                            {MyUtils.isEmptyArray(this.state.checkDetail.questions) &&
                                 MyUtils.renderErrorView("Check detail is not available", () => {
                                     this.setState({ isLoading: true, isError: false })
                                     this.loadData()
                                 })
                             }
-                            {!MyUtils.isEmptyArray(this.state.checkDetail[0].questions) &&
+                            {!MyUtils.isEmptyArray(this.state.checkDetail.questions) &&
                                 <View style={{ flex: 1 }}>
 
                                     <ScrollView style={{ flex: 1 }}>
-                                        {!MyUtils.isEmptyString(this.state.checkDetail[0].productid) &&
-                                            this.state.checkDetail[0].productid != "0" && this.renderLineStatusView()}
-                                        {this.renderItem(this.state.checkDetail[0], 0)}
+                                        {!MyUtils.isEmptyString(this.state.checkDetail.productid) &&
+                                            this.state.checkDetail.productid != "0" && this.renderLineStatusView()}
+                                        {this.renderItem(this.state.checkDetail, 0)}
                                     </ScrollView>
 
                                     <View style={{ flexDirection: "row", padding: 10 }}>
@@ -278,8 +362,8 @@ class CheckDetailForm extends Component {
                                             buttonStyle={{ backgroundColor: "green", marginEnd: 5 }}
                                             onPress={() => {
                                                 this.verifyForSubmit(
-                                                    this.state.checkDetail[0].productid,
-                                                    this.state.checkDetail[0].questions)
+                                                    this.state.checkDetail.productid,
+                                                    this.state.checkDetail.questions)
                                             }}
                                         />
                                         <Button
@@ -319,22 +403,6 @@ class CheckDetailForm extends Component {
                 </View>
             </SafeAreaView>
         );
-    }
-
-    handleOnItemClick(quesData) {
-        this.props.navigation.navigate("CheckDetail", {
-            _checkId: this.state.checkId,
-            _quesData: quesData
-        })
-    }
-
-    handleRefresh() {
-        this.setState({ refreshing: true })
-        this.loadData()
-    }
-
-    handleLoadMore() {
-
     }
 
     updateCheckResp(topicId, resp) {
@@ -399,7 +467,7 @@ class CheckDetailForm extends Component {
     }
 
     handleForLineDown() {
-        let checkQues = this.state.checkDetail[0].questions
+        let checkQues = this.state.checkDetail.questions
         if (!MyUtils.isEmptyArray(checkQues)) {
             let ans = []
             checkQues.map((item) => {
@@ -414,37 +482,52 @@ class CheckDetailForm extends Component {
                 }
                 ans.push({ resp: resp })
             })
-            this.submitData(JSON.stringify(ans), PTYPE_NA_VAL)
+            this.submitData(ans, PTYPE_NA_VAL)
         }
     }
 
     submitData(quesResp, PTypes) {
-        this.setState({ isFormSubmitting: true })
-        if (this.state.isMediaReUploading) {
-            webHandler.deleteCheckMedia(this.state.checkId, (responseJson) => {
-                this.uploadMedia()
-            }, error => {
-                alert("Unable to upload media files, try again")
-            })
-            return;
-        }
-        webHandler.submitCheck(this.state.checkId,
-            this.state.checkTitle, quesResp, PTypes,
-            (responseJson) => {
-                MyUtils.showSnackbar("Form submitted successfully!", "")
-                if (!MyUtils.isEmptyArray(this.state.mediaFiles)) {
-                    this.setState({ uploadingIndex: 0 })
+        let { isNetworkAvailable, isMediaReUploading,
+            checkId, checkTitle, mediaFiles } = this.state
+
+        if (isNetworkAvailable) {
+            this.setState({ isFormSubmitting: true })
+            if (isMediaReUploading) {
+                webHandler.deleteCheckMedia(checkId, (responseJson) => {
                     this.uploadMedia()
-                } else {
-                    this.setState({ isFormSubmitting: false })
-                    this.props.navigation.state.params.onReload()
-                    this.props.navigation.goBack();
-                }
-            }, error => {
-                MyUtils.showCustomAlert("Check Submit Failed", error)
-                this.setState({ isFormSubmitting: false, submitBtnText: "Re-Submit" })
+                }, error => {
+                    alert("Unable to upload media files, try again")
+                })
+                return;
+            }
+
+            webHandler.submitCheck(checkId, checkTitle, quesResp, PTypes,
+                (responseJson) => {
+                    MyUtils.showSnackbar("Form submitted successfully!", "")
+                    if (!MyUtils.isEmptyArray(mediaFiles)) {
+                        this.setState({ uploadingIndex: 0 })
+                        this.uploadMedia()
+                    } else {
+                        this.setState({ isFormSubmitting: false })
+                        this.props.navigation.state.params.onReload()
+                        this.props.navigation.goBack();
+                    }
+                }, error => {
+                    MyUtils.showCustomAlert("Check Submit Failed", error)
+                    this.setState({ isFormSubmitting: false, submitBtnText: "Re-Submit" })
+                })
+        } else {
+            this.setState({ isFormSubmitting: true })
+            let formData = { checkId, checkTitle, quesResp, PTypes, mediaFiles }
+            localDB.updatePendingFormsData(formData, () => {
+                this.setState({ isFormSubmitting: false })
+                this.props.navigation.state.params.onReload()
+                this.props.navigation.goBack();
+            }, (msg) => {
+                this.setState({ isFormSubmitting: false })
+                MyUtils.showSnackbar(msg, "red")
             })
-        // alert(quesResp) 
+        }
     }
 
     uploadMedia() {

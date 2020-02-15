@@ -14,9 +14,11 @@ import PrefManager from "../data/local/PrefManager"
 import MyUtils from '../utils/MyUtils'
 import { appGreyColor, appPinkColor } from './AppStyles';
 import Modal from "react-native-modal";
+import LocalDBManager from '../data/local/LocalDBManager';
 
 const webHandler = new WebHandler()
 const prefManager = new PrefManager()
+const localDB = new LocalDBManager()
 const win = Dimensions.get('window');
 const width = win.width * 70 / 100
 
@@ -137,6 +139,7 @@ export default class MainDrawerHeader extends React.Component {
 
     async destroyUserSession() {
         prefManager.destroyUserSession()
+        localDB.removeAllData()
         const resetAction = StackActions.reset({
             index: 0,
             actions: [NavigationActions.navigate({ routeName: 'Login' })],
@@ -230,7 +233,7 @@ export default class MainDrawerHeader extends React.Component {
                         }).catch(reason => { console.log(reason) });
                     }
                 },
-            ]
+            ], { cancelable: true }
         )
     }
 

@@ -44,8 +44,8 @@ class SelectOptionModal extends Component {
     }
 
     handleOptionClick(type) {
+        this.setState({ modalVisible: false })
         this.props.onItemPress(type)
-        this.onCancel()
     }
 
     setModalVisible(options) {
