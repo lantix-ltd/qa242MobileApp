@@ -482,7 +482,7 @@ class CheckDetailForm extends Component {
                 }
                 ans.push({ resp: resp })
             })
-            this.submitData(ans, PTYPE_NA_VAL)
+            this.submitData(JSON.stringify(ans), PTYPE_NA_VAL)
         }
     }
 

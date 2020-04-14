@@ -41,28 +41,31 @@ class QuesDetailForm extends Component {
 
             isProductionCheckCalculation: props.isProductionCheckCalculation ?
                 props.isProductionCheckCalculation : false,
-            fillingAutoCalVal: ""
         }
     }
 
     componentDidMount() {
         let opts = []
         const qDtata = this.state.checkQuesData
-        let indx = shapeOptions.findIndex(item => item.title == qDtata.answers[0].possible_answer)
-        indx = (indx != undefined && indx > -1) ? indx : 0
-        let shapeData = shapeOptions[indx]
-        this.setState({ selectedShapeOptId: shapeData.id })
-        setTimeout(() => {
-            if (qDtata.question_type === "Dropdown") {
-                this.updateMyResponse(
-                    qDtata.answers[0].answer_id,
-                    qDtata.answers[0].possible_answer,
-                    this.state.rangeInput,
-                    this.state.quesComment,
-                    this.state.isAcceptableAnswer
-                )
-            }
-        }, 1000)
+        if (qDtata.question_type === "Dropdown") {
+            let indx = shapeOptions.findIndex(item => item.title == qDtata.answers[0].possible_answer)
+            indx = (indx != undefined && indx > -1) ? indx : 0
+            let shapeData = shapeOptions[indx]
+            this.setState({
+                selectedShapeOptId: shapeData.id,
+                fixedValInput: shapeData.title
+            })
+            this.updateMyResponse(
+                qDtata.answers[0].answer_id,
+                qDtata.answers[0].possible_answer,
+                this.state.rangeInput,
+                this.state.quesComment,
+                this.state.isAcceptableAnswer
+            )
+        }
+        // setTimeout(() => {
+
+        // }, 1000)
 
         if (qDtata.question_type === MULTI_SELECT) {
             qDtata.answers.map((item, index) => {
@@ -207,7 +210,7 @@ class QuesDetailForm extends Component {
                     <View>
                         {this.state.checkQuesData.question_type === "Weight" &&
                             <View style={[styles.round_white_bg_container, { flexDirection: "row", justifyContent: "center", alignItems: "center" }]}>
-                                <Text style={{ padding: 10, flex: 1, fontSize: 14 }}>{this.state.fillingAutoCalVal}</Text>
+                                <Text style={{ padding: 10, flex: 1, fontSize: 14 }}>{this.state.fixedValInput}</Text>
                                 <TouchableOpacity onPress={() => { this.handleFillingAutoCalculateChange("weight") }}>
                                     <Text>Calculate</Text>
                                 </TouchableOpacity>
@@ -216,7 +219,7 @@ class QuesDetailForm extends Component {
 
                         {this.state.checkQuesData.question_type === "Percentage" &&
                             <View style={[styles.round_white_bg_container, { flexDirection: "row", justifyContent: "center", alignItems: "center" }]}>
-                                <Text style={{ padding: 10, flex: 1, fontSize: 14 }}>{this.state.fillingAutoCalVal}</Text>
+                                <Text style={{ padding: 10, flex: 1, fontSize: 14 }}>{this.state.fixedValInput}</Text>
                                 <TouchableOpacity onPress={() => { this.handleFillingAutoCalculateChange("percentage") }}>
                                     <Text>Calculate</Text>
                                 </TouchableOpacity>
@@ -352,7 +355,7 @@ class QuesDetailForm extends Component {
             isAcceptable = (ans == val)
         }
         console.log("VAL2: " + val)
-        this.setState({ fillingAutoCalVal: val, isAcceptableAnswer: isAcceptable })
+        this.setState({ fixedValInput: val, isAcceptableAnswer: isAcceptable })
         this.updateMyResponse("", val, "", this.state.quesComment, isAcceptable)
     }
 

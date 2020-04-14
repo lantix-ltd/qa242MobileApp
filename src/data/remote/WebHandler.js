@@ -664,10 +664,11 @@ export default class WebHandler {
         })
     }
 
-    getLineProducts(lineId, onSuccess, onFailure) {
+    getLineProducts(plantId, lineId, onSuccess, onFailure) {
         prefManager.getUserSessionData(userData => {
             if (userData != null) {
                 var body = "line=" + lineId +
+                    "&plant_id=" + plantId +
                     "&user_id=" + userData.id +
                     "&outlet_id=" + userData.businessId +
                     "&session_token=" + userData.sessionToken
@@ -814,29 +815,29 @@ export default class WebHandler {
             }).catch((error) => {
                 console.log(error.message)
                 // onError(error.message)
-                onError('Something went wrong while connecting to server.')
+                // onError('Something went wrong while connecting to server.')
 
-                // fetch(url, {
-                //     method: 'POST',
-                //     // signal: signal,
-                //     headers: new Headers({
-                //         'Content-Type': 'application/x-www-form-urlencoded',
-                //         'dateTime': dt,
-                //         'url': url,
-                //         'key': key
-                //     }),
-                //     body: _body
-                // })
-                //     .then((response) => response.text())
-                //     .then((responseText) => {
-                //         console.log("RESPONSE==> " + responseText)
-                //         alert(JSON.stringify(responseText))
-                //         onError(error.message)
-                //     }).catch((error2) => {
-                //         console.log("RESPONSE==> " + error2.message)
-                //         alert(error2.message)
-                //         onError(error2.message)
-                //     });
+                fetch(url, {
+                    method: 'POST',
+                    // signal: signal,
+                    headers: new Headers({
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'dateTime': dt,
+                        'url': url,
+                        'key': key
+                    }),
+                    body: _body
+                })
+                    .then((response) => response.text())
+                    .then((responseText) => {
+                        // console.log("RESPONSE==> " + responseText)
+                        alert(JSON.stringify(responseText))
+                        onError(error.message)
+                    }).catch((error2) => {
+                        console.log("RESPONSE==> " + error2.message)
+                        alert(error2.message)
+                        onError(error2.message)
+                    });
             });
     }
 

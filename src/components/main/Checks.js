@@ -400,6 +400,7 @@ class Checks extends Component {
         this.setState({ isLoading: true, checksData: [] })
         localDB.getLastFetchedData(respData => {
             this.setState({
+                openedCheck: "Open",
                 checksData: respData.data,
                 totalPages: respData.total_pages,
                 newChecks: respData.open,

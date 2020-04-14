@@ -328,23 +328,27 @@ class LinesAndShift extends Component {
     }
 
     handleLineChange(item) {
+        let { selectedPlantIndex, plantsWithLines } = this.state
         this.setState({ selectedLineIndex: item })
 
         let _LD = this.state.linesData
         let lineId = _LD[item].id
 
-        // let isChecked_old = item.isChecked
+        let plantId = ""
+        if (selectedPlantIndex > -1) {
+            let plantData = plantsWithLines[selectedPlantIndex]
+            plantId = plantData.plant_id
+        }
 
+        // let isChecked_old = item.isChecked
         // let indx = _LD.findIndex(opt => opt.id == item.id)
         // let mod_item = { id: item.id, val: item.val, isChecked: !isChecked_old }
-
         // _LD[indx] = mod_item
-
         // this.setState({ linesData: _LD })
 
         this.setState({ isProductsLoading: true })
         let products = []
-        webHandler.getLineProducts(lineId, (respJson) => {
+        webHandler.getLineProducts(plantId, lineId, (respJson) => {
             respJson.data.map((item) => {
                 products.push({ id: item.productid, key: item.product_title, type: item.productid })
             })

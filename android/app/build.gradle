@@ -105,16 +105,16 @@ android {
             applicationId 'com.qaproject.lantix'
             minSdkVersion rootProject.ext.minSdkVersion
             targetSdkVersion rootProject.ext.targetSdkVersion
-            versionCode 2
-            versionName '1.1'
+            versionCode 3
+            versionName '1.2'
             testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         }
         valleyfine {
             applicationId 'com.qaproject.vff'
             minSdkVersion rootProject.ext.minSdkVersion
             targetSdkVersion rootProject.ext.targetSdkVersion
-            versionCode 1
-            versionName '1.0'
+            versionCode 2
+            versionName '1.1'
             testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         }
         eqsmart {
