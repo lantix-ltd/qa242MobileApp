@@ -1,6 +1,7 @@
 import React from "react";
 import { ToastAndroid, ActivityIndicator, Text, View, TouchableOpacity, Platform, Alert } from "react-native"
 import { appPinkColor, defButtonContainer, defButtonText } from "./AppStyles";
+import AppConfig from "./AppConfig";
 
 export default {
 
@@ -9,7 +10,7 @@ export default {
     // VFF eQSmart
     // eQSmart
 
-    APP_NAME: "LANTIX eQCheck",
+    APP_NAME: AppConfig.appName,
 
     isEmptyString(txt) {
         return (txt == undefined || txt == null || txt.trim() == "" || txt.length == 0)

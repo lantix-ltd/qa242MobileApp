@@ -4,6 +4,7 @@ import LocalDBManager from "../local/LocalDBManager"
 
 import CryptoJS from "crypto-js"
 import MyUtils from '../../utils/MyUtils';
+import AppConfig from '../../utils/AppConfig';
 
 const API_KEY = "3ec00dddc00e1dec3115457b0e317c9fb1c34db2";
 const prefManager = new PrefManager();
@@ -814,30 +815,33 @@ export default class WebHandler {
                 onResponse(responseJson)
             }).catch((error) => {
                 console.log(error.message)
-                // onError(error.message)
-                // onError('Something went wrong while connecting to server.')
+                if (AppConfig.isDevMode) {
+                    fetch(url, {
+                        method: 'POST',
+                        // signal: signal,
+                        headers: new Headers({
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'dateTime': dt,
+                            'url': url,
+                            'key': key
+                        }),
+                        body: _body
+                    })
+                        .then((response) => response.text())
+                        .then((responseText) => {
+                            // console.log("RESPONSE==> " + responseText)
+                            alert(JSON.stringify(responseText))
+                            onError(error.message)
+                        }).catch((error2) => {
+                            console.log("RESPONSE==> " + error2.message)
+                            alert(error2.message)
+                            onError(error2.message)
+                        });
+                } else {
+                    // onError(error.message)
+                    onError('Something went wrong while connecting to server.')
+                }
 
-                fetch(url, {
-                    method: 'POST',
-                    // signal: signal,
-                    headers: new Headers({
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'dateTime': dt,
-                        'url': url,
-                        'key': key
-                    }),
-                    body: _body
-                })
-                    .then((response) => response.text())
-                    .then((responseText) => {
-                        // console.log("RESPONSE==> " + responseText)
-                        alert(JSON.stringify(responseText))
-                        onError(error.message)
-                    }).catch((error2) => {
-                        console.log("RESPONSE==> " + error2.message)
-                        alert(error2.message)
-                        onError(error2.message)
-                    });
             });
     }
 

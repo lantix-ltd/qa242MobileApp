@@ -1,8 +1,12 @@
 //  const SERVER = "https://qa.hwryk.com/"
-const SERVER = "https://lantixapp1.lantix.com/"
+// const SERVER = "https://lantixapp1.lantix.com/"
 // const SERVER = "https://eqcheck.valleyfine.com/"
 // const SERVER = "https://eqsmart.alchemy20.com/"
 // const SERVER = "https://eqs.alchemy20.com/"
+
+import AppConfig from "../../utils/AppConfig"
+
+const SERVER = AppConfig.SERVER_IP
 
 export default {
     LOGIN_URL: SERVER + "outlet-admin-login",
