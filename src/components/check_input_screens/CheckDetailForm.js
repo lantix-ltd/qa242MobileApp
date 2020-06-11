@@ -104,22 +104,41 @@ class CheckDetailForm extends Component {
     }
 
     loadData() {
-        if (!this.state.checkDetail || this.state.checkDetail == []) {
-            webHandler.getCheckListDetail(this.state.checkId,
-                (responseJson) => {
-                    this.setState({
-                        checkDetail: responseJson.data[0],
-                        isLoading: false, refreshing: false
-                    })
-                },
-                (error) => {
-                    MyUtils.showSnackbar(error, "")
-                    this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: error })
-                }
-            )
-        } else {
-            this.setState({ isLoading: false })
-        }
+        localDB.getCheckDetail(this.state.checkId, (detail) => {
+            if (detail) {
+                this.setState({ checkDetail: detail, isLoading: false })
+            } else {
+                webHandler.getCheckListDetail(this.state.checkId,
+                    (responseJson) => {
+                        this.setState({
+                            checkDetail: responseJson.data[0],
+                            isLoading: false, refreshing: false
+                        })
+                        localDB.updateCheckDetail(this.state.checkId, responseJson.data[0])
+                    },
+                    (error) => {
+                        MyUtils.showSnackbar(error, "")
+                        this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: error })
+                    }
+                )
+            }
+        })
+        // if (!this.state.checkDetail || this.state.checkDetail == []) {
+        //     webHandler.getCheckListDetail(this.state.checkId,
+        //         (responseJson) => {
+        //             this.setState({
+        //                 checkDetail: responseJson.data[0],
+        //                 isLoading: false, refreshing: false
+        //             })
+        //         },
+        //         (error) => {
+        //             MyUtils.showSnackbar(error, "")
+        //             this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: error })
+        //         }
+        //     )
+        // } else {
+        //     this.setState({ isLoading: false })
+        // }
     }
 
     loadProgramTypes() {

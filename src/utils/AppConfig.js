@@ -7,7 +7,7 @@ const configs = [
     {
         appName: "LANTIX eQCheck",
         SERVER_IP: "https://lantixapp1.lantix.com/",
-        isDevMode: false
+        isDevMode: true
     },
     {
         appName: "VFF eQSmart",

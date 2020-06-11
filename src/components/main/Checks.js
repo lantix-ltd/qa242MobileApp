@@ -40,6 +40,8 @@ class Checks extends Component {
 
             isOfflineFormsUploading: false,
             offlineFormsCount: 0,
+
+            isFetchingChecksDetail: false
         }
     }
 
@@ -299,6 +301,14 @@ class Checks extends Component {
                             }
                         </View>
                     }
+                    {this.state.isFetchingChecksDetail &&
+                        <View style={{ backgroundColor: "orange", justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
+                            <Text style={{ padding: 5, color: "#fff", fontSize: 12, fontWeight: "bold" }}>
+                                {"Fetching checks data..."}
+                            </Text>
+                            <ActivityIndicator size="small" color={"#fff"} />
+                        </View>
+                    }
                     {this.renderLineAndShiftModal()}
                     {/* {this.state.userRole == prefManager.AGENT && this.renderLineAndShiftModal()} */}
                     <View style={{ padding: 5, height: 60, flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: primaryColor }}>
@@ -364,7 +374,7 @@ class Checks extends Component {
 
     loadDataFromServer(checkType) {
         webHandler.getUserChecks(1, checkType, (responseJson) => {
-            this.setState({ checksData: [] })
+           // this.setState({ checksData: [] })
             this.setState({
                 checksData: responseJson.data,
                 totalPages: responseJson.total_pages,
@@ -376,6 +386,13 @@ class Checks extends Component {
                 isLoading: false, refreshing: false
             })
             this.props.updateCounter(responseJson.total_notification)
+
+            localDB.updateLastFetchedData(responseJson, checkType, () => {
+                this.setState({ isFetchingChecksDetail: true })
+                localDB.fetchChecksDetail(() => {
+                    this.setState({ isFetchingChecksDetail: false })
+                })
+            })
         }, (errorMsg) => {
             MyUtils.showSnackbar(errorMsg, "")
             this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: errorMsg })
@@ -623,7 +640,6 @@ class Checks extends Component {
         })
 
     }
-
 
 }
 

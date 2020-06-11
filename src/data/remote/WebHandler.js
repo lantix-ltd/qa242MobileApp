@@ -93,9 +93,9 @@ export default class WebHandler {
                                 "&page_number=" + pageNo
 
                             this.sendSimplePostFormRequest(Urls.CHECKS_LIST_URL, body, (responseJson) => {
-                                if (pageNo == 1) {
-                                    localDB.updateLastFetchedData(responseJson, checkTypes)
-                                }
+                                // if (pageNo == 1) {
+                                //     localDB.updateLastFetchedData(responseJson, checkTypes)
+                                // }
                                 if (responseJson.status) {
                                     onSuccess(responseJson)
                                 } else {
@@ -794,8 +794,12 @@ export default class WebHandler {
         var data = dt + url
         var key = CryptoJS.HmacSHA1(data, API_KEY)
 
+        let debugData = "<==URL==>\n" + url + "\n\n"
+        debugData = debugData + "<==BODYPARAMS==>\n" + _body + "\n\n"
+
         console.log("URL==> " + url)
         console.log("PARAMS==> " + _body)
+
         fetch(url, {
             method: 'POST',
             // signal: signal,
@@ -829,8 +833,9 @@ export default class WebHandler {
                     })
                         .then((response) => response.text())
                         .then((responseText) => {
-                            // console.log("RESPONSE==> " + responseText)
-                            alert(JSON.stringify(responseText))
+                            console.log("RESPONSE==> " + responseText)
+                            debugData = debugData + "<==RESPONSE==>\n" + responseText + "\n"
+                            alert(debugData)
                             onError(error.message)
                         }).catch((error2) => {
                             console.log("RESPONSE==> " + error2.message)
