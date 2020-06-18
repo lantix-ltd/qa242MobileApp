@@ -18,7 +18,7 @@ class MyVideoPlayer extends Component {
     render() {
         return (
             <View >
-                <Video url={this.state.videoUrl} />
+                <Video url={this.state.videoUrl} logo={""} />
             </View>
         );
     }

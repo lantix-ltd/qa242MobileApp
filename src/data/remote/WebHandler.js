@@ -789,6 +789,35 @@ export default class WebHandler {
         })
     }
 
+    async uploadStaticFormMedia(assignId, mediaFile, mediaType, onSuccess, onFailure) {
+        prefManager.getUserSessionData(userData => {
+            if (userData != null) {
+                var formData = new FormData()
+                formData.append("user_id", userData.id)
+                formData.append("outlet_id", userData.businessId)
+                formData.append("session_token", userData.sessionToken)
+                formData.append("assign_id", assignId)
+                var ext = (mediaType === "video") ? ".mp4" : ".jpg"
+                formData.append("answer_media", { uri: mediaFile, name: "MediaFile" + ext, type: 'multipart/form-data' })
+                formData.append("media_type", mediaType)
+
+                this.sendMediaPostFormRequest(Urls.UPLOAD_STATIC_FORM_MEDIA_URL, formData, (responseJson) => {
+                    if (responseJson.status) {
+                        onSuccess(responseJson)
+                    } else {
+                        onFailure(responseJson.message)
+                    }
+                }, (error) => {
+                    onFailure(error)
+                })
+
+            } else {
+                onFailure("User session not exist!")
+            }
+        })
+    }
+
+
     sendSimplePostFormRequest(url, _body, onResponse, onError) {
         var dt = Date.now().toString()
         var data = dt + url

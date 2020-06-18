@@ -32,5 +32,6 @@ export default {
     SUBMIT_FIXED_FORM_AS_DRAFT_URL: SERVER + "submit-draft",
     GET_FIXED_FORM_DRAFT_URL: SERVER + "draft-checks",
     GET_FIXED_FORM_DRAFT_DETAIL_URL: SERVER + "draft-checks-detail",
-    UPDATE_CHAT_MESSAGE_STATUS_URL: SERVER + "change-messages-status-of-user"
+    UPDATE_CHAT_MESSAGE_STATUS_URL: SERVER + "change-messages-status-of-user",
+    UPLOAD_STATIC_FORM_MEDIA_URL: SERVER + "static-media-file"
 }

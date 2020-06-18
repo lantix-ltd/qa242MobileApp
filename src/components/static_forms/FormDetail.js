@@ -1,11 +1,23 @@
 import React, { Component } from 'react'
-import { Text, View, ScrollView } from 'react-native'
+import { Text, View, ScrollView, TouchableOpacity, Image } from 'react-native'
 import WebHandler from '../../data/remote/WebHandler'
 import MyUtils from '../../utils/MyUtils';
 import FormQuestion from './FormQuestion'
 import { Button } from 'react-native-elements'
 import PrefManager from '../../data/local/PrefManager'
+import SelectOptionModal from "../../utils/SelectOptionModal"
+import Icon from 'react-native-vector-icons/Feather';
+import ImagePicker from 'react-native-image-crop-picker';
+import { appGreyColor } from '../../utils/AppStyles';
+import FullImageView from "../../utils/FullImageView"
 
+var count = 0
+const photoOptions = [
+    { id: 1, key: "Take a photo", icon: "camera", type: "photo" },
+    { id: 2, key: "Open Gallery", icon: "image", type: "file" },
+    // { id: 3, key: "Record Audio", icon: "mic", type: "audio" },
+    { id: 4, key: "Record Video", icon: "video", type: "video" },
+]
 const prefManager = new PrefManager()
 const DRAFT_TYPE = "DRAFT", SUBMIT_TYPE = "SUBMIT"
 const webHandler = new WebHandler()
@@ -27,7 +39,7 @@ export default class FormDetail extends Component {
             formId: props.navigation.getParam('_formId'),
             assignId: props.navigation.getParam('_assignId'),
             isDraft: props.navigation.getParam('_isDraft', false),
-            formQuesAns: []
+            formQuesAns: [], mediaFiles: [],
         }
     }
 
@@ -71,6 +83,13 @@ export default class FormDetail extends Component {
                 }
                 {!this.state.isLoading && !MyUtils.isEmptyArray(this.state.formData) &&
                     <ScrollView style={{ flex: 1 }}>
+                        <SelectOptionModal
+                            ref="_selectPhotoOptModal"
+                            onItemPress={(type) => this.handleMediaFileAction(type)}
+                        />
+                        <FullImageView
+                            ref="_fullImageViewModal"
+                        />
                         {
                             this.state.formData.map((item, index) => {
                                 return (
@@ -83,6 +102,35 @@ export default class FormDetail extends Component {
                                     />
                                 )
                             })
+                        }
+                        {
+                            <View style={[{
+                                backgroundColor: '#fff',
+                                marginLeft: 10,
+                                marginRight: 10,
+                                marginBottom: 10,
+                                padding: 5,
+                                borderRadius: 5
+                            }]}>
+                                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                                    <Text style={{ fontSize: 14, flex: 1, fontWeight: "bold", marginBottom: 5 }}>Media Files:</Text>
+                                    <TouchableOpacity
+                                        onPress={() => { this.refs._selectPhotoOptModal.setModalVisible(photoOptions) }}
+                                    >
+                                        <Icon name="plus-circle" color={appGreyColor} size={24} />
+                                    </TouchableOpacity>
+                                </View>
+                                {
+                                    this.state.mediaFiles.map((item, index) => {
+                                        console.log(item)
+                                        if (item.type == "image") {
+                                            return this.renderImageFileView(item, index)
+                                        } else if (item.type == "video") {
+                                            return this.renderVideoFileView(item, index)
+                                        }
+                                    })
+                                }
+                            </View>
                         }
                         {!this.state.isSubmitting &&
                             <View style={{ flexDirection: "row", padding: 10 }}>
@@ -111,6 +159,106 @@ export default class FormDetail extends Component {
                 }
             </View>
         )
+    }
+
+    renderImageFileView(item, index) {
+        return (
+            <View key={index} style={{ marginTop: 5, flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.refs._fullImageViewModal.loadImage(item.file.uri) }}>
+                    <Image key={index}
+                        style={{
+                            height: 200,
+                            width: "80%",
+                            padding: 5,
+                        }}
+                        source={{ uri: item.file.uri }} />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={{ marginLeft: 10 }} onPress={() => { this.removeMediaFile(item) }}>
+                    <Icon name="x-circle" size={24} color="red" />
+                </TouchableOpacity>
+            </View>
+        )
+    }
+
+    renderVideoFileView(item, index) {
+        return (
+            <View key={index} style={{ marginTop: 5, flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleVideoPlay(item) }}>
+                    <Image
+                        style={{
+                            height: 120,
+                            width: 120,
+                            padding: 5,
+                        }}
+                        resizeMode="contain"
+                        source={require("../../assets/images/video_file_icon.png")} />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={{ marginLeft: 10 }} onPress={() => { this.removeMediaFile(item) }}>
+                    <Icon name="x-circle" size={24} color="red" />
+                </TouchableOpacity>
+
+            </View>
+        )
+    }
+
+    handleMediaFileAction(type) {
+        if (type == "photo") {
+            ImagePicker.openCamera({
+                cropping: true,
+                width: 300,
+                height: 400,
+                includeExif: true,
+            }).then(image => {
+                console.log('received image', image);
+                let img = { uri: image.path, width: image.width, height: image.height }
+                count++
+                this.addNewMediaFile(count, img, "image")
+            }).catch(e => console.log(e));
+        } else if (type == "file") {
+            ImagePicker.openPicker({
+                width: 300,
+                height: 400,
+                cropping: true
+            }).then(image => {
+                console.log(image);
+                let img = { uri: image.path, width: image.width, height: image.height, mime: image.mime }
+                count++
+                this.addNewMediaFile(count, img, "image")
+            }).catch(reason => { console.log(reason) });
+        } else if (type == "video") {
+            ImagePicker.openCamera({
+                mediaType: "video",
+                includeExif: true,
+            }).then((video) => {
+                count++
+                this.addNewMediaFile(count, video, "video")
+            }).catch(reason => { console.log(reason) });
+        }
+    }
+
+    addNewMediaFile(id, file, type) {
+        var mediaFile = { id, file, type }
+        var mediaFiles = [...this.state.mediaFiles, mediaFile]
+        this.setState({ mediaFiles })
+    }
+
+    removeMediaFile(file) {
+        var mediaFiles = [...this.state.mediaFiles]
+        var index = mediaFiles.findIndex(item => item.id == file.id)
+        if (index != undefined && index != -1) {
+            mediaFiles.splice(index, 1)
+        }
+        this.setState({ mediaFiles })
+    }
+
+    handleVideoPlay(fileData) {
+        this.props.navigation.navigate("MyVideoPlayer", {
+            _videoUri: fileData.file.path,
+            _videoWidth: fileData.file.width,
+            _videoHeigth: fileData.file.height
+        })
     }
 
     updateCheckResp(quesId, resp) {
@@ -173,17 +321,53 @@ export default class FormDetail extends Component {
         }
     }
 
+    uploadMedia(formId) {
+        MyUtils.showSnackbar("Uploading file...", "")
+        var uploadPromises = []
+        this.state.mediaFiles.map((item, index) => {
+            var p = new Promise((resolve, reject) => {
+                webHandler.uploadStaticFormMedia(formId, item.file.uri, item.type, (responseJson) => {
+                    resolve("File " + (index + 1) + " uploaded")
+                }, (error) => {
+                    reject(new Error(error))
+                })
+            })
+            uploadPromises.push(p)
+        });
+        Promise.all(uploadPromises).then(result => {
+            if (this.state.mediaFiles.length == result.length) {
+                MyUtils.showSnackbar("All media files uploaded successfully", "")
+                this.setState({ isSubmitting: false })
+                if (this.props.navigation.state.params.onReload) {
+                    this.props.navigation.state.params.onReload()
+                }
+                this.props.navigation.goBack()
+            } else {
+                this.setState({ isMediaReUploading: true, submitBtnText: "Re-Upload" })
+                alert("Unable to upload media files, try again")
+            }
+        }).catch(error => {
+            this.setState({ isMediaReUploading: true, submitBtnText: "Re-Upload" })
+            MyUtils.showSnackbar(JSON.stringify(error), "")
+        });
+    }
+
     submitData(respData) {
         this.setState({ isSubmitting: true })
         webHandler.submitFixedFormData(this.state.formId, this.state.assignId, respData, (responseJson) => {
             MyUtils.showSnackbar("form submitted successfully", "")
-            if (this.props.navigation.state.params.onReload) {
-                this.props.navigation.state.params.onReload()
+            if (!MyUtils.isEmptyArray(this.state.mediaFiles)) {
+                this.setState({ uploadingIndex: 0 })
+                this.uploadMedia(responseJson.id)
+            } else {
+                if (this.props.navigation.state.params.onReload) {
+                    this.props.navigation.state.params.onReload()
+                }
+                this.props.navigation.goBack()
             }
-            this.props.navigation.goBack()
         }, (error) => {
             MyUtils.showSnackbar(error, "")
-            this.setState({ isFormSubmitting: false })
+            this.setState({ isSubmitting: false })
         })
     }
 
@@ -198,7 +382,7 @@ export default class FormDetail extends Component {
             this.props.navigation.goBack()
         }, (error) => {
             MyUtils.showSnackbar(error, "")
-            this.setState({ isFormSubmitting: false })
+            this.setState({ isSubmitting: false })
         })
     }
 

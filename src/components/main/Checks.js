@@ -374,7 +374,7 @@ class Checks extends Component {
 
     loadDataFromServer(checkType) {
         webHandler.getUserChecks(1, checkType, (responseJson) => {
-           // this.setState({ checksData: [] })
+            // this.setState({ checksData: [] })
             this.setState({
                 checksData: responseJson.data,
                 totalPages: responseJson.total_pages,
@@ -387,12 +387,25 @@ class Checks extends Component {
             })
             this.props.updateCounter(responseJson.total_notification)
 
-            localDB.updateLastFetchedData(responseJson, checkType, () => {
-                this.setState({ isFetchingChecksDetail: true })
-                localDB.fetchChecksDetail(() => {
-                    this.setState({ isFetchingChecksDetail: false })
+            if (this.state.userRole == prefManager.AGENT) {
+                localDB.getLastFetchedData(formData => {
+                    responseJson.data.map((ch, chI) => {
+                        if (formData) {
+                            let oldCheckData = formData.data.find(i => i.assign_id == ch.assign_id)
+                            if (oldCheckData && oldCheckData.detail) {
+                                ch.detail = oldCheckData.detail
+                            }
+                        }
+                    })
+                    localDB.updateLastFetchedData(responseJson, checkType, () => {
+                        this.setState({ isFetchingChecksDetail: true })
+                        localDB.fetchChecksDetail(() => {
+                            this.setState({ isFetchingChecksDetail: false })
+                        })
+                    })
                 })
-            })
+            }
+
         }, (errorMsg) => {
             MyUtils.showSnackbar(errorMsg, "")
             this.setState({ isLoading: false, refreshing: false, isError: true, errorMsg: errorMsg })
