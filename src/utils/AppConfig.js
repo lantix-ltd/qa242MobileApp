@@ -16,4 +16,4 @@ const configs = [
     },
 ]
 
-export default configs[2]
+export default configs[1]

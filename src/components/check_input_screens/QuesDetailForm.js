@@ -261,6 +261,7 @@ class QuesDetailForm extends Component {
             isAcceptableAnswer: isAcceptable
         }
         this.props.onResponse(resp)
+        this.props.onUpdateChildQues(this.state.checkQuesData.question_id, isAcceptable)
     }
 
     handleChoiceChange(selecetdAnsId) {

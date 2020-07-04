@@ -73,6 +73,7 @@ class CheckDetailForm extends Component {
         this.setUpForInternetConnectivity()
         this.loadProgramTypes()
         this.loadData()
+        // console.log(this.state.checkDetail)
     }
 
 
@@ -237,9 +238,12 @@ class CheckDetailForm extends Component {
                                         }}
                                         getCalculatedFillingWeight={() => { return this.getFillingValue(item.productid, quest, "weight") }}
                                         getCalculatedFillingPercentage={() => { return this.getFillingValue(item.productid, quest, "percentage") }}
+                                        onDisableChildQues={(parentId) => { console.log("ParentID", parentId) }}
+                                        onUpdateChildQues={(parentId, isAcceptable) => { this.onUpdateChildQues(parentId, isAcceptable) }}
                                     />
                                 </View>
                                 <View style={{ height: 1, backgroundColor: "#ccc", marginHorizontal: 5 }} />
+                                {quest.isDisabled && <View style={[styles.overlay, { height: '100%' }]} />}
                             </View>
                         )
                     })}
@@ -326,6 +330,17 @@ class CheckDetailForm extends Component {
         }
 
         return val
+    }
+
+    onUpdateChildQues(quesId, isAcceptable) {
+        let { checkDetail } = this.state
+        // console.log(JSON.stringify(checkDetail))
+        checkDetail.questions.map((q, qi) => {
+            if (q.parent_id == quesId) {
+                q.isDisabled = !isAcceptable
+            }
+        })
+        this.setState({ checkDetail })
     }
 
     renderLineStatusView() {
@@ -450,11 +465,37 @@ class CheckDetailForm extends Component {
             return
         }
 
+        let { checkDetail } = this.state
+        // console.log("QUESTIONS", JSON.stringify(checkDetail.questions))
+        // console.log("RESPONSE", JSON.stringify(allResp))
+
+        checkDetail.questions.map((cq, cqi) => {
+            if (cq.isDisabled) {
+                let resIndx = allResp.findIndex(i => i.resp.quesId == cq.question_id)
+                let resp = {
+                    quesType: cq.question_type,
+                    quesId: cq.question_id,
+                    selecetedAnsId: "",
+                    givenAns: "",
+                    givenRange: "",
+                    comment: "N/A",
+                    isAcceptableAnswer: false
+                }
+                if (resIndx > -1) {
+                    allResp[resIndx].resp = resp
+                } else {
+                    allResp.push({ topicId, resp })
+                }
+            }
+        })
+
         allResp.map((item, index) => {
             if (item.topicId == topicId) {
                 topicResp.push(item)
             }
         })
+
+        // console.log("FINAL RESPONSE", JSON.stringify(allResp))
 
         if (topicResp.length == 0 || topicResp.length != quesData.length) {
             MyUtils.showSnackbar("Please you need to provide valid answers to all questions.", "")
