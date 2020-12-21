@@ -2,7 +2,7 @@ const configs = [
     {
         appName: "QA eQCheck",
         SERVER_IP: "https://qa.hwryk.com/",
-        isDevMode: false
+        isDevMode: true
     },
     {
         appName: "LANTIX eQCheck",
@@ -16,4 +16,4 @@ const configs = [
     },
 ]
 
-export default configs[1]
+export default configs[2]

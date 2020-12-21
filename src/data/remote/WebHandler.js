@@ -817,7 +817,6 @@ export default class WebHandler {
         })
     }
 
-
     sendSimplePostFormRequest(url, _body, onResponse, onError) {
         var dt = Date.now().toString()
         var data = dt + url
@@ -846,6 +845,10 @@ export default class WebHandler {
             .then((responseJson) => {
                 console.log("RESPONSE==> " + JSON.stringify(responseJson))
                 onResponse(responseJson)
+                // if (AppConfig.isDevMode) {
+                //     debugData = debugData + "<==RESPONSE==>\n" + JSON.stringify(responseJson) + "\n"
+                //     alert(debugData)
+                // }
             }).catch((error) => {
                 console.log(error.message)
                 if (AppConfig.isDevMode) {
@@ -875,7 +878,6 @@ export default class WebHandler {
                     // onError(error.message)
                     onError('Something went wrong while connecting to server.')
                 }
-
             });
     }
 
