@@ -11,7 +11,7 @@
     "@react-native-community/async-storage": "^1.6.1",
     "@react-native-community/netinfo": "^5.3.3",
     "crypto-js": "^3.1.9-1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "react": "16.8.6",
     "react-native": "0.60.5",
     "react-native-af-video-player": "^0.2.1",
